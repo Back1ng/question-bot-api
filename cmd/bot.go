@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"log"
 
+	questions "gitlab.com/back1ng1/question-bot/internal/questions"
+
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
 func main() {
-	bot, err := tgbotapi.NewBotAPI("placeholder")
+	bot, err := tgbotapi.NewBotAPI("6124185313:AAH0X7cTdWfPD0ExMkXekGJPx-p1Ke2HBhQ")
 
 	if err != nil {
 		log.Panic(err)
@@ -26,7 +28,14 @@ func main() {
 	for update := range updates {
 		if update.Message != nil {
 
-			poll := tgbotapi.NewPoll(update.Message.Chat.ID, "Как у тебя настроение?", "Хорошо", "Отлично", "Пошел нахуй")
+			question := questions.GetRandom()
+			answers := make([]string, len(question.Answers))
+
+			for i, answer := range question.Answers {
+				answers[i] = answer.Title
+			}
+
+			poll := tgbotapi.NewPoll(update.Message.Chat.ID, question.Title, answers...)
 
 			bot.Send(poll)
 
