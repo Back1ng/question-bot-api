@@ -1,9 +1,5 @@
 package database_adapter
 
-import (
-	"fmt"
-)
-
 type DB struct {
 	strategy string
 }
@@ -22,30 +18,34 @@ type DatabaseActions interface {
 
 type void interface{}
 
-func (strategy string) SetStrategyDatabase() DB {
-	return DB{strategy: strategy}
-}
+// что за (strategy string)???? Надо (s *DB), а уже у него вызываешь s.strategy
+// или нормально создаешь метод func SetStrategyDatabase(s string) DB {return DB{strategy: s}}
+
+// func (strategy string) SetStrategyDatabase() DB {
+// 	return DB{strategy: strategy}
+// }
 
 func main() {
 	//todo выбор стратегии, а потом получать. Сделать получение в зависимости от стратегий
 }
 
-func (_) Get() map[int]PollAnswer {
-	var data map[int]PollAnswer
-	answers := make(map[int]string)
-	tag := "tag"
-	question := "question"
-	answer := "answer"
+// нельзя ссылаться на (_)
+// func (_) Get() map[int]PollAnswer {
+// 	var data map[int]PollAnswer
+// 	answers := make(map[int]string)
+// 	tag := "tag"
+// 	question := "question"
+// 	answer := "answer"
 
-	for i := 0; i < 5; i++ {
-		answers[i] = fmt.Sprint(i, answer)
-		data[i] = PollAnswer{
-			UserId:      uint64(i),
-			TelegramTag: fmt.Sprint(i, tag),
-			Question:    fmt.Sprint(i, question),
-			Answers:     answers,
-		}
-	}
+// 	for i := 0; i < 5; i++ {
+// 		answers[i] = fmt.Sprint(i, answer)
+// 		data[i] = PollAnswer{
+// 			UserId:      uint64(i),
+// 			TelegramTag: fmt.Sprint(i, tag),
+// 			Question:    fmt.Sprint(i, question),
+// 			Answers:     answers,
+// 		}
+// 	}
 
-	return data
-}
+// 	return data
+// }
