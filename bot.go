@@ -29,13 +29,8 @@ func main() {
 		if update.Message != nil {
 
 			question := questions.GetRandom()
-			answers := make([]string, len(question.Answers))
 
-			for i, answer := range question.Answers {
-				answers[i] = answer.Title
-			}
-
-			poll := tgbotapi.NewPoll(update.Message.Chat.ID, question.Title, answers...)
+			poll := question.CreatePoll(update.Message.Chat.ID)
 
 			bot.Send(poll)
 
