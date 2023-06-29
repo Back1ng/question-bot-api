@@ -13,6 +13,8 @@ services:
       GOOSE_DRIVER: postgres
       GOOSE_DBSTRING: "postgresql://${DB_USERNAME}:${DB_PASSWORD}@db:${DB_PORT}/${DB_DATABASE}"
     restart: unless-stopped
+    volumes:
+      - ./:/usr/src/app
     networks:
       - bot
   db:
