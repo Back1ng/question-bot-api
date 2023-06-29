@@ -1,8 +1,31 @@
 version: '3.5'
 
+networks:
+  bot:
+    driver: bridge
+
 services:
   bot:
     build:
       context: .
       dockerfile: docker/golang/Dockerfile
+    environment:
+      GOOSE_DRIVER: postgres
+      GOOSE_DBSTRING: "postgresql://${DB_USERNAME}:${DB_PASSWORD}@db:${DB_PORT}/${DB_DATABASE}"
     restart: unless-stopped
+    networks:
+      - bot
+  db:
+    image: postgres:14.2-alpine
+    restart: always
+    command: ["postgres", "-p", "${DB_PORT}"]
+    ports:
+        - '5432:5432'
+    networks:
+        - bot
+    environment:
+        POSTGRES_DB: ${DB_DATABASE}
+        POSTGRES_USER: ${DB_USERNAME}
+        POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+        - ~/db-data:/var/lib/postgresql/data
