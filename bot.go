@@ -3,14 +3,24 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 
-	questions "gitlab.com/back1ng1/question-bot/internal/questions"
+	"gitlab.com/back1ng1/question-bot/internal/database"
+	"gitlab.com/back1ng1/question-bot/internal/questions"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/joho/godotenv"
 )
 
 func main() {
-	bot, err := tgbotapi.NewBotAPI("6124185313:AAH0X7cTdWfPD0ExMkXekGJPx-p1Ke2HBhQ")
+	godotenv.Load(".env")
+	bot, err := tgbotapi.NewBotAPI(os.Getenv("TGBOT_TOKEN"))
+
+	if err != nil {
+		log.Panic(err)
+	}
+
+	_ = database.GetConnection()
 
 	if err != nil {
 		log.Panic(err)
