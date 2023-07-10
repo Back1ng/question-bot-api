@@ -1,8 +1,8 @@
 -- +goose Up
-CREATE TABLE questions (
+CREATE TABLE presets (
 	id bigint NOT NULL PRIMARY KEY,
 	title varchar NOT NULL
 );
 
 -- +goose Down
-DROP TABLE questions;
+DROP TABLE presets;
