@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"gitlab.com/back1ng1/question-bot/internal/database"
+	"gitlab.com/back1ng1/question-bot/internal/models"
 	"gitlab.com/back1ng1/question-bot/internal/questions"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -20,7 +21,20 @@ func main() {
 		log.Panic(err)
 	}
 
-	_ = database.GetConnection()
+	// example Gorm
+	// db := database.GetConnection()
+
+	// first_question := models.Question{Title: "Название вопроса №1"}
+	// second_question := models.Question{Title: "Название вопроса №2"}
+
+	// db.AutoMigrate(&models.Question{}, &models.Preset{})
+
+	// db.Create(&models.Question{Title: "Название вопроса №1"})
+	// db.Create(&models.Question{Title: "Название вопроса №2"})
+	// db.Create(&models.Preset{
+		// Title:     "Название пресета",
+		// Questions: []models.Question{first_question, second_question},
+	// })
 
 	if err != nil {
 		log.Panic(err)
