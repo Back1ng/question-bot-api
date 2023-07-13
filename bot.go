@@ -8,8 +8,12 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
-	"gitlab.com/back1ng1/question-bot/internal/api/presets"
-	"gitlab.com/back1ng1/question-bot/internal/questions"
+	"gitlab.com/back1ng1/question-bot/internal/database"
+	presets "gitlab.com/back1ng1/question-bot/internal/presets/api"
+	presets_models "gitlab.com/back1ng1/question-bot/internal/presets/models"
+	test_questions "gitlab.com/back1ng1/question-bot/internal/questions"
+	questions "gitlab.com/back1ng1/question-bot/internal/questions/api"
+	questions_models "gitlab.com/back1ng1/question-bot/internal/questions/models"
 )
 
 func runApi() {
@@ -17,6 +21,7 @@ func runApi() {
 
 	// register routes
 	presets.Routes(app)
+	questions.Routes(app)
 
 	app.Listen(":3000")
 }
@@ -32,12 +37,12 @@ func main() {
 	go runApi()
 
 	// example Gorm
-	// db := database.GetConnection()
+	db := database.GetConnection()
 
 	// first_question := models.Question{Title: "Название вопроса №1"}
 	// second_question := models.Question{Title: "Название вопроса №2"}
 
-	// db.AutoMigrate(&models.Question{}, &models.Preset{})
+	db.AutoMigrate(&questions_models.Answer{}, &questions_models.Question{}, &presets_models.Preset{})
 
 	// db.Create(&models.Question{Title: "Название вопроса №1"})
 	// db.Create(&models.Question{Title: "Название вопроса №2"})
@@ -62,7 +67,7 @@ func main() {
 	for update := range updates {
 		if update.Message != nil {
 
-			question := questions.GetRandom()
+			question := test_questions.GetRandom()
 
 			poll := question.CreatePoll(update.Message.Chat.ID)
 

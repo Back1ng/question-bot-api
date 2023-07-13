@@ -1,6 +1,8 @@
 package presets
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"github.com/gofiber/fiber/v2"
+)
 
 func Routes(app *fiber.App) {
 	app.Get("/api/presets", func(c *fiber.Ctx) error {
