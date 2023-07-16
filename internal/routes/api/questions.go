@@ -8,14 +8,14 @@ import (
 	"gitlab.com/back1ng1/question-bot/internal/database/models"
 )
 
-func Routes(app *fiber.App) {
+func QuestionRoutes(app *fiber.App) {
 	// get question by id
 	app.Get("/api/question", func(c *fiber.Ctx) error {
-		questions := []models.Question{}
+		question := models.Question{}
 
-		database.Database.DB.Preload("Answers").Find(&questions)
+		database.Database.DB.Preload("Answers").Find(&question)
 
-		return c.JSON(questions)
+		return c.JSON(question)
 	})
 
 	// store new question with all needed data
@@ -43,8 +43,9 @@ func Routes(app *fiber.App) {
 			return errors.New("ID not represented")
 		}
 
-		temp_payload := models.Question{ID: payload.ID}
-		database.Database.DB.Find(&temp_payload).Updates(payload)
+		database.Database.DB.
+			First(&payload, models.Question{ID: payload.ID}).
+			Updates(&payload)
 
 		return c.JSON(payload)
 	})
@@ -57,7 +58,7 @@ func Routes(app *fiber.App) {
 			return err
 		}
 
-		database.Database.DB.Delete(payload)
+		database.Database.DB.Delete(payload, models.Question{ID: payload.ID})
 
 		return c.JSON(payload)
 	})

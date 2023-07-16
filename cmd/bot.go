@@ -10,16 +10,15 @@ import (
 	"github.com/joho/godotenv"
 	"gitlab.com/back1ng1/question-bot/internal/database"
 	"gitlab.com/back1ng1/question-bot/internal/database/models"
-	presets "gitlab.com/back1ng1/question-bot/internal/presets/api"
-	questions "gitlab.com/back1ng1/question-bot/internal/questions/api"
+	"gitlab.com/back1ng1/question-bot/internal/routes/api"
 )
 
 func runApi() {
 	app := fiber.New()
 
 	// register routes
-	presets.Routes(app)
-	questions.Routes(app)
+	api.QuestionRoutes(app)
+	api.PresetRoutes(app)
 
 	app.Listen(":3000")
 }
