@@ -9,11 +9,9 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
 	"gitlab.com/back1ng1/question-bot/internal/database"
+	"gitlab.com/back1ng1/question-bot/internal/database/models"
 	presets "gitlab.com/back1ng1/question-bot/internal/presets/api"
-	presets_models "gitlab.com/back1ng1/question-bot/internal/presets/models"
-	test_questions "gitlab.com/back1ng1/question-bot/internal/questions"
 	questions "gitlab.com/back1ng1/question-bot/internal/questions/api"
-	questions_models "gitlab.com/back1ng1/question-bot/internal/questions/models"
 )
 
 func runApi() {
@@ -37,18 +35,12 @@ func main() {
 
 	go runApi()
 
-	// example Gorm
-	// first_question := models.Question{Title: "Название вопроса №1"}
-	// second_question := models.Question{Title: "Название вопроса №2"}
-
-	database.Database.DB.AutoMigrate(&questions_models.Answer{}, &questions_models.Question{}, &presets_models.Preset{})
-
-	// db.Create(&models.Question{Title: "Название вопроса №1"})
-	// db.Create(&models.Question{Title: "Название вопроса №2"})
-	// db.Create(&models.Preset{
-	// Title:     "Название пресета",
-	// Questions: []models.Question{first_question, second_question},
-	// })
+	database.Database.DB.AutoMigrate(
+		&models.Question{},
+		&models.Answer{},
+		&models.Preset{},
+		&models.User{},
+	)
 
 	if err != nil {
 		log.Panic(err)
@@ -66,18 +58,14 @@ func main() {
 	for update := range updates {
 		if update.Message != nil {
 
-			question := test_questions.GetRandom()
+			user := models.User{ChatId: update.Message.Chat.ID}
+			database.Database.DB.FirstOrCreate(&user)
 
-			poll := question.CreatePoll(update.Message.Chat.ID)
+			question := user.GetQuestion()
+
+			poll := question.CreatePoll(user.ChatId)
 
 			bot.Send(poll)
-
-			// log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
-
-			// msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
-			// msg.ReplyToMessageID = update.Message.MessageID
-
-			// bot.Send(msg)
 		}
 
 		if update.Poll != nil {

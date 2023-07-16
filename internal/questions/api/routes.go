@@ -3,7 +3,7 @@ package api
 import (
 	"github.com/gofiber/fiber/v2"
 	"gitlab.com/back1ng1/question-bot/internal/database"
-	"gitlab.com/back1ng1/question-bot/internal/questions/models"
+	"gitlab.com/back1ng1/question-bot/internal/database/models"
 )
 
 func Routes(app *fiber.App) {
