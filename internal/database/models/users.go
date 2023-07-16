@@ -18,5 +18,9 @@ type User struct {
 func (u *User) GetQuestion() Question {
 	database.Database.DB.Preload("Preset.Questions.Answers").Find(u)
 
+	if len(u.Preset.Questions) == 0 {
+		return Question{}
+	}
+
 	return u.Preset.Questions[rand.Intn(len(u.Preset.Questions))]
 }

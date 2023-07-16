@@ -21,7 +21,7 @@ services:
     restart: always
     command: ["postgres", "-p", "${DB_PORT}"]
     ports:
-        - '5432:5432'
+        - '${DB_PORT}:${DB_PORT}'
     networks:
         - bot
     environment:
