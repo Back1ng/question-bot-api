@@ -10,7 +10,7 @@ func Routes(app *fiber.App) {
 	app.Get("/api/questions", func(c *fiber.Ctx) error {
 		questions := []models.Question{}
 
-		database.GetConnection().Preload("Answers").Find(&questions)
+		database.Database.DB.Preload("Answers").Find(&questions)
 
 		return c.JSON(questions)
 	})
@@ -23,7 +23,7 @@ func Routes(app *fiber.App) {
 			return err
 		}
 
-		database.GetConnection().Create(&payload)
+		database.Database.DB.Create(&payload)
 
 		return c.JSON(payload)
 	})

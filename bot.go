@@ -28,6 +28,7 @@ func runApi() {
 
 func main() {
 	godotenv.Load(".env")
+	database.SetupConnection()
 	bot, err := tgbotapi.NewBotAPI(os.Getenv("TGBOT_TOKEN"))
 
 	if err != nil {
@@ -37,12 +38,10 @@ func main() {
 	go runApi()
 
 	// example Gorm
-	db := database.GetConnection()
-
 	// first_question := models.Question{Title: "Название вопроса №1"}
 	// second_question := models.Question{Title: "Название вопроса №2"}
 
-	db.AutoMigrate(&questions_models.Answer{}, &questions_models.Question{}, &presets_models.Preset{})
+	database.Database.DB.AutoMigrate(&questions_models.Answer{}, &questions_models.Question{}, &presets_models.Preset{})
 
 	// db.Create(&models.Question{Title: "Название вопроса №1"})
 	// db.Create(&models.Question{Title: "Название вопроса №2"})
