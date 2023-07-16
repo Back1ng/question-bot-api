@@ -7,6 +7,7 @@ import (
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/joho/godotenv"
 	"gitlab.com/back1ng1/question-bot/internal/database"
 	"gitlab.com/back1ng1/question-bot/internal/database/models"
@@ -15,6 +16,8 @@ import (
 
 func runApi() {
 	app := fiber.New()
+
+	app.Use(cors.New())
 
 	// register routes
 	api.QuestionRoutes(app)
