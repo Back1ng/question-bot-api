@@ -9,10 +9,11 @@ import (
 
 type User struct {
 	gorm.Model
-	Id       int64
+	Id       int64 `json:"id"`
 	ChatId   int64
-	PresetId int64
+	PresetId int64 `json:"preset_id"`
 	Preset   Preset
+	Nickname string `json:"nickname"`
 }
 
 func (u *User) GetQuestion() Question {

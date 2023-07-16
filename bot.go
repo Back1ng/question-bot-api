@@ -22,6 +22,8 @@ func runApi() {
 	// register routes
 	api.QuestionRoutes(app)
 	api.PresetRoutes(app)
+	api.AnswerRoutes(app)
+	api.UserRoutes(app)
 
 	app.Listen(":3000")
 }
@@ -60,8 +62,11 @@ func main() {
 	for update := range updates {
 		if update.Message != nil {
 
-			user := models.User{ChatId: update.Message.Chat.ID}
-			database.Database.DB.FirstOrCreate(&user)
+			user := models.User{
+				ChatId:   update.Message.Chat.ID,
+				Nickname: update.Message.Chat.UserName,
+			}
+			database.Database.DB.FirstOrCreate(&user).Updates(&user)
 
 			question := user.GetQuestion()
 
