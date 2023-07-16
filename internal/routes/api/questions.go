@@ -2,6 +2,7 @@ package api
 
 import (
 	"errors"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 	"gitlab.com/back1ng1/question-bot/internal/database"
@@ -9,6 +10,22 @@ import (
 )
 
 func QuestionRoutes(app *fiber.App) {
+	app.Get("/api/questions/:presetid", func(c *fiber.Ctx) error {
+		id, err := strconv.Atoi(c.Params("presetid"))
+
+		if err != nil {
+			return err
+		}
+
+		questions := []models.Question{}
+
+		database.Database.DB.
+			Preload("Preset").
+			Find(&questions, &models.Question{PresetId: int64(id)})
+
+		return c.JSON(questions)
+	})
+
 	// get question by id
 	app.Get("/api/question", func(c *fiber.Ctx) error {
 		question := models.Question{}
@@ -51,14 +68,16 @@ func QuestionRoutes(app *fiber.App) {
 	})
 
 	// delete question by him Id
-	app.Delete("/api/question", func(c *fiber.Ctx) error {
-		payload := models.Question{}
+	app.Delete("/api/question/:id", func(c *fiber.Ctx) error {
+		id, err := strconv.Atoi(c.Params("id"))
 
-		if err := c.BodyParser(&payload); err != nil {
+		if err != nil {
 			return err
 		}
 
-		database.Database.DB.Delete(payload, models.Question{ID: payload.ID})
+		payload := models.Question{ID: int64(id)}
+
+		database.Database.DB.Delete(&payload, &models.Question{ID: payload.ID})
 
 		return c.JSON(payload)
 	})
