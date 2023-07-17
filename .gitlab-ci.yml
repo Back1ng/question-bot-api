@@ -33,6 +33,7 @@ deploy-main:
     - main
   script:
     - scp docker-compose.prod.yml $USER_PRODUCTION@$HOSTNAME_PRODUCTION:$PATH_PRODUCTION/docker-compose.back.yml
+    - scp .env.example $USER_PRODUCTION@$HOSTNAME_PRODUCTION:$PATH_PRODUCTION/.env.example
     - ssh -T $USER_PRODUCTION@$HOSTNAME_PRODUCTION "cd $PATH_PRODUCTION &&
       docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY"
     - ssh -T $USER_PRODUCTION@$HOSTNAME_PRODUCTION "cd $PATH_PRODUCTION &&
