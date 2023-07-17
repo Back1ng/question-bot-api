@@ -1,0 +1,31 @@
+version: '3.5'
+
+networks:
+  bot:
+    driver: bridge
+
+services:
+  bot:
+    build:
+      context: .
+      dockerfile: build/golang/Dockerfile_prod
+    restart: unless-stopped
+    image: registry.gitlab.com/back1ng1/question-bot:main
+    ports:
+      - "3000:3000"
+    networks:
+      - bot
+  db:
+    image: postgres:14.2-alpine
+    restart: always
+    command: ["postgres", "-p", "${DB_PORT}"]
+    ports:
+        - '${DB_PORT}:${DB_PORT}'
+    networks:
+        - bot
+    environment:
+        POSTGRES_DB: ${DB_DATABASE}
+        POSTGRES_USER: ${DB_USERNAME}
+        POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+        - ~/db-data:/var/lib/postgresql/data

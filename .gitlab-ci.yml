@@ -1,0 +1,41 @@
+image: docker
+
+services:
+  - "docker:dind"
+
+stages:
+  - build
+  - deploy
+
+before_script:
+  - mkdir -p ~/.ssh
+  - chmod 700 ~/.ssh
+  - echo "$SSH_PRIVATE_KEY" >> ~/.ssh/id_rsa
+  - echo "$SSH_PUB_KEY" >> ~/.ssh/id_rsa.pub
+  - chmod 400 ~/.ssh/id_rsa
+  - chmod 400 ~/.ssh/id_rsa.pub
+  - ssh-keyscan $HOSTNAME_PRODUCTION >> ~/.ssh/known_hosts
+  - chmod 644 ~/.ssh/known_hosts
+
+build-main:
+  stage: build
+  only:
+    - main
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build --pull -t $CI_REGISTRY_IMAGE:main -f build/node/Dockerfile --build-arg REPOSITORY_NAME=$REPOSITORY_NAME .
+    - docker push "$CI_REGISTRY_IMAGE:main"
+    - docker system prune --force
+
+deploy-main:
+  stage: deploy
+  only:
+    - main
+  script:
+    - scp docker-compose.prod.yml $USER_PRODUCTION@$HOSTNAME_PRODUCTION:$PATH_PRODUCTION/docker-compose.back.yml
+    - ssh -T $USER_PRODUCTION@$HOSTNAME_PRODUCTION "cd $PATH_PRODUCTION &&
+      docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY"
+    - ssh -T $USER_PRODUCTION@$HOSTNAME_PRODUCTION "cd $PATH_PRODUCTION &&
+      docker pull $CI_REGISTRY_IMAGE:main"
+    - ssh -T $USER_PRODUCTION@$HOSTNAME_PRODUCTION "cd $PATH_PRODUCTION &&
+      docker-compose -f docker-compose.back.yml up --remove-orphans -d bot"
