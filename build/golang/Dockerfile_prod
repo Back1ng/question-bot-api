@@ -8,4 +8,4 @@ RUN go mod download && go mod verify
 
 RUN go build -v -o ./ ./...
 
-ENTRYPOINT [ "go" "run" "./..." ]
+ENTRYPOINT [ "go", "run", "./..." ]
