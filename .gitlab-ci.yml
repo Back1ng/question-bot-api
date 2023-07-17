@@ -23,7 +23,7 @@ build-main:
     - main
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker build --pull -t $CI_REGISTRY_IMAGE:main -f build/node/Dockerfile --build-arg REPOSITORY_NAME=$REPOSITORY_NAME .
+    - docker build --pull -t $CI_REGISTRY_IMAGE:main -f build/golang/Dockerfile_prod --build-arg REPOSITORY_NAME=$REPOSITORY_NAME .
     - docker push "$CI_REGISTRY_IMAGE:main"
     - docker system prune --force
 
