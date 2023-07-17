@@ -39,4 +39,4 @@ deploy-main:
     - ssh -T $USER_PRODUCTION@$HOSTNAME_PRODUCTION "cd $PATH_PRODUCTION &&
       docker pull $CI_REGISTRY_IMAGE:main"
     - ssh -T $USER_PRODUCTION@$HOSTNAME_PRODUCTION "cd $PATH_PRODUCTION &&
-      docker-compose -f docker-compose.back.yml up --remove-orphans -d bot"
+      docker-compose -f docker-compose.back.yml up -d bot"
