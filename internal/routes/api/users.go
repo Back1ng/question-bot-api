@@ -30,10 +30,15 @@ func UserRoutes(app *fiber.App) {
 			return err
 		}
 
+		preset := models.Preset{Id: user.Preset.Id}
+		database.Database.DB.First(&preset)
+
+		user.Preset = preset
+		user.PresetId = preset.Id
+
 		database.Database.DB.
-			Preload("Preset").
 			First(&user, models.User{Id: int64(id)}).
-			UpdateColumn("preset_id", &user.Preset.ID)
+			Updates(&user)
 
 		return c.JSON(&user)
 	})

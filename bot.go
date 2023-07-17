@@ -66,6 +66,16 @@ func main() {
 				ChatId:   update.Message.Chat.ID,
 				Nickname: update.Message.Chat.UserName,
 			}
+
+			var presets []models.Preset
+			database.Database.DB.Find(&presets)
+
+			if len(presets) == 0 {
+				preset := models.Preset{Title: "temporary name"}
+				database.Database.DB.Create(&preset)
+				user.PresetId = preset.Id
+			}
+
 			database.Database.DB.FirstOrCreate(&user).Updates(&user)
 
 			question := user.GetQuestion()
