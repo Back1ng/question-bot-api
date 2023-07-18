@@ -74,9 +74,14 @@ func main() {
 				preset := models.Preset{Title: "temporary name"}
 				database.Database.DB.Create(&preset)
 				user.PresetId = preset.Id
+			} else {
+				user.PresetId = presets[0].Id
 			}
 
-			database.Database.DB.FirstOrCreate(&user).Updates(&user)
+			database.Database.DB.Find(&user, models.User{ChatId: user.ChatId})
+			if user.Id == 0 {
+				database.Database.DB.Create(&user)
+			}
 
 			question := user.GetQuestion()
 
