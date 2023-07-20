@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/gofiber/fiber/v2"
@@ -11,6 +12,7 @@ import (
 	"github.com/joho/godotenv"
 	"gitlab.com/back1ng1/question-bot/internal/database"
 	"gitlab.com/back1ng1/question-bot/internal/database/models"
+	"gitlab.com/back1ng1/question-bot/internal/interval"
 	"gitlab.com/back1ng1/question-bot/internal/routes/api"
 )
 
@@ -59,9 +61,36 @@ func main() {
 
 	updates := bot.GetUpdatesChan(u)
 
+	ticker := time.NewTicker(30 * time.Second)
+	quit := make(chan struct{})
+
+	go func() {
+		for {
+			select {
+			case <-ticker.C:
+				intervals := interval.GetActual(30)
+
+				fmt.Println(intervals)
+				for _, interval := range intervals {
+
+					users := []models.User{}
+					database.Database.DB.Find(&users, models.User{Interval: interval, IntervalEnabled: true})
+
+					for _, user := range users {
+						question := user.GetQuestion()
+						poll := question.CreatePoll(user.ChatId)
+						bot.Send(poll)
+					}
+				}
+			case <-quit:
+				ticker.Stop()
+				return
+			}
+		}
+	}()
+
 	for update := range updates {
 		if update.Message != nil {
-
 			user := models.User{
 				ChatId:   update.Message.Chat.ID,
 				Nickname: update.Message.Chat.UserName,
@@ -79,15 +108,9 @@ func main() {
 			}
 
 			database.Database.DB.Find(&user, models.User{ChatId: user.ChatId})
-			if user.Id == 0 {
+			if user.ID == 0 {
 				database.Database.DB.Create(&user)
 			}
-
-			question := user.GetQuestion()
-
-			poll := question.CreatePoll(user.ChatId)
-
-			bot.Send(poll)
 		}
 
 		if update.Poll != nil {
