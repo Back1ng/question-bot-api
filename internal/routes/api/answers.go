@@ -56,8 +56,9 @@ func AnswerRoutes(app *fiber.App) {
 			return err
 		}
 
+		dbAnswer := models.Answer{}
 		database.Database.DB.
-			First(&answer, models.Answer{ID: answer.ID}).
+			First(&dbAnswer, models.Answer{ID: answer.ID}).
 			Updates(&answer)
 
 		return c.JSON(answer)

@@ -60,8 +60,9 @@ func QuestionRoutes(app *fiber.App) {
 			return errors.New("ID not represented")
 		}
 
+		dbQuestion := models.Question{}
 		database.Database.DB.
-			First(&payload, models.Question{ID: payload.ID}).
+			First(&dbQuestion, models.Question{ID: payload.ID}).
 			Updates(&payload)
 
 		return c.JSON(payload)

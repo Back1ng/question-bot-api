@@ -46,8 +46,9 @@ func PresetRoutes(app *fiber.App) {
 			return err
 		}
 
+		dbPreset := models.Preset{}
 		database.Database.DB.
-			First(&preset, models.Preset{Id: preset.Id}).
+			First(&dbPreset, models.Preset{Id: preset.Id}).
 			Updates(&preset)
 
 		return c.JSON(preset)
