@@ -7,8 +7,8 @@ import (
 func GetActual(seconds int) (intervals []int) {
 	now := time.Now()
 
-	startDay := time.Date(now.Year(), now.Month(), now.Day(), 2, 0, 0, 0, now.Location())
-	endDay := time.Date(now.Year(), now.Month(), now.Day(), 14, 0, 0, 0, now.Location())
+	startDay := time.Date(now.Year(), now.Month(), now.Day(), 5, 0, 0, 0, time.UTC)
+	endDay := time.Date(now.Year(), now.Month(), now.Day(), 10, 0, 0, 0, time.UTC)
 
 	currentSeconds := int(endDay.Sub(now).Seconds())
 	daySeconds := endDay.Sub(startDay).Seconds()
