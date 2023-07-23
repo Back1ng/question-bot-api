@@ -12,9 +12,13 @@ import (
 	"github.com/joho/godotenv"
 	"gitlab.com/back1ng1/question-bot/internal/database"
 	"gitlab.com/back1ng1/question-bot/internal/database/models"
+	user_repository "gitlab.com/back1ng1/question-bot/internal/database/repository"
 	"gitlab.com/back1ng1/question-bot/internal/interval"
 	"gitlab.com/back1ng1/question-bot/internal/routes/api"
+	"gitlab.com/back1ng1/question-bot/internal/telegram"
 )
+
+var bot *tgbotapi.BotAPI
 
 func runApi() {
 	app := fiber.New()
@@ -30,16 +34,20 @@ func runApi() {
 	app.Listen(":3000")
 }
 
-func main() {
+func bootstrap() {
+	var err error
 	godotenv.Load(".env")
 	database.SetupConnection()
-	bot, err := tgbotapi.NewBotAPI(os.Getenv("TGBOT_TOKEN"))
+
+	bot, err = tgbotapi.NewBotAPI(os.Getenv("TGBOT_TOKEN"))
+	bot.Debug = true
+	log.Printf("Authorized on account %s", bot.Self.UserName)
+
+	go runApi()
 
 	if err != nil {
 		log.Panic(err)
 	}
-
-	go runApi()
 
 	database.Database.DB.AutoMigrate(
 		&models.Question{},
@@ -47,19 +55,10 @@ func main() {
 		&models.Preset{},
 		&models.User{},
 	)
+}
 
-	if err != nil {
-		log.Panic(err)
-	}
-
-	bot.Debug = true
-
-	log.Printf("Authorized on account %s", bot.Self.UserName)
-
-	u := tgbotapi.NewUpdate(0)
-	u.Timeout = 60
-
-	updates := bot.GetUpdatesChan(u)
+func main() {
+	bootstrap()
 
 	ticker := time.NewTicker(30 * time.Second)
 	quit := make(chan struct{})
@@ -72,11 +71,7 @@ func main() {
 
 				fmt.Println(intervals)
 				for _, interval := range intervals {
-
-					users := []models.User{}
-					database.Database.DB.Find(&users, models.User{Interval: interval, IntervalEnabled: true})
-
-					for _, user := range users {
+					for _, user := range user_repository.FindByInterval(interval) {
 						question := user.GetQuestion()
 						poll := question.CreatePoll(user.ChatId)
 						bot.Send(poll)
@@ -89,13 +84,15 @@ func main() {
 		}
 	}()
 
-	for update := range updates {
+	for update := range telegram.GetUpdates(bot) {
 		if update.Message != nil {
+			// создаем пользователя для его авторизации
 			user := models.User{
 				ChatId:   update.Message.Chat.ID,
 				Nickname: update.Message.Chat.UserName,
 			}
 
+			// пользователь не может быть без пресета, даём ему один
 			var presets []models.Preset
 			database.Database.DB.Find(&presets)
 
@@ -107,13 +104,20 @@ func main() {
 				user.PresetId = presets[0].Id
 			}
 
-			database.Database.DB.Find(&user, models.User{ChatId: user.ChatId})
+			// находим по айдишнику чата
+			database.Database.DB.Find(
+				&user,
+				models.User{ChatId: user.ChatId},
+			)
+
+			// если такого нет - создаем
 			if user.ID == 0 {
 				database.Database.DB.Create(&user)
 			}
 		}
 
 		if update.Poll != nil {
+			// todo: записывать статистику ответов
 			for id, option := range update.Poll.Options {
 				if option.VoterCount > 0 {
 					fmt.Printf("Selected{id: %v, value:%s}", id, option.Text)

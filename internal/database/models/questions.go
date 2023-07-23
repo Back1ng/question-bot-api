@@ -24,10 +24,16 @@ func (q *Question) CreatePoll(chatId int64) tgbotapi.SendPollConfig {
 
 	poll := tgbotapi.NewPoll(chatId, q.Title, answers...)
 
+	correctCount := 0
 	for i, answer := range q.Answers {
 		if answer.IsCorrect {
 			poll.CorrectOptionID = int64(i)
+			correctCount++
 		}
+	}
+
+	if correctCount > 1 {
+		poll.AllowsMultipleAnswers = true
 	}
 
 	poll.Type = "quiz"
