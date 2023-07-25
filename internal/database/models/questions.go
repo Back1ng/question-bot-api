@@ -2,11 +2,9 @@ package models
 
 import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"gorm.io/gorm"
 )
 
 type Question struct {
-	gorm.Model
 	ID       int64 `json:"id"`
 	PresetId int64 `json:"preset_id"`
 	Preset   Preset

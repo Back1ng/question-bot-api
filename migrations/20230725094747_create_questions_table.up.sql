@@ -1,5 +1,5 @@
 CREATE TABLE questions (
-	id bigint NOT NULL PRIMARY KEY,
-    preset_id bigint NOT NULL,
+	id BIGSERIAL NOT NULL PRIMARY KEY,
+    preset_id bigint NOT NULL REFERENCES presets (id),
 	title varchar NOT NULL
 );

@@ -1,9 +1,6 @@
 package models
 
-import "gorm.io/gorm"
-
 type Answer struct {
-	gorm.Model
 	ID         int64 `json:"id"`
 	QuestionId int64 `json:"question_id"`
 	Question   Question

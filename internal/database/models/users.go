@@ -3,13 +3,9 @@ package models
 import (
 	"errors"
 	"math/rand"
-
-	"gitlab.com/back1ng1/question-bot/internal/database"
-	"gorm.io/gorm"
 )
 
 type User struct {
-	gorm.Model
 	ID              int64 `json:"id"`
 	ChatId          int64
 	PresetId        int64 `json:"preset_id"`
@@ -20,7 +16,7 @@ type User struct {
 }
 
 func (u *User) GetQuestion() Question {
-	database.Database.DB.Preload("Preset.Questions.Answers").Find(u)
+	// database.Database.DB.Preload("Preset.Questions.Answers").Find(u)
 
 	if len(u.Preset.Questions) == 0 {
 		return Question{}

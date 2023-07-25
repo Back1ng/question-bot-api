@@ -48,13 +48,6 @@ func bootstrap() {
 	if err != nil {
 		log.Panic(err)
 	}
-
-	database.Database.DB.AutoMigrate(
-		&models.Question{},
-		&models.Answer{},
-		&models.Preset{},
-		&models.User{},
-	)
 }
 
 func main() {
@@ -71,7 +64,7 @@ func main() {
 
 				fmt.Println(intervals)
 				for _, interval := range intervals {
-					for _, user := range user_repository.FindByInterval(interval) {
+					for _, user := range user_repository.UserFindByInterval(interval) {
 						question := user.GetQuestion()
 						poll := question.CreatePoll(user.ChatId)
 						bot.Send(poll)

@@ -1,7 +1,7 @@
 CREATE TABLE users (
-    id bigint NOT NULL PRIMARY KEY,
+    id BIGSERIAL NOT NULL PRIMARY KEY,
+    preset_id bigint NOT NULL REFERENCES presets (id),
     chat_id bigint NOT NULL,
-    preset_id bigint NOT NULL,
     nickname VARCHAR(255) NOT NULL,
     interval int,
     interval_enabled bool DEFAULT false
