@@ -40,3 +40,5 @@ deploy-main:
       docker pull $CI_REGISTRY_IMAGE:main"
     - ssh -T $USER_PRODUCTION@$HOSTNAME_PRODUCTION "cd $PATH_PRODUCTION &&
       docker-compose -f docker-compose.back.yml up -d bot"
+    - ssh -T $USER_PRODUCTION@$HOSTNAME_PRODUCTION "cd $PATH_PRODUCTION &&
+      docker image prune --force"
