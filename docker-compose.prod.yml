@@ -9,6 +9,8 @@ services:
     build:
       context: .
       dockerfile: build/golang/Dockerfile_prod
+    environment:
+    - POSTGRESQL_URL=postgresql://${DB_USERNAME}:${DB_PASSWORD}@db:${DB_PORT}/${DB_DATABASE}
     restart: unless-stopped
     image: registry.gitlab.com/back1ng1/question-bot:main
     ports:
