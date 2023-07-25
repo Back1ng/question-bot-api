@@ -41,7 +41,9 @@ func FindQuestionsInPreset(presetId int) ([]models.Question, error) {
 func StoreQuestion(q models.Question) (models.Question, error) {
 	row := database.Database.DB.QueryRow(
 		context.Background(),
-		"INSERT INTO questions(preset_id, title) VALUES($1, $2) RETURNING id, preset_id, title",
+		`INSERT INTO questions(preset_id, title) 
+		VALUES($1, $2) 
+		RETURNING id, preset_id, title`,
 		q.PresetId,
 		q.Title,
 	)
