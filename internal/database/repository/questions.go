@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log"
 
+	"github.com/jackc/pgx/v5"
 	"gitlab.com/back1ng1/question-bot/internal/database"
 	"gitlab.com/back1ng1/question-bot/internal/database/models"
 )
@@ -16,8 +17,10 @@ func FindQuestionsInPreset(presetId int) ([]models.Question, error) {
 		context.Background(),
 		`SELECT id, preset_id, title 
 		FROM questions 
-		WHERE preset_id=$1`,
-		presetId,
+		WHERE preset_id=@preset_id`,
+		pgx.NamedArgs{
+			"preset_id": presetId,
+		},
 	)
 
 	if err != nil {
@@ -45,10 +48,12 @@ func StoreQuestion(q models.Question) (models.Question, error) {
 	row := database.Database.DB.QueryRow(
 		context.Background(),
 		`INSERT INTO questions(preset_id, title) 
-		VALUES($1, $2) 
+		VALUES(@preset_id, @title) 
 		RETURNING id, preset_id, title`,
-		q.PresetId,
-		q.Title,
+		pgx.NamedArgs{
+			"preset_id": q.PresetId,
+			"title":     q.Title,
+		},
 	)
 
 	question := models.Question{}
@@ -68,9 +73,11 @@ func UpdateQuestionTitle(id int, q models.Question) (models.Question, error) {
 
 	commandTag, err := database.Database.DB.Exec(
 		context.Background(),
-		`UPDATE questions SET title=$1 WHERE id=$2`,
-		q.Title,
-		id,
+		`UPDATE questions SET title=@title WHERE id=@id`,
+		pgx.NamedArgs{
+			"title": q.Title,
+			"id":    id,
+		},
 	)
 	if err != nil {
 		return q, err
@@ -86,8 +93,10 @@ func UpdateQuestionTitle(id int, q models.Question) (models.Question, error) {
 func DeleteQuestion(id int) error {
 	commandTag, err := database.Database.DB.Exec(
 		context.Background(),
-		`DELETE FROM questions WHERE id=$1`,
-		id,
+		`DELETE FROM questions WHERE id=@id`,
+		pgx.NamedArgs{
+			"id": id,
+		},
 	)
 
 	if err != nil {

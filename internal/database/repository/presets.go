@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log"
 
+	"github.com/jackc/pgx/v5"
 	"gitlab.com/back1ng1/question-bot/internal/database"
 	"gitlab.com/back1ng1/question-bot/internal/database/models"
 )
@@ -40,8 +41,10 @@ func FindPresets() ([]models.Preset, error) {
 func StorePreset(p models.Preset) (models.Preset, error) {
 	row := database.Database.DB.QueryRow(
 		context.Background(),
-		"INSERT INTO presets(title) VALUES($1) RETURNING id, title",
-		p.Title,
+		"INSERT INTO presets(title) VALUES(@title) RETURNING id, title",
+		pgx.NamedArgs{
+			"title": p.Title,
+		},
 	)
 
 	preset := models.Preset{}
@@ -61,9 +64,11 @@ func UpdatePreset(id int, p models.Preset) (models.Preset, error) {
 
 	commandTag, err := database.Database.DB.Exec(
 		context.Background(),
-		`UPDATE presets SET title=$1 WHERE id=$2`,
-		p.Title,
-		id,
+		`UPDATE presets SET title=@title WHERE id=@id`,
+		pgx.NamedArgs{
+			"title": p.Title,
+			"id":    id,
+		},
 	)
 
 	if err != nil {
@@ -80,8 +85,10 @@ func UpdatePreset(id int, p models.Preset) (models.Preset, error) {
 func DeletePreset(id int) error {
 	commandTag, err := database.Database.DB.Exec(
 		context.Background(),
-		`DELETE FROM presets WHERE id=$1`,
-		id,
+		`DELETE FROM presets WHERE id=@id`,
+		pgx.NamedArgs{
+			"id": id,
+		},
 	)
 
 	if err != nil {

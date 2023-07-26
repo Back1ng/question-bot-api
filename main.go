@@ -32,7 +32,7 @@ func main() {
 	// register routes
 	api.QuestionRoutes(app)
 	api.PresetRoutes(app)
-	// api.AnswerRoutes(app)
+	api.AnswerRoutes(app)
 	// api.UserRoutes(app)
 
 	app.Listen(":3000")
