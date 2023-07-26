@@ -1,30 +1,23 @@
 package api
 
 import (
+	"strconv"
+
 	"github.com/gofiber/fiber/v2"
 	"gitlab.com/back1ng1/question-bot/internal/database/models"
 	"gitlab.com/back1ng1/question-bot/internal/database/repository"
 )
 
 func PresetRoutes(app *fiber.App) {
-	/*
-		app.Get("/api/presets", func(c *fiber.Ctx) error {
-			preset := []models.Preset{}
+	app.Get("/api/presets", func(c *fiber.Ctx) error {
+		presets, err := repository.FindPresets()
 
-			database.Database.DB.Find(&preset)
+		if err != nil {
+			return err
+		}
 
-			return c.JSON(preset)
-		})
-
-		app.Get("/api/preset", func(c *fiber.Ctx) error {
-			// send presets
-			preset := models.Preset{}
-
-			database.Database.DB.First(&preset)
-
-			return c.JSON(preset)
-		})
-	*/
+		return c.JSON(presets)
+	})
 	app.Post("/api/preset", func(c *fiber.Ctx) error {
 		preset := models.Preset{}
 
@@ -40,34 +33,33 @@ func PresetRoutes(app *fiber.App) {
 
 		return c.JSON(preset)
 	})
-	/*
-		app.Put("/api/preset", func(c *fiber.Ctx) error {
-			preset := models.Preset{}
+	app.Put("/api/preset/:id", func(c *fiber.Ctx) error {
+		id, err := strconv.Atoi(c.Params("id"))
+		if err != nil {
+			return err
+		}
 
-			if err := c.BodyParser(&preset); err != nil {
-				return err
-			}
+		preset := models.Preset{}
+		if err := c.BodyParser(&preset); err != nil {
+			return err
+		}
 
-			dbPreset := models.Preset{}
-			database.Database.DB.
-				First(&dbPreset, models.Preset{Id: preset.Id}).
-				Updates(&preset)
+		preset, err = repository.UpdatePreset(id, preset)
+		if err != nil {
+			return err
+		}
 
-			return c.JSON(preset)
-		})
+		return c.JSON(preset)
+	})
+	app.Delete("/api/preset/:id", func(c *fiber.Ctx) error {
+		id, err := strconv.Atoi(c.Params("id"))
 
-		app.Delete("/api/preset/:id", func(c *fiber.Ctx) error {
-			id, err := strconv.Atoi(c.Params("id"))
+		if err != nil {
+			return err
+		}
 
-			if err != nil {
-				return err
-			}
+		repository.DeletePreset(id)
 
-			preset := models.Preset{Id: int64(id)}
-
-			database.Database.DB.Delete(&preset, models.Preset{Id: preset.Id})
-
-			return c.JSON(preset)
-		})
-	*/
+		return c.JSON("success deleted")
+	})
 }

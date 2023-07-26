@@ -13,7 +13,9 @@ func FindQuestionsInPreset(presetId int) ([]models.Question, error) {
 
 	rows, err := database.Database.DB.Query(
 		context.Background(),
-		"SELECT id, preset_id, title FROM questions WHERE preset_id=$1",
+		`SELECT id, preset_id, title 
+		FROM questions 
+		WHERE preset_id=$1`,
 		presetId,
 	)
 
