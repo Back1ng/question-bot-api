@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"log"
 
 	"gitlab.com/back1ng1/question-bot/internal/database"
@@ -58,4 +59,44 @@ func StoreQuestion(q models.Question) (models.Question, error) {
 	}
 
 	return question, nil
+}
+
+func UpdateQuestionTitle(id int, q models.Question) (models.Question, error) {
+	if len(q.Title) == 0 {
+		return q, errors.New("title is null in update question")
+	}
+
+	commandTag, err := database.Database.DB.Exec(
+		context.Background(),
+		`UPDATE questions SET title=$1 WHERE id=$2`,
+		q.Title,
+		id,
+	)
+	if err != nil {
+		return q, err
+	}
+
+	if commandTag.RowsAffected() != 1 {
+		return q, errors.New("cannot update question")
+	}
+
+	return q, nil
+}
+
+func DeleteQuestion(id int) error {
+	commandTag, err := database.Database.DB.Exec(
+		context.Background(),
+		`DELETE FROM questions WHERE id=$1`,
+		id,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	if commandTag.RowsAffected() != 1 {
+		return errors.New("cannot delete question")
+	}
+
+	return nil
 }

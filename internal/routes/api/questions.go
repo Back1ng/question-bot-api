@@ -40,40 +40,38 @@ func QuestionRoutes(app *fiber.App) {
 		return c.JSON(question)
 	})
 
-	/*
-		// update exists question by him ID with needed data
-		app.Put("/api/question", func(c *fiber.Ctx) error {
-			payload := models.Question{}
+	// update title in existence question by id
+	app.Put("/api/question/:id", func(c *fiber.Ctx) error {
+		id, err := strconv.Atoi(c.Params("id"))
+		if err != nil {
+			return err
+		}
 
-			if err := c.BodyParser(&payload); err != nil {
-				return err
-			}
+		question := models.Question{}
+		if err := c.BodyParser(&question); err != nil {
+			return err
+		}
 
-			if payload.ID == 0 {
-				return errors.New("ID not represented")
-			}
+		_, err = repository.UpdateQuestionTitle(id, question)
+		if err != nil {
+			return err
+		}
 
-			dbQuestion := models.Question{}
-			database.Database.DB.
-				First(&dbQuestion, models.Question{ID: payload.ID}).
-				Updates(&payload)
+		return c.JSON(question)
+	})
 
-			return c.JSON(payload)
-		})
+	// delete question by him Id
+	app.Delete("/api/question/:id", func(c *fiber.Ctx) error {
+		id, err := strconv.Atoi(c.Params("id"))
+		if err != nil {
+			return err
+		}
 
-		// delete question by him Id
-		app.Delete("/api/question/:id", func(c *fiber.Ctx) error {
-			id, err := strconv.Atoi(c.Params("id"))
+		err = repository.DeleteQuestion(id)
+		if err != nil {
+			return err
+		}
 
-			if err != nil {
-				return err
-			}
-
-			payload := models.Question{ID: int64(id)}
-
-			database.Database.DB.Delete(&payload, &models.Question{ID: payload.ID})
-
-			return c.JSON(payload)
-		})
-	*/
+		return c.JSON("success deleted")
+	})
 }
