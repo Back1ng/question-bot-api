@@ -7,11 +7,11 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"gitlab.com/back1ng1/question-bot/internal/database"
-	"gitlab.com/back1ng1/question-bot/internal/database/models"
+	"gitlab.com/back1ng1/question-bot/internal/database/entity"
 )
 
-func FindQuestionsInPreset(presetId int) ([]models.Question, error) {
-	questions := []models.Question{}
+func FindQuestionsInPreset(presetId int) ([]entity.Question, error) {
+	questions := []entity.Question{}
 
 	rows, err := database.Database.DB.Query(
 		context.Background(),
@@ -31,7 +31,7 @@ func FindQuestionsInPreset(presetId int) ([]models.Question, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		question := models.Question{}
+		question := entity.Question{}
 		rows.Scan(&question.ID, &question.PresetId, &question.Title)
 		questions = append(questions, question)
 	}
@@ -44,7 +44,7 @@ func FindQuestionsInPreset(presetId int) ([]models.Question, error) {
 	return questions, nil
 }
 
-func StoreQuestion(q models.Question) (models.Question, error) {
+func StoreQuestion(q entity.Question) error {
 	row := database.Database.DB.QueryRow(
 		context.Background(),
 		`INSERT INTO questions(preset_id, title) 
@@ -56,19 +56,19 @@ func StoreQuestion(q models.Question) (models.Question, error) {
 		},
 	)
 
-	question := models.Question{}
+	var question entity.Question
 	err := row.Scan(&question.ID, &question.PresetId, &question.Title)
 
 	if err != nil {
-		return question, err
+		return err
 	}
 
-	return question, nil
+	return nil
 }
 
-func UpdateQuestionTitle(id int, q models.Question) (models.Question, error) {
+func UpdateQuestionTitle(id int, q entity.Question) error {
 	if len(q.Title) == 0 {
-		return q, errors.New("title is null in update question")
+		return errors.New("title is null in update question")
 	}
 
 	commandTag, err := database.Database.DB.Exec(
@@ -80,14 +80,14 @@ func UpdateQuestionTitle(id int, q models.Question) (models.Question, error) {
 		},
 	)
 	if err != nil {
-		return q, err
+		return err
 	}
 
 	if commandTag.RowsAffected() != 1 {
-		return q, errors.New("cannot update question")
+		return errors.New("cannot update question")
 	}
 
-	return q, nil
+	return nil
 }
 
 func DeleteQuestion(id int) error {

@@ -6,10 +6,10 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"gitlab.com/back1ng1/question-bot/internal/database"
-	"gitlab.com/back1ng1/question-bot/internal/database/models"
+	"gitlab.com/back1ng1/question-bot/internal/database/entity"
 )
 
-func UserFindByInterval(i int) []models.User {
+func UserFindByInterval(i int) []entity.User {
 	rows, err := database.Database.DB.Query(
 		context.Background(),
 		`SELECT id, chat_id, nickname, interval, interval_enabled 
@@ -24,10 +24,10 @@ func UserFindByInterval(i int) []models.User {
 	}
 	defer rows.Close()
 
-	users := []models.User{}
+	var users []entity.User
 
 	for rows.Next() {
-		user := models.User{}
+		user := entity.User{}
 		rows.Scan(&user.ID, &user.ChatId, &user.Nickname, &user.Interval, &user.IntervalEnabled)
 		users = append(users, user)
 	}

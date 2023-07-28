@@ -4,7 +4,7 @@ import (
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
-	"gitlab.com/back1ng1/question-bot/internal/database/models"
+	"gitlab.com/back1ng1/question-bot/internal/database/entity"
 	"gitlab.com/back1ng1/question-bot/internal/database/repository"
 )
 
@@ -25,15 +25,12 @@ func QuestionRoutes(app *fiber.App) {
 
 	// store new question with all needed data
 	app.Post("/api/question", func(c *fiber.Ctx) error {
-		question := models.Question{}
-
+		var question entity.Question
 		if err := c.BodyParser(&question); err != nil {
 			return err
 		}
 
-		question, err := repository.StoreQuestion(question)
-
-		if err != nil {
+		if err := repository.StoreQuestion(question); err != nil {
 			return err
 		}
 
@@ -47,13 +44,12 @@ func QuestionRoutes(app *fiber.App) {
 			return err
 		}
 
-		question := models.Question{}
+		var question entity.Question
 		if err := c.BodyParser(&question); err != nil {
 			return err
 		}
 
-		_, err = repository.UpdateQuestionTitle(id, question)
-		if err != nil {
+		if err = repository.UpdateQuestionTitle(id, question); err != nil {
 			return err
 		}
 
@@ -67,8 +63,7 @@ func QuestionRoutes(app *fiber.App) {
 			return err
 		}
 
-		err = repository.DeleteQuestion(id)
-		if err != nil {
+		if err = repository.DeleteQuestion(id); err != nil {
 			return err
 		}
 

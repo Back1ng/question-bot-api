@@ -25,7 +25,7 @@ func AnswerRoutes(app *fiber.App) {
 
 		// send info about answer
 		app.Get("/api/answer", func(c *fiber.Ctx) error {
-			answer := models.Answer{}
+			answer := entity.Answer{}
 
 			database.Database.DB.First(&answer)
 
@@ -35,7 +35,7 @@ func AnswerRoutes(app *fiber.App) {
 		// store new answer
 		app.Post("/api/answer", func(c *fiber.Ctx) error {
 			// store answer
-			answer := models.Answer{}
+			answer := entity.Answer{}
 
 			if err := c.BodyParser(&answer); err != nil {
 				return err
@@ -48,15 +48,15 @@ func AnswerRoutes(app *fiber.App) {
 
 		// update exists answer
 		app.Put("/api/answer", func(c *fiber.Ctx) error {
-			answer := models.Answer{}
+			answer := entity.Answer{}
 
 			if err := c.BodyParser(&answer); err != nil {
 				return err
 			}
 
-			dbAnswer := models.Answer{}
+			dbAnswer := entity.Answer{}
 			database.Database.DB.
-				First(&dbAnswer, models.Answer{ID: answer.ID}).
+				First(&dbAnswer, entity.Answer{ID: answer.ID}).
 				Updates(&answer)
 
 			return c.JSON(answer)
@@ -70,9 +70,9 @@ func AnswerRoutes(app *fiber.App) {
 				return err
 			}
 
-			answer := models.Answer{}
+			answer := entity.Answer{}
 
-			database.Database.DB.Delete(&answer, &models.Answer{ID: int64(id)})
+			database.Database.DB.Delete(&answer, &entity.Answer{ID: int64(id)})
 
 			return c.JSON(answer)
 		})

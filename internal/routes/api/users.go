@@ -7,7 +7,7 @@ import (
 func UserRoutes(app *fiber.App) {
 	/*
 		app.Get("/api/users", func(c *fiber.Ctx) error {
-			users := []models.User{}
+			users := []entity.User{}
 
 			database.Database.DB.Find(&users)
 
@@ -21,7 +21,7 @@ func UserRoutes(app *fiber.App) {
 				return err
 			}
 
-			user := models.User{}
+			user := entity.User{}
 
 			if err := c.BodyParser(&user); err != nil {
 				return err
@@ -39,7 +39,7 @@ func UserRoutes(app *fiber.App) {
 		})
 
 		app.Put("/api/users", func(c *fiber.Ctx) error {
-			user := models.User{}
+			user := entity.User{}
 
 			if err := c.BodyParser(&user); err != nil {
 				return err
@@ -49,7 +49,7 @@ func UserRoutes(app *fiber.App) {
 				return err
 			}
 
-			dbUser := models.User{}
+			dbUser := entity.User{}
 			model := database.Database.DB.First(&dbUser, user.ID).Updates(&user)
 
 			if dbUser.IntervalEnabled != user.IntervalEnabled {

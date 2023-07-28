@@ -11,7 +11,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/joho/godotenv"
 	"gitlab.com/back1ng1/question-bot/internal/database"
-	"gitlab.com/back1ng1/question-bot/internal/database/models"
+	"gitlab.com/back1ng1/question-bot/internal/database/entity"
 	user_repository "gitlab.com/back1ng1/question-bot/internal/database/repository"
 	"gitlab.com/back1ng1/question-bot/internal/interval"
 	"gitlab.com/back1ng1/question-bot/internal/routes/api"
@@ -80,17 +80,17 @@ func main() {
 	for update := range telegram.GetUpdates(bot) {
 		if update.Message != nil {
 			// создаем пользователя для его авторизации
-			user := models.User{
+			user := entity.User{
 				ChatId:   update.Message.Chat.ID,
 				Nickname: update.Message.Chat.UserName,
 			}
 
 			// пользователь не может быть без пресета, даём ему один
-			var presets []models.Preset
+			var presets []entity.Preset
 			database.Database.DB.Find(&presets)
 
 			if len(presets) == 0 {
-				preset := models.Preset{Title: "temporary name"}
+				preset := entity.Preset{Title: "temporary name"}
 				database.Database.DB.Create(&preset)
 				user.PresetId = preset.Id
 			} else {
@@ -100,7 +100,7 @@ func main() {
 			// находим по айдишнику чата
 			database.Database.DB.Find(
 				&user,
-				models.User{ChatId: user.ChatId},
+				entity.User{ChatId: user.ChatId},
 			)
 
 			// если такого нет - создаем

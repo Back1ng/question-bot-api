@@ -1,4 +1,4 @@
-package models
+package entity
 
 type Answer struct {
 	ID         int64 `json:"id"`

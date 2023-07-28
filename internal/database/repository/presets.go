@@ -7,11 +7,11 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"gitlab.com/back1ng1/question-bot/internal/database"
-	"gitlab.com/back1ng1/question-bot/internal/database/models"
+	"gitlab.com/back1ng1/question-bot/internal/database/entity"
 )
 
-func FindPresets() ([]models.Preset, error) {
-	presets := []models.Preset{}
+func FindPresets() ([]entity.Preset, error) {
+	var presets []entity.Preset
 	rows, err := database.Database.DB.Query(
 		context.Background(),
 		`SELECT id, title FROM presets`,
@@ -25,7 +25,7 @@ func FindPresets() ([]models.Preset, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		preset := models.Preset{}
+		var preset entity.Preset
 		rows.Scan(&preset.ID, &preset.Title)
 		presets = append(presets, preset)
 	}
@@ -38,7 +38,7 @@ func FindPresets() ([]models.Preset, error) {
 	return presets, nil
 }
 
-func StorePreset(p models.Preset) (models.Preset, error) {
+func StorePreset(p entity.Preset) error {
 	row := database.Database.DB.QueryRow(
 		context.Background(),
 		"INSERT INTO presets(title) VALUES(@title) RETURNING id, title",
@@ -47,19 +47,17 @@ func StorePreset(p models.Preset) (models.Preset, error) {
 		},
 	)
 
-	preset := models.Preset{}
-	err := row.Scan(&preset.ID, &preset.Title)
-
-	if err != nil {
-		return preset, err
+	var preset entity.Preset
+	if err := row.Scan(&preset.ID, &preset.Title); err != nil {
+		return err
 	}
 
-	return preset, nil
+	return nil
 }
 
-func UpdatePreset(id int, p models.Preset) (models.Preset, error) {
+func UpdatePreset(id int, p entity.Preset) error {
 	if len(p.Title) == 0 {
-		return p, errors.New("title is null in update preset")
+		return errors.New("title is null in update preset")
 	}
 
 	commandTag, err := database.Database.DB.Exec(
@@ -72,14 +70,14 @@ func UpdatePreset(id int, p models.Preset) (models.Preset, error) {
 	)
 
 	if err != nil {
-		return p, err
+		return err
 	}
 
 	if commandTag.RowsAffected() != 1 {
-		return p, errors.New("cannot update presets")
+		return errors.New("cannot update presets")
 	}
 
-	return p, nil
+	return nil
 }
 
 func DeletePreset(id int) error {

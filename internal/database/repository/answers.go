@@ -5,11 +5,11 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"gitlab.com/back1ng1/question-bot/internal/database"
-	"gitlab.com/back1ng1/question-bot/internal/database/models"
+	"gitlab.com/back1ng1/question-bot/internal/database/entity"
 )
 
-func FindAnswersInQuestion(questionId int) ([]models.Answer, error) {
-	answers := []models.Answer{}
+func FindAnswersInQuestion(questionId int) ([]entity.Answer, error) {
+	var answers []entity.Answer
 
 	rows, err := database.Database.DB.Query(
 		context.Background(),
@@ -23,7 +23,7 @@ func FindAnswersInQuestion(questionId int) ([]models.Answer, error) {
 	}
 
 	for rows.Next() {
-		answer := models.Answer{}
+		var answer entity.Answer
 		rows.Scan(&answer.ID, &answer.QuestionId, &answer.Title, &answer.IsCorrect)
 		answers = append(answers, answer)
 	}

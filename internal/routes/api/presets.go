@@ -4,7 +4,7 @@ import (
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
-	"gitlab.com/back1ng1/question-bot/internal/database/models"
+	"gitlab.com/back1ng1/question-bot/internal/database/entity"
 	"gitlab.com/back1ng1/question-bot/internal/database/repository"
 )
 
@@ -19,15 +19,13 @@ func PresetRoutes(app *fiber.App) {
 		return c.JSON(presets)
 	})
 	app.Post("/api/preset", func(c *fiber.Ctx) error {
-		preset := models.Preset{}
+		preset := entity.Preset{}
 
 		if err := c.BodyParser(&preset); err != nil {
 			return err
 		}
 
-		preset, err := repository.StorePreset(preset)
-
-		if err != nil {
+		if err := repository.StorePreset(preset); err != nil {
 			return err
 		}
 
@@ -39,13 +37,12 @@ func PresetRoutes(app *fiber.App) {
 			return err
 		}
 
-		preset := models.Preset{}
+		preset := entity.Preset{}
 		if err := c.BodyParser(&preset); err != nil {
 			return err
 		}
 
-		preset, err = repository.UpdatePreset(id, preset)
-		if err != nil {
+		if err = repository.UpdatePreset(id, preset); err != nil {
 			return err
 		}
 
@@ -58,7 +55,9 @@ func PresetRoutes(app *fiber.App) {
 			return err
 		}
 
-		repository.DeletePreset(id)
+		if err := repository.DeletePreset(id); err != nil {
+			return err
+		}
 
 		return c.JSON("success deleted")
 	})
