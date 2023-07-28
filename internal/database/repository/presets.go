@@ -10,9 +10,13 @@ import (
 	"gitlab.com/back1ng1/question-bot/internal/database/entity"
 )
 
-func FindPresets() ([]entity.Preset, error) {
+type PresetRepository struct {
+	*database.DbInstance
+}
+
+func (r *PresetRepository) FindPresets() ([]entity.Preset, error) {
 	var presets []entity.Preset
-	rows, err := database.Database.DB.Query(
+	rows, err := r.Query(
 		context.Background(),
 		`SELECT id, title FROM presets`,
 	)
@@ -38,8 +42,8 @@ func FindPresets() ([]entity.Preset, error) {
 	return presets, nil
 }
 
-func StorePreset(p entity.Preset) error {
-	row := database.Database.DB.QueryRow(
+func (r *PresetRepository) StorePreset(p entity.Preset) error {
+	row := r.QueryRow(
 		context.Background(),
 		"INSERT INTO presets(title) VALUES(@title) RETURNING id, title",
 		pgx.NamedArgs{
@@ -55,12 +59,12 @@ func StorePreset(p entity.Preset) error {
 	return nil
 }
 
-func UpdatePreset(id int, p entity.Preset) error {
+func (r *PresetRepository) UpdatePreset(id int, p entity.Preset) error {
 	if len(p.Title) == 0 {
 		return errors.New("title is null in update preset")
 	}
 
-	commandTag, err := database.Database.DB.Exec(
+	commandTag, err := r.Exec(
 		context.Background(),
 		`UPDATE presets SET title=@title WHERE id=@id`,
 		pgx.NamedArgs{
@@ -80,8 +84,8 @@ func UpdatePreset(id int, p entity.Preset) error {
 	return nil
 }
 
-func DeletePreset(id int) error {
-	commandTag, err := database.Database.DB.Exec(
+func (r *PresetRepository) DeletePreset(id int) error {
+	commandTag, err := r.Exec(
 		context.Background(),
 		`DELETE FROM presets WHERE id=@id`,
 		pgx.NamedArgs{

@@ -23,7 +23,7 @@ func main() {
 	}
 	defer conn.Close(context.Background())
 
-	database.Database = database.DbInstance{DB: conn}
+	database.Database = database.DbInstance{Conn: conn}
 
 	app := fiber.New()
 

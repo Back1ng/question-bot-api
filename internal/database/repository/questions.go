@@ -10,10 +10,14 @@ import (
 	"gitlab.com/back1ng1/question-bot/internal/database/entity"
 )
 
-func FindQuestionsInPreset(presetId int) ([]entity.Question, error) {
+type QuestionRepository struct {
+	*database.DbInstance
+}
+
+func (r *QuestionRepository) FindQuestionsInPreset(presetId int) ([]entity.Question, error) {
 	questions := []entity.Question{}
 
-	rows, err := database.Database.DB.Query(
+	rows, err := r.Query(
 		context.Background(),
 		`SELECT id, preset_id, title 
 		FROM questions 
@@ -44,8 +48,8 @@ func FindQuestionsInPreset(presetId int) ([]entity.Question, error) {
 	return questions, nil
 }
 
-func StoreQuestion(q entity.Question) error {
-	row := database.Database.DB.QueryRow(
+func (r *QuestionRepository) StoreQuestion(q entity.Question) error {
+	row := r.QueryRow(
 		context.Background(),
 		`INSERT INTO questions(preset_id, title) 
 		VALUES(@preset_id, @title) 
@@ -66,12 +70,12 @@ func StoreQuestion(q entity.Question) error {
 	return nil
 }
 
-func UpdateQuestionTitle(id int, q entity.Question) error {
+func (r *QuestionRepository) UpdateQuestionTitle(id int, q entity.Question) error {
 	if len(q.Title) == 0 {
 		return errors.New("title is null in update question")
 	}
 
-	commandTag, err := database.Database.DB.Exec(
+	commandTag, err := r.Exec(
 		context.Background(),
 		`UPDATE questions SET title=@title WHERE id=@id`,
 		pgx.NamedArgs{
@@ -90,8 +94,8 @@ func UpdateQuestionTitle(id int, q entity.Question) error {
 	return nil
 }
 
-func DeleteQuestion(id int) error {
-	commandTag, err := database.Database.DB.Exec(
+func (r *QuestionRepository) DeleteQuestion(id int) error {
+	commandTag, err := r.Exec(
 		context.Background(),
 		`DELETE FROM questions WHERE id=@id`,
 		pgx.NamedArgs{

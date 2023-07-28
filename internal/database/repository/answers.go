@@ -8,10 +8,14 @@ import (
 	"gitlab.com/back1ng1/question-bot/internal/database/entity"
 )
 
-func FindAnswersInQuestion(questionId int) ([]entity.Answer, error) {
+type AnswerRepository struct {
+	*database.DbInstance
+}
+
+func (r *AnswerRepository) FindAnswersInQuestion(questionId int) ([]entity.Answer, error) {
 	var answers []entity.Answer
 
-	rows, err := database.Database.DB.Query(
+	rows, err := r.Query(
 		context.Background(),
 		`SELECT * FROM answers WHERE question_id = @question_id`,
 		pgx.NamedArgs{

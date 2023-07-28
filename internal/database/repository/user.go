@@ -9,8 +9,12 @@ import (
 	"gitlab.com/back1ng1/question-bot/internal/database/entity"
 )
 
-func UserFindByInterval(i int) []entity.User {
-	rows, err := database.Database.DB.Query(
+type UserRepository struct {
+	*database.DbInstance
+}
+
+func (r *UserRepository) UserFindByInterval(i int) []entity.User {
+	rows, err := r.Query(
 		context.Background(),
 		`SELECT id, chat_id, nickname, interval, interval_enabled 
 		FROM users 
