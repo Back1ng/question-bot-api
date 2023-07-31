@@ -2,9 +2,15 @@ package api
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"gitlab.com/back1ng1/question-bot/internal/database"
 )
 
-func UserRoutes(app *fiber.App) {
+type UserApi struct {
+	App  *fiber.App
+	Repo database.UserRepository
+}
+
+func (r *UserApi) UserRoutes() {
 	/*
 		app.Get("/api/users", func(c *fiber.Ctx) error {
 			users := []entity.User{}

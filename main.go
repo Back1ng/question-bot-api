@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"gitlab.com/back1ng1/question-bot/internal/routes"
 	"os"
 
 	"github.com/gofiber/fiber/v2"
@@ -10,7 +11,6 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/joho/godotenv"
 	"gitlab.com/back1ng1/question-bot/internal/database"
-	"gitlab.com/back1ng1/question-bot/internal/routes/api"
 )
 
 func main() {
@@ -23,17 +23,14 @@ func main() {
 	}
 	defer conn.Close(context.Background())
 
-	database.Database = database.DbInstance{Conn: conn}
+	repo := database.GetRepositories(conn)
 
 	app := fiber.New()
-
 	app.Use(cors.New())
-
-	// register routes
-	api.QuestionRoutes(app)
-	api.PresetRoutes(app)
-	api.AnswerRoutes(app)
-	// api.UserRoutes(app)
-
+	routes := routes.RegisterRoutes(app, repo)
+	routes.PresetRoutes.PresetRoutes()
+	routes.AnswerRoutes.AnswerRoutes()
+	routes.QuestionRoutes.QuestionRoutes()
+	routes.UserRoutes.UserRoutes()
 	app.Listen(":3000")
 }

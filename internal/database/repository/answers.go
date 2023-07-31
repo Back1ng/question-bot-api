@@ -2,14 +2,16 @@ package repository
 
 import (
 	"context"
-
 	"github.com/jackc/pgx/v5"
-	"gitlab.com/back1ng1/question-bot/internal/database"
 	"gitlab.com/back1ng1/question-bot/internal/database/entity"
 )
 
 type AnswerRepository struct {
-	*database.DbInstance
+	*pgx.Conn
+}
+
+func NewAnswerRepository(conn *pgx.Conn) *AnswerRepository {
+	return &AnswerRepository{conn}
 }
 
 func (r *AnswerRepository) FindAnswersInQuestion(questionId int) ([]entity.Answer, error) {

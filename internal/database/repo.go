@@ -1,6 +1,10 @@
 package database
 
-import "gitlab.com/back1ng1/question-bot/internal/database/entity"
+import (
+	"github.com/jackc/pgx/v5"
+	"gitlab.com/back1ng1/question-bot/internal/database/entity"
+	"gitlab.com/back1ng1/question-bot/internal/database/repository"
+)
 
 type AnswerRepository interface {
 	FindAnswersInQuestion(questionId int) ([]entity.Answer, error)
@@ -24,9 +28,18 @@ type UserRepository interface {
 	UserFindByInterval(i int) []entity.User
 }
 
-type Repositories interface {
+type Repositories struct {
 	AnswerRepository
 	PresetRepository
 	QuestionRepository
 	UserRepository
+}
+
+func GetRepositories(conn *pgx.Conn) Repositories {
+	return Repositories{
+		AnswerRepository:   repository.NewAnswerRepository(conn),
+		PresetRepository:   repository.NewPresetRepository(conn),
+		QuestionRepository: repository.NewQuestionRepository(conn),
+		UserRepository:     repository.NewUserRepository(conn),
+	}
 }

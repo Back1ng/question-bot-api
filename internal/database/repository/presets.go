@@ -6,15 +6,18 @@ import (
 	"log"
 
 	"github.com/jackc/pgx/v5"
-	"gitlab.com/back1ng1/question-bot/internal/database"
 	"gitlab.com/back1ng1/question-bot/internal/database/entity"
 )
 
 type PresetRepository struct {
-	*database.DbInstance
+	*pgx.Conn
 }
 
-func (r *PresetRepository) FindPresets() ([]entity.Preset, error) {
+func NewPresetRepository(conn *pgx.Conn) *PresetRepository {
+	return &PresetRepository{conn}
+}
+
+func (r PresetRepository) FindPresets() ([]entity.Preset, error) {
 	var presets []entity.Preset
 	rows, err := r.Query(
 		context.Background(),
@@ -42,7 +45,7 @@ func (r *PresetRepository) FindPresets() ([]entity.Preset, error) {
 	return presets, nil
 }
 
-func (r *PresetRepository) StorePreset(p entity.Preset) error {
+func (r PresetRepository) StorePreset(p entity.Preset) error {
 	row := r.QueryRow(
 		context.Background(),
 		"INSERT INTO presets(title) VALUES(@title) RETURNING id, title",
@@ -59,7 +62,7 @@ func (r *PresetRepository) StorePreset(p entity.Preset) error {
 	return nil
 }
 
-func (r *PresetRepository) UpdatePreset(id int, p entity.Preset) error {
+func (r PresetRepository) UpdatePreset(id int, p entity.Preset) error {
 	if len(p.Title) == 0 {
 		return errors.New("title is null in update preset")
 	}
@@ -84,7 +87,7 @@ func (r *PresetRepository) UpdatePreset(id int, p entity.Preset) error {
 	return nil
 }
 
-func (r *PresetRepository) DeletePreset(id int) error {
+func (r PresetRepository) DeletePreset(id int) error {
 	commandTag, err := r.Exec(
 		context.Background(),
 		`DELETE FROM presets WHERE id=@id`,

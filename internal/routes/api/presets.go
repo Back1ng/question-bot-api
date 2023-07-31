@@ -1,16 +1,21 @@
 package api
 
 import (
+	"gitlab.com/back1ng1/question-bot/internal/database"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 	"gitlab.com/back1ng1/question-bot/internal/database/entity"
-	"gitlab.com/back1ng1/question-bot/internal/database/repository"
 )
 
-func PresetRoutes(app *fiber.App) {
-	app.Get("/api/presets", func(c *fiber.Ctx) error {
-		presets, err := repository.FindPresets()
+type PresetApi struct {
+	App  *fiber.App
+	Repo database.PresetRepository
+}
+
+func (r *PresetApi) PresetRoutes() {
+	r.App.Get("/api/presets", func(c *fiber.Ctx) error {
+		presets, err := r.Repo.FindPresets()
 
 		if err != nil {
 			return err
@@ -18,20 +23,20 @@ func PresetRoutes(app *fiber.App) {
 
 		return c.JSON(presets)
 	})
-	app.Post("/api/preset", func(c *fiber.Ctx) error {
+	r.App.Post("/api/preset", func(c *fiber.Ctx) error {
 		preset := entity.Preset{}
 
 		if err := c.BodyParser(&preset); err != nil {
 			return err
 		}
 
-		if err := repository.StorePreset(preset); err != nil {
+		if err := r.Repo.StorePreset(preset); err != nil {
 			return err
 		}
 
 		return c.JSON(preset)
 	})
-	app.Put("/api/preset/:id", func(c *fiber.Ctx) error {
+	r.App.Put("/api/preset/:id", func(c *fiber.Ctx) error {
 		id, err := strconv.Atoi(c.Params("id"))
 		if err != nil {
 			return err
@@ -42,20 +47,20 @@ func PresetRoutes(app *fiber.App) {
 			return err
 		}
 
-		if err = repository.UpdatePreset(id, preset); err != nil {
+		if err = r.Repo.UpdatePreset(id, preset); err != nil {
 			return err
 		}
 
 		return c.JSON(preset)
 	})
-	app.Delete("/api/preset/:id", func(c *fiber.Ctx) error {
+	r.App.Delete("/api/preset/:id", func(c *fiber.Ctx) error {
 		id, err := strconv.Atoi(c.Params("id"))
 
 		if err != nil {
 			return err
 		}
 
-		if err := repository.DeletePreset(id); err != nil {
+		if err := r.Repo.DeletePreset(id); err != nil {
 			return err
 		}
 

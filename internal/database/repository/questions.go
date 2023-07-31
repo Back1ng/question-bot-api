@@ -6,16 +6,19 @@ import (
 	"log"
 
 	"github.com/jackc/pgx/v5"
-	"gitlab.com/back1ng1/question-bot/internal/database"
 	"gitlab.com/back1ng1/question-bot/internal/database/entity"
 )
 
 type QuestionRepository struct {
-	*database.DbInstance
+	*pgx.Conn
 }
 
-func (r *QuestionRepository) FindQuestionsInPreset(presetId int) ([]entity.Question, error) {
-	questions := []entity.Question{}
+func NewQuestionRepository(conn *pgx.Conn) *QuestionRepository {
+	return &QuestionRepository{conn}
+}
+
+func (r QuestionRepository) FindQuestionsInPreset(presetId int) ([]entity.Question, error) {
+	var questions []entity.Question
 
 	rows, err := r.Query(
 		context.Background(),
@@ -48,7 +51,7 @@ func (r *QuestionRepository) FindQuestionsInPreset(presetId int) ([]entity.Quest
 	return questions, nil
 }
 
-func (r *QuestionRepository) StoreQuestion(q entity.Question) error {
+func (r QuestionRepository) StoreQuestion(q entity.Question) error {
 	row := r.QueryRow(
 		context.Background(),
 		`INSERT INTO questions(preset_id, title) 
@@ -70,7 +73,7 @@ func (r *QuestionRepository) StoreQuestion(q entity.Question) error {
 	return nil
 }
 
-func (r *QuestionRepository) UpdateQuestionTitle(id int, q entity.Question) error {
+func (r QuestionRepository) UpdateQuestionTitle(id int, q entity.Question) error {
 	if len(q.Title) == 0 {
 		return errors.New("title is null in update question")
 	}
@@ -94,7 +97,7 @@ func (r *QuestionRepository) UpdateQuestionTitle(id int, q entity.Question) erro
 	return nil
 }
 
-func (r *QuestionRepository) DeleteQuestion(id int) error {
+func (r QuestionRepository) DeleteQuestion(id int) error {
 	commandTag, err := r.Exec(
 		context.Background(),
 		`DELETE FROM questions WHERE id=@id`,

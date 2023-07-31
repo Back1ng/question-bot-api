@@ -1,20 +1,25 @@
 package api
 
 import (
+	"gitlab.com/back1ng1/question-bot/internal/database"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
-	"gitlab.com/back1ng1/question-bot/internal/database/repository"
 )
 
-func AnswerRoutes(app *fiber.App) {
-	app.Get("/api/answers/:questionid", func(c *fiber.Ctx) error {
+type AnswerApi struct {
+	App  *fiber.App
+	Repo database.AnswerRepository
+}
+
+func (r *AnswerApi) AnswerRoutes() {
+	r.App.Get("/api/answers/:questionid", func(c *fiber.Ctx) error {
 		id, err := strconv.Atoi(c.Params("questionid"))
 		if err != nil {
 			return err
 		}
 
-		answers, err := repository.FindAnswersInQuestion(id)
+		answers, err := r.Repo.FindAnswersInQuestion(id)
 		if err != nil {
 			return err
 		}

@@ -5,15 +5,18 @@ import (
 	"log"
 
 	"github.com/jackc/pgx/v5"
-	"gitlab.com/back1ng1/question-bot/internal/database"
 	"gitlab.com/back1ng1/question-bot/internal/database/entity"
 )
 
 type UserRepository struct {
-	*database.DbInstance
+	*pgx.Conn
 }
 
-func (r *UserRepository) UserFindByInterval(i int) []entity.User {
+func NewUserRepository(conn *pgx.Conn) *UserRepository {
+	return &UserRepository{conn}
+}
+
+func (r UserRepository) UserFindByInterval(i int) []entity.User {
 	rows, err := r.Query(
 		context.Background(),
 		`SELECT id, chat_id, nickname, interval, interval_enabled 
