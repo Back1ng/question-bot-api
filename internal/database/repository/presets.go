@@ -101,7 +101,7 @@ func (r PresetRepository) DeletePreset(id int) error {
 	}
 
 	if commandTag.RowsAffected() != 1 {
-		return errors.New("cannot delete presets")
+		return errors.New("cannot delete preset")
 	}
 
 	return nil

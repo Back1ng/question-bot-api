@@ -21,6 +21,9 @@ func (r *PresetApi) PresetRoutes() {
 			return err
 		}
 
+		if len(presets) == 0 {
+			return c.JSON([]string{})
+		}
 		return c.JSON(presets)
 	})
 	r.App.Post("/api/preset", func(c *fiber.Ctx) error {

@@ -27,10 +27,12 @@ func main() {
 
 	app := fiber.New()
 	app.Use(cors.New())
+
 	routes := routes.RegisterRoutes(app, repo)
 	routes.PresetRoutes.PresetRoutes()
 	routes.AnswerRoutes.AnswerRoutes()
 	routes.QuestionRoutes.QuestionRoutes()
 	routes.UserRoutes.UserRoutes()
+
 	app.Listen(":3000")
 }

@@ -8,6 +8,9 @@ import (
 
 type AnswerRepository interface {
 	FindAnswersInQuestion(questionId int) ([]entity.Answer, error)
+	StoreAnswer(answer entity.Answer) (entity.Answer, error)
+	UpdateAnswer(answer entity.Answer) error
+	DeleteAnswer(answer entity.Answer) error
 }
 
 type PresetRepository interface {

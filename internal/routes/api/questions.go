@@ -25,6 +25,9 @@ func (r *QuestionApi) QuestionRoutes() {
 			return err
 		}
 
+		if len(questions) == 0 {
+			return c.JSON([]string{})
+		}
 		return c.JSON(questions)
 	})
 

@@ -2,6 +2,7 @@ package api
 
 import (
 	"gitlab.com/back1ng1/question-bot/internal/database"
+	"gitlab.com/back1ng1/question-bot/internal/database/entity"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -24,62 +25,56 @@ func (r *AnswerApi) AnswerRoutes() {
 			return err
 		}
 
+		if len(answers) == 0 {
+			return c.JSON([]string{})
+		}
 		return c.JSON(answers)
 	})
-	/*
+	// store new answer
+	r.App.Post("/api/answer", func(c *fiber.Ctx) error {
+		// store answer
+		answer := entity.Answer{}
 
-		// send info about answer
-		app.Get("/api/answer", func(c *fiber.Ctx) error {
-			answer := entity.Answer{}
+		if err := c.BodyParser(&answer); err != nil {
+			return err
+		}
 
-			database.Database.DB.First(&answer)
+		storedAnswer, err := r.Repo.StoreAnswer(answer)
+		if err != nil {
+			return err
+		}
 
-			return c.JSON(answer)
-		})
+		return c.JSON(storedAnswer)
+	})
 
-		// store new answer
-		app.Post("/api/answer", func(c *fiber.Ctx) error {
-			// store answer
-			answer := entity.Answer{}
+	// update exists answer
+	r.App.Put("/api/answer", func(c *fiber.Ctx) error {
+		answer := entity.Answer{}
+		if err := c.BodyParser(&answer); err != nil {
+			return err
+		}
 
-			if err := c.BodyParser(&answer); err != nil {
-				return err
-			}
+		if err := r.Repo.UpdateAnswer(answer); err != nil {
+			return err
+		}
 
-			database.Database.DB.Create(&answer)
+		return c.JSON(answer)
+	})
 
-			return c.JSON(answer)
-		})
+	// delete exists answer by id
+	r.App.Delete("/api/answer/:id", func(c *fiber.Ctx) error {
+		id, err := strconv.Atoi(c.Params("id"))
+		if err != nil {
+			return err
+		}
 
-		// update exists answer
-		app.Put("/api/answer", func(c *fiber.Ctx) error {
-			answer := entity.Answer{}
+		err = r.Repo.DeleteAnswer(
+			entity.Answer{ID: int64(id)},
+		)
+		if err != nil {
+			return err
+		}
 
-			if err := c.BodyParser(&answer); err != nil {
-				return err
-			}
-
-			dbAnswer := entity.Answer{}
-			database.Database.DB.
-				First(&dbAnswer, entity.Answer{ID: answer.ID}).
-				Updates(&answer)
-
-			return c.JSON(answer)
-		})
-
-		// delete exists answer by id
-		app.Delete("/api/answer/:id", func(c *fiber.Ctx) error {
-			id, err := strconv.Atoi(c.Params("id"))
-
-			if err != nil {
-				return err
-			}
-
-			answer := entity.Answer{}
-
-			database.Database.DB.Delete(&answer, &entity.Answer{ID: int64(id)})
-
-			return c.JSON(answer)
-		})
-	*/
+		return c.JSON("success deleted")
+	})
 }
