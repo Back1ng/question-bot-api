@@ -29,6 +29,7 @@ type QuestionRepository interface {
 
 type UserRepository interface {
 	UserFindByInterval(i int) []entity.User
+	CreateUser(u entity.User) (entity.User, error)
 }
 
 type Repositories struct {

@@ -45,3 +45,7 @@ func (r UserRepository) UserFindByInterval(i int) []entity.User {
 
 	return users
 }
+
+func (r UserRepository) CreateUser(u entity.User) (entity.User, error) {
+	return u, nil
+}

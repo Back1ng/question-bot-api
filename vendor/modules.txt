@@ -50,17 +50,9 @@ github.com/mattn/go-isatty
 # github.com/mattn/go-runewidth v0.0.15
 ## explicit; go 1.9
 github.com/mattn/go-runewidth
-# github.com/philhofer/fwd v1.1.2
-## explicit; go 1.15
 # github.com/rivo/uniseg v0.4.4
 ## explicit; go 1.18
 github.com/rivo/uniseg
-# github.com/savsgio/dictpool v0.0.0-20221023140959-7bf2e61cea94
-## explicit; go 1.13
-# github.com/savsgio/gotils v0.0.0-20230208104028-c358bd845dee
-## explicit; go 1.20
-# github.com/tinylib/msgp v1.1.8
-## explicit; go 1.15
 # github.com/valyala/bytebufferpool v1.0.0
 ## explicit
 github.com/valyala/bytebufferpool

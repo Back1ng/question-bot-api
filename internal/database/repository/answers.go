@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"errors"
+
 	"github.com/jackc/pgx/v5"
 	"gitlab.com/back1ng1/question-bot/internal/database/entity"
 )
