@@ -30,12 +30,7 @@ func Run() {
 	fmt.Println("Initializing api...")
 	app := fiber.New()
 	app.Use(cors.New())
-
-	routes := routes.RegisterRoutes(app, repo)
-	routes.PresetRoutes.PresetRoutes()
-	routes.AnswerRoutes.AnswerRoutes()
-	routes.QuestionRoutes.QuestionRoutes()
-	routes.UserRoutes.UserRoutes()
+	routes.RegisterRoutes(app, repo)
 
 	app.Listen(":3000")
 }

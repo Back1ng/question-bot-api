@@ -30,10 +30,17 @@ type Routes struct {
 }
 
 func RegisterRoutes(app *fiber.App, r database.Repositories) Routes {
-	return Routes{
+	routes := Routes{
 		QuestionRoutes: &api.QuestionApi{App: app, Repo: r.QuestionRepository},
 		PresetRoutes:   &api.PresetApi{App: app, Repo: r.PresetRepository},
 		AnswerRoutes:   &api.AnswerApi{App: app, Repo: r.AnswerRepository},
 		UserRoutes:     &api.UserApi{App: app, Repo: r.UserRepository},
 	}
+
+	routes.PresetRoutes.PresetRoutes()
+	routes.AnswerRoutes.AnswerRoutes()
+	routes.QuestionRoutes.QuestionRoutes()
+	routes.UserRoutes.UserRoutes()
+
+	return routes
 }
