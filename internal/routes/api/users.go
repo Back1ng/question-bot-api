@@ -6,8 +6,8 @@ import (
 )
 
 type UserApi struct {
-	App *fiber.App
-	database.UserRepository
+	App  *fiber.App
+	Repo database.UserRepository
 }
 
 func (r *UserApi) UserRoutes() {

@@ -9,8 +9,8 @@ import (
 )
 
 type QuestionApi struct {
-	App *fiber.App
-	database.QuestionRepository
+	App  *fiber.App
+	Repo database.QuestionRepository
 }
 
 func (r *QuestionApi) QuestionRoutes() {
@@ -20,7 +20,7 @@ func (r *QuestionApi) QuestionRoutes() {
 			return err
 		}
 
-		questions, err := r.FindQuestionsInPreset(id)
+		questions, err := r.Repo.FindQuestionsInPreset(id)
 		if err != nil {
 			return err
 		}
@@ -38,7 +38,7 @@ func (r *QuestionApi) QuestionRoutes() {
 			return err
 		}
 
-		if err := r.StoreQuestion(question); err != nil {
+		if err := r.Repo.StoreQuestion(question); err != nil {
 			return err
 		}
 
@@ -57,7 +57,7 @@ func (r *QuestionApi) QuestionRoutes() {
 			return err
 		}
 
-		if err = r.UpdateQuestionTitle(id, question); err != nil {
+		if err = r.Repo.UpdateQuestionTitle(id, question); err != nil {
 			return err
 		}
 
@@ -71,7 +71,7 @@ func (r *QuestionApi) QuestionRoutes() {
 			return err
 		}
 
-		if err = r.DeleteQuestion(id); err != nil {
+		if err = r.Repo.DeleteQuestion(id); err != nil {
 			return err
 		}
 
