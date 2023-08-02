@@ -1,8 +1,10 @@
 package api
 
+import "C"
 import (
 	"github.com/gofiber/fiber/v2"
-	"gitlab.com/back1ng1/question-bot/internal/database"
+	"gitlab.com/back1ng1/question-bot-api/internal/database"
+	"strconv"
 )
 
 type UserApi struct {
@@ -11,6 +13,22 @@ type UserApi struct {
 }
 
 func (r *UserApi) UserRoutes() {
+	r.App.Get("/api/user/:chat_id", func(c *fiber.Ctx) error {
+		chatId, err := strconv.Atoi(c.Params("chat_id"))
+		if err != nil {
+			return err
+		}
+
+		user, err := r.Repo.FindUserByChatId(chatId)
+		if err != nil {
+			return err
+		}
+
+		if user.ID == 0 {
+			return c.JSON([]string{})
+		}
+		return c.JSON(user)
+	})
 	/*
 		app.Get("/api/users", func(c *fiber.Ctx) error {
 			users := []entity.User{}

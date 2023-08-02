@@ -1,4 +1,4 @@
-module gitlab.com/back1ng1/question-bot
+module gitlab.com/back1ng1/question-bot-api
 
 go 1.20
 

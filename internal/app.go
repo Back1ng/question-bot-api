@@ -7,8 +7,8 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/jackc/pgx/v5"
 	"github.com/joho/godotenv"
-	"gitlab.com/back1ng1/question-bot/internal/database"
-	"gitlab.com/back1ng1/question-bot/internal/routes"
+	"gitlab.com/back1ng1/question-bot-api/internal/database"
+	"gitlab.com/back1ng1/question-bot-api/internal/routes"
 	"os"
 )
 

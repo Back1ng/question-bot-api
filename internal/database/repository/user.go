@@ -2,10 +2,10 @@ package repository
 
 import (
 	"context"
+	"gitlab.com/back1ng1/question-bot-api/internal/database/entity"
 	"log"
 
 	"github.com/jackc/pgx/v5"
-	"gitlab.com/back1ng1/question-bot/internal/database/entity"
 )
 
 type UserRepository struct {
@@ -48,4 +48,34 @@ func (r UserRepository) UserFindByInterval(i int) []entity.User {
 
 func (r UserRepository) CreateUser(u entity.User) (entity.User, error) {
 	return u, nil
+}
+
+func (r UserRepository) FindUserByChatId(chatId int) (entity.User, error) {
+	var user entity.User
+
+	rows, err := r.Query(
+		context.Background(),
+		`SELECT id, chat_id, nickname, interval, interval_enabled
+			FROM users
+			WHERE chat_id = @chat_id`,
+		pgx.NamedArgs{
+			"chat_id": chatId,
+		},
+	)
+	if err != nil {
+		return user, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		rows.Scan(&user.ID, &user.ChatId, &user.Nickname, &user.Interval, &user.IntervalEnabled)
+		break
+	}
+
+	if err := rows.Err(); err != nil {
+		log.Fatal(err)
+		return user, err
+	}
+
+	return user, nil
 }

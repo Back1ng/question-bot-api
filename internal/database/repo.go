@@ -2,8 +2,8 @@ package database
 
 import (
 	"github.com/jackc/pgx/v5"
-	"gitlab.com/back1ng1/question-bot/internal/database/entity"
-	"gitlab.com/back1ng1/question-bot/internal/database/repository"
+	"gitlab.com/back1ng1/question-bot-api/internal/database/entity"
+	"gitlab.com/back1ng1/question-bot-api/internal/database/repository"
 )
 
 type AnswerRepository interface {
@@ -30,6 +30,7 @@ type QuestionRepository interface {
 type UserRepository interface {
 	UserFindByInterval(i int) []entity.User
 	CreateUser(u entity.User) (entity.User, error)
+	FindUserByChatId(chatId int) (entity.User, error)
 }
 
 type Repositories struct {

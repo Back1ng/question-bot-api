@@ -1,11 +1,11 @@
 package api
 
 import (
-	"gitlab.com/back1ng1/question-bot/internal/database"
+	"gitlab.com/back1ng1/question-bot-api/internal/database"
+	"gitlab.com/back1ng1/question-bot-api/internal/database/entity"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
-	"gitlab.com/back1ng1/question-bot/internal/database/entity"
 )
 
 type QuestionApi struct {

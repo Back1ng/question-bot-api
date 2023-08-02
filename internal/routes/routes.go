@@ -2,8 +2,8 @@ package routes
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"gitlab.com/back1ng1/question-bot/internal/database"
-	"gitlab.com/back1ng1/question-bot/internal/routes/api"
+	"gitlab.com/back1ng1/question-bot-api/internal/database"
+	"gitlab.com/back1ng1/question-bot-api/internal/routes/api"
 )
 
 type QuestionRoutes interface {

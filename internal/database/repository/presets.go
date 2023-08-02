@@ -3,10 +3,10 @@ package repository
 import (
 	"context"
 	"errors"
+	"gitlab.com/back1ng1/question-bot-api/internal/database/entity"
 	"log"
 
 	"github.com/jackc/pgx/v5"
-	"gitlab.com/back1ng1/question-bot/internal/database/entity"
 )
 
 type PresetRepository struct {

@@ -5,7 +5,8 @@ networks:
     driver: bridge
 
 services:
-  bot:
+  api:
+    container_name: api
     build:
       context: .
       dockerfile: build/golang/Dockerfile_prod
@@ -20,6 +21,7 @@ services:
     volumes:
       - ./.env:/usr/src/app/.env
   db:
+    container_name: db
     image: postgres:14.2-alpine
     restart: always
     command: ["postgres", "-p", "${DB_PORT}"]
