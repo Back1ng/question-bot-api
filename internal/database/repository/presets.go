@@ -4,17 +4,18 @@ import (
 	"context"
 	"errors"
 	"gitlab.com/back1ng1/question-bot-api/internal/database/entity"
+	"gitlab.com/back1ng1/question-bot-api/pkg/postgres"
 	"log"
 
 	"github.com/jackc/pgx/v5"
 )
 
 type PresetRepository struct {
-	*pgx.Conn
+	postgres.PgConfig
 }
 
-func NewPresetRepository(conn *pgx.Conn) *PresetRepository {
-	return &PresetRepository{conn}
+func NewPresetRepository(pg postgres.PgConfig) *PresetRepository {
+	return &PresetRepository{pg}
 }
 
 func (r PresetRepository) FindPresets() ([]entity.Preset, error) {

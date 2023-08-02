@@ -4,6 +4,7 @@ import "C"
 import (
 	"github.com/gofiber/fiber/v2"
 	"gitlab.com/back1ng1/question-bot-api/internal/database"
+	"gitlab.com/back1ng1/question-bot-api/internal/database/entity"
 	"strconv"
 )
 
@@ -28,6 +29,19 @@ func (r *UserApi) UserRoutes() {
 			return c.JSON([]string{})
 		}
 		return c.JSON(user)
+	})
+	r.App.Post("/api/user", func(c *fiber.Ctx) error {
+		var user entity.User
+		if err := c.BodyParser(&user); err != nil {
+			return err
+		}
+
+		u, err := r.Repo.CreateUser(user)
+		if err != nil {
+			return err
+		}
+
+		return c.JSON(u)
 	})
 	/*
 		app.Get("/api/users", func(c *fiber.Ctx) error {

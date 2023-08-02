@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"fmt"
+	"github.com/Masterminds/squirrel"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/jackc/pgx/v5"
@@ -17,6 +18,7 @@ func Run() {
 	godotenv.Load(".env")
 
 	fmt.Println("Initializing postgres connection...")
+	sb := squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
 	conn, err := pgx.Connect(context.Background(), os.Getenv("POSTGRESQL_URL"))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "unable to connect to database: %v\n", err)
@@ -25,7 +27,7 @@ func Run() {
 	defer conn.Close(context.Background())
 
 	fmt.Println("Initializing repositories...")
-	repo := database.GetRepositories(conn)
+	repo := database.GetRepositories(conn, sb)
 
 	fmt.Println("Initializing api...")
 	app := fiber.New()

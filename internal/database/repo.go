@@ -1,9 +1,11 @@
 package database
 
 import (
+	"github.com/Masterminds/squirrel"
 	"github.com/jackc/pgx/v5"
 	"gitlab.com/back1ng1/question-bot-api/internal/database/entity"
 	"gitlab.com/back1ng1/question-bot-api/internal/database/repository"
+	"gitlab.com/back1ng1/question-bot-api/pkg/postgres"
 )
 
 type AnswerRepository interface {
@@ -40,11 +42,13 @@ type Repositories struct {
 	UserRepository
 }
 
-func GetRepositories(conn *pgx.Conn) Repositories {
+func GetRepositories(conn *pgx.Conn, sb squirrel.StatementBuilderType) Repositories {
+	pg := postgres.PgConfig{Conn: conn, StatementBuilderType: sb}
+
 	return Repositories{
-		AnswerRepository:   repository.NewAnswerRepository(conn),
-		PresetRepository:   repository.NewPresetRepository(conn),
-		QuestionRepository: repository.NewQuestionRepository(conn),
-		UserRepository:     repository.NewUserRepository(conn),
+		AnswerRepository:   repository.NewAnswerRepository(pg),
+		PresetRepository:   repository.NewPresetRepository(pg),
+		QuestionRepository: repository.NewQuestionRepository(pg),
+		UserRepository:     repository.NewUserRepository(pg),
 	}
 }

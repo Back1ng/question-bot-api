@@ -2,18 +2,20 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"gitlab.com/back1ng1/question-bot-api/internal/database/entity"
+	"gitlab.com/back1ng1/question-bot-api/pkg/postgres"
 	"log"
 
 	"github.com/jackc/pgx/v5"
 )
 
 type UserRepository struct {
-	*pgx.Conn
+	postgres.PgConfig
 }
 
-func NewUserRepository(conn *pgx.Conn) *UserRepository {
-	return &UserRepository{conn}
+func NewUserRepository(pg postgres.PgConfig) *UserRepository {
+	return &UserRepository{pg}
 }
 
 func (r UserRepository) UserFindByInterval(i int) []entity.User {
@@ -47,6 +49,33 @@ func (r UserRepository) UserFindByInterval(i int) []entity.User {
 }
 
 func (r UserRepository) CreateUser(u entity.User) (entity.User, error) {
+	query := r.Insert("users").
+		Columns("chat_id", "nickname", "preset_id").
+		Values(u.ChatId, u.Nickname, u.PresetId)
+
+	if u.Interval != 0 {
+		query.Columns("interval").Values(u.Interval)
+	}
+
+	sql, args, err := query.ToSql()
+	if err != nil {
+		return u, err
+	}
+
+	commandTag, err := r.Exec(
+		context.Background(),
+		sql,
+		args...,
+	)
+
+	if err != nil {
+		return u, err
+	}
+
+	if commandTag.RowsAffected() != 1 {
+		return u, errors.New("user cannot be created")
+	}
+
 	return u, nil
 }
 
