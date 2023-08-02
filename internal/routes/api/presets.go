@@ -9,13 +9,13 @@ import (
 )
 
 type PresetApi struct {
-	App  *fiber.App
-	Repo database.PresetRepository
+	App *fiber.App
+	database.PresetRepository
 }
 
 func (r *PresetApi) PresetRoutes() {
 	r.App.Get("/api/presets", func(c *fiber.Ctx) error {
-		presets, err := r.Repo.FindPresets()
+		presets, err := r.FindPresets()
 
 		if err != nil {
 			return err
@@ -33,7 +33,7 @@ func (r *PresetApi) PresetRoutes() {
 			return err
 		}
 
-		if err := r.Repo.StorePreset(preset); err != nil {
+		if err := r.StorePreset(preset); err != nil {
 			return err
 		}
 
@@ -50,7 +50,7 @@ func (r *PresetApi) PresetRoutes() {
 			return err
 		}
 
-		if err = r.Repo.UpdatePreset(id, preset); err != nil {
+		if err = r.UpdatePreset(id, preset); err != nil {
 			return err
 		}
 
@@ -63,7 +63,7 @@ func (r *PresetApi) PresetRoutes() {
 			return err
 		}
 
-		if err := r.Repo.DeletePreset(id); err != nil {
+		if err := r.DeletePreset(id); err != nil {
 			return err
 		}
 

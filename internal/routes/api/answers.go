@@ -9,8 +9,8 @@ import (
 )
 
 type AnswerApi struct {
-	App  *fiber.App
-	Repo database.AnswerRepository
+	App *fiber.App
+	database.AnswerRepository
 }
 
 func (r *AnswerApi) AnswerRoutes() {
@@ -20,7 +20,7 @@ func (r *AnswerApi) AnswerRoutes() {
 			return err
 		}
 
-		answers, err := r.Repo.FindAnswersInQuestion(id)
+		answers, err := r.FindAnswersInQuestion(id)
 		if err != nil {
 			return err
 		}
@@ -39,7 +39,7 @@ func (r *AnswerApi) AnswerRoutes() {
 			return err
 		}
 
-		storedAnswer, err := r.Repo.StoreAnswer(answer)
+		storedAnswer, err := r.StoreAnswer(answer)
 		if err != nil {
 			return err
 		}
@@ -54,7 +54,7 @@ func (r *AnswerApi) AnswerRoutes() {
 			return err
 		}
 
-		if err := r.Repo.UpdateAnswer(answer); err != nil {
+		if err := r.UpdateAnswer(answer); err != nil {
 			return err
 		}
 
@@ -68,7 +68,7 @@ func (r *AnswerApi) AnswerRoutes() {
 			return err
 		}
 
-		err = r.Repo.DeleteAnswer(
+		err = r.DeleteAnswer(
 			entity.Answer{ID: int64(id)},
 		)
 		if err != nil {
