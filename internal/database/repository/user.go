@@ -79,15 +79,17 @@ func (r UserRepository) FindUserByChatId(chatId int) (entity.User, error) {
 }
 
 func (r UserRepository) CreateUser(u entity.User) (entity.User, error) {
-	query := r.Insert("users").
-		Columns("chat_id", "nickname", "preset_id").
-		Values(u.ChatId, u.Nickname, u.PresetId)
+	toInsert := map[string]interface{}{}
+
+	toInsert["chat_id"] = u.ChatId
+	toInsert["nickname"] = u.Nickname
+	toInsert["preset_id"] = u.PresetId
 
 	if u.Interval != 0 {
-		query.Columns("interval").Values(u.Interval)
+		toInsert["interval"] = u.Interval
 	}
 
-	sql, args, err := query.ToSql()
+	sql, args, err := r.Insert("users").SetMap(toInsert).ToSql()
 	if err != nil {
 		return u, err
 	}
