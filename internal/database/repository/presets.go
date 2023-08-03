@@ -20,9 +20,18 @@ func NewPresetRepository(pg postgres.PgConfig) *PresetRepository {
 
 func (r PresetRepository) FindPresets() ([]entity.Preset, error) {
 	var presets []entity.Preset
+
+	sql, _, err := r.Select("id", "title").
+		From("presets").
+		ToSql()
+
+	if err != nil {
+		return presets, err
+	}
+
 	rows, err := r.Query(
 		context.Background(),
-		`SELECT id, title FROM presets`,
+		sql,
 	)
 
 	if err != nil {
@@ -47,12 +56,20 @@ func (r PresetRepository) FindPresets() ([]entity.Preset, error) {
 }
 
 func (r PresetRepository) StorePreset(p entity.Preset) error {
+	sql, args, err := r.Insert("presets").
+		Columns("title").
+		Values(p.Title).
+		Suffix("RETURNING id, title").
+		ToSql()
+
+	if err != nil {
+		return err
+	}
+
 	row := r.QueryRow(
 		context.Background(),
-		"INSERT INTO presets(title) VALUES(@title) RETURNING id, title",
-		pgx.NamedArgs{
-			"title": p.Title,
-		},
+		sql,
+		args...,
 	)
 
 	var preset entity.Preset

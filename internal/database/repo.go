@@ -30,9 +30,10 @@ type QuestionRepository interface {
 }
 
 type UserRepository interface {
-	UserFindByInterval(i int) []entity.User
-	CreateUser(u entity.User) (entity.User, error)
+	FindUserByInterval(i int) []entity.User
 	FindUserByChatId(chatId int) (entity.User, error)
+	CreateUser(u entity.User) (entity.User, error)
+	UpdateUser(u entity.User) (entity.User, error)
 }
 
 type Repositories struct {

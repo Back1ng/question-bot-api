@@ -43,6 +43,19 @@ func (r *UserApi) UserRoutes() {
 
 		return c.JSON(u)
 	})
+	r.App.Put("/api/user", func(c *fiber.Ctx) error {
+		user := entity.User{}
+		if err := c.BodyParser(&user); err != nil {
+			return err
+		}
+
+		user, err := r.Repo.UpdateUser(user)
+		if err != nil {
+			return err
+		}
+
+		return c.JSON(user)
+	})
 	/*
 		app.Get("/api/users", func(c *fiber.Ctx) error {
 			users := []entity.User{}
@@ -76,25 +89,6 @@ func (r *UserApi) UserRoutes() {
 			return c.JSON(&user)
 		})
 
-		app.Put("/api/users", func(c *fiber.Ctx) error {
-			user := entity.User{}
 
-			if err := c.BodyParser(&user); err != nil {
-				return err
-			}
-
-			if err := user.UpdateInterval(user.Interval); err != nil {
-				return err
-			}
-
-			dbUser := entity.User{}
-			model := database.Database.DB.First(&dbUser, user.ID).Updates(&user)
-
-			if dbUser.IntervalEnabled != user.IntervalEnabled {
-				model.Update("interval_enabled", user.IntervalEnabled)
-			}
-
-			return c.JSON(dbUser)
-		})
 	*/
 }
