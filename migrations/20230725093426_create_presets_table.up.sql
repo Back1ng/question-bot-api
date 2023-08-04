@@ -1,0 +1,4 @@
+CREATE TABLE presets (
+	id BIGSERIAL NOT NULL PRIMARY KEY,
+	title varchar NOT NULL
+);

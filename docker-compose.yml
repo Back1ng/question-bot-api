@@ -5,10 +5,13 @@ networks:
     driver: bridge
 
 services:
-  bot:
+  api:
+    container_name: api
     build:
       context: .
       dockerfile: build/golang/Dockerfile
+    environment:
+      - POSTGRESQL_URL=postgresql://${DB_USERNAME}:${DB_PASSWORD}@pgbouncer:${PGBOUNCER_PORT}/${DB_DATABASE}?sslmode=disable
     restart: unless-stopped
     ports:
       - "3000:3000"
@@ -16,7 +19,11 @@ services:
       - ./:/usr/src/app
     networks:
       - bot
+    depends_on:
+      - db
+
   db:
+    container_name: db
     image: postgres:14.2-alpine
     restart: always
     command: ["postgres", "-p", "${DB_PORT}"]
@@ -30,3 +37,18 @@ services:
         POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
         - ~/db-data:/var/lib/postgresql/data
+    expose:
+      - ${DB_PORT}
+
+  pgbouncer:
+    container_name: pgbouncer
+    image: docker.io/bitnami/pgbouncer
+    ports:
+      - "${PGBOUNCER_PORT}:6432"
+    environment:
+      POSTGRESQL_USERNAME: ${DB_USERNAME}
+      POSTGRESQL_PASSWORD: ${DB_PASSWORD}
+      PGBOUNCER_DATABASE: ${DB_DATABASE}
+      POSTGRESQL_HOST: db
+    networks:
+      - bot

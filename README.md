@@ -1,3 +1,4 @@
 # question-bot
 
-Миграции запускаются автоматически
+Миграции запускаются по команде из контейнера:
+migrate -database ${POSTGRESQL_URL} -path migrations/ up

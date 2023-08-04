@@ -1,85 +1,80 @@
 package api
 
 import (
-	"errors"
+	"gitlab.com/back1ng1/question-bot-api/internal/database"
+	"gitlab.com/back1ng1/question-bot-api/internal/database/entity"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
-	"gitlab.com/back1ng1/question-bot/internal/database"
-	"gitlab.com/back1ng1/question-bot/internal/database/models"
 )
 
-func QuestionRoutes(app *fiber.App) {
-	app.Get("/api/questions/:presetid", func(c *fiber.Ctx) error {
-		id, err := strconv.Atoi(c.Params("presetid"))
+type QuestionApi struct {
+	App  *fiber.App
+	Repo database.QuestionRepository
+}
 
+func (r *QuestionApi) QuestionRoutes() {
+	r.App.Get("/api/questions/:presetid", func(c *fiber.Ctx) error {
+		id, err := strconv.Atoi(c.Params("presetid"))
 		if err != nil {
 			return err
 		}
 
-		questions := []models.Question{}
+		questions, err := r.Repo.FindQuestionsInPreset(id)
+		if err != nil {
+			return err
+		}
 
-		database.Database.DB.
-			Preload("Preset").
-			Find(&questions, &models.Question{PresetId: int64(id)})
-
+		if len(questions) == 0 {
+			return c.JSON([]string{})
+		}
 		return c.JSON(questions)
 	})
 
-	// get question by id
-	app.Get("/api/question", func(c *fiber.Ctx) error {
-		question := models.Question{}
+	// store new question with all needed data
+	r.App.Post("/api/question", func(c *fiber.Ctx) error {
+		var question entity.Question
+		if err := c.BodyParser(&question); err != nil {
+			return err
+		}
 
-		database.Database.DB.Preload("Answers").Find(&question)
+		if err := r.Repo.StoreQuestion(question); err != nil {
+			return err
+		}
 
 		return c.JSON(question)
 	})
 
-	// store new question with all needed data
-	app.Post("/api/question", func(c *fiber.Ctx) error {
-		payload := models.Question{}
-
-		if err := c.BodyParser(&payload); err != nil {
-			return err
-		}
-
-		database.Database.DB.Create(&payload)
-
-		return c.JSON(payload)
-	})
-
-	// update exists question by him ID with needed data
-	app.Put("/api/question", func(c *fiber.Ctx) error {
-		payload := models.Question{}
-
-		if err := c.BodyParser(&payload); err != nil {
-			return err
-		}
-
-		if payload.ID == 0 {
-			return errors.New("ID not represented")
-		}
-
-		dbQuestion := models.Question{}
-		database.Database.DB.
-			First(&dbQuestion, models.Question{ID: payload.ID}).
-			Updates(&payload)
-
-		return c.JSON(payload)
-	})
-
-	// delete question by him Id
-	app.Delete("/api/question/:id", func(c *fiber.Ctx) error {
+	// update title in existence question by id
+	r.App.Put("/api/question/:id", func(c *fiber.Ctx) error {
 		id, err := strconv.Atoi(c.Params("id"))
-
 		if err != nil {
 			return err
 		}
 
-		payload := models.Question{ID: int64(id)}
+		var question entity.Question
+		if err := c.BodyParser(&question); err != nil {
+			return err
+		}
 
-		database.Database.DB.Delete(&payload, &models.Question{ID: payload.ID})
+		if err = r.Repo.UpdateQuestionTitle(id, question); err != nil {
+			return err
+		}
 
-		return c.JSON(payload)
+		return c.JSON(question)
+	})
+
+	// delete question by him Id
+	r.App.Delete("/api/question/:id", func(c *fiber.Ctx) error {
+		id, err := strconv.Atoi(c.Params("id"))
+		if err != nil {
+			return err
+		}
+
+		if err = r.Repo.DeleteQuestion(id); err != nil {
+			return err
+		}
+
+		return c.JSON("success deleted")
 	})
 }

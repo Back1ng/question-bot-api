@@ -1,70 +1,72 @@
 package api
 
 import (
+	"gitlab.com/back1ng1/question-bot-api/internal/database"
+	"gitlab.com/back1ng1/question-bot-api/internal/database/entity"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
-	"gitlab.com/back1ng1/question-bot/internal/database"
-	"gitlab.com/back1ng1/question-bot/internal/database/models"
 )
 
-func PresetRoutes(app *fiber.App) {
-	app.Get("/api/presets", func(c *fiber.Ctx) error {
-		preset := []models.Preset{}
+type PresetApi struct {
+	App  *fiber.App
+	Repo database.PresetRepository
+}
 
-		database.Database.DB.Find(&preset)
+func (r *PresetApi) PresetRoutes() {
+	r.App.Get("/api/presets", func(c *fiber.Ctx) error {
+		presets, err := r.Repo.FindPresets()
 
-		return c.JSON(preset)
+		if err != nil {
+			return err
+		}
+
+		if len(presets) == 0 {
+			return c.JSON([]string{})
+		}
+		return c.JSON(presets)
 	})
-
-	app.Get("/api/preset", func(c *fiber.Ctx) error {
-		// send presets
-		preset := models.Preset{}
-
-		database.Database.DB.First(&preset)
-
-		return c.JSON(preset)
-	})
-
-	app.Post("/api/preset", func(c *fiber.Ctx) error {
-		// store preset
-		preset := models.Preset{}
+	r.App.Post("/api/preset", func(c *fiber.Ctx) error {
+		preset := entity.Preset{}
 
 		if err := c.BodyParser(&preset); err != nil {
 			return err
 		}
 
-		database.Database.DB.Create(&preset)
+		if err := r.Repo.StorePreset(preset); err != nil {
+			return err
+		}
 
 		return c.JSON(preset)
 	})
+	r.App.Put("/api/preset/:id", func(c *fiber.Ctx) error {
+		id, err := strconv.Atoi(c.Params("id"))
+		if err != nil {
+			return err
+		}
 
-	app.Put("/api/preset", func(c *fiber.Ctx) error {
-		preset := models.Preset{}
-
+		preset := entity.Preset{}
 		if err := c.BodyParser(&preset); err != nil {
 			return err
 		}
 
-		dbPreset := models.Preset{}
-		database.Database.DB.
-			First(&dbPreset, models.Preset{Id: preset.Id}).
-			Updates(&preset)
+		if err = r.Repo.UpdatePreset(id, preset); err != nil {
+			return err
+		}
 
 		return c.JSON(preset)
 	})
-
-	app.Delete("/api/preset/:id", func(c *fiber.Ctx) error {
+	r.App.Delete("/api/preset/:id", func(c *fiber.Ctx) error {
 		id, err := strconv.Atoi(c.Params("id"))
 
 		if err != nil {
 			return err
 		}
 
-		preset := models.Preset{Id: int64(id)}
+		if err := r.Repo.DeletePreset(id); err != nil {
+			return err
+		}
 
-		database.Database.DB.Delete(&preset, models.Preset{Id: preset.Id})
-
-		return c.JSON(preset)
+		return c.JSON("success deleted")
 	})
 }
