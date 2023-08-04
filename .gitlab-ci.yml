@@ -32,15 +32,15 @@ deploy-main:
   only:
     - main
   script:
-    - scp docker-compose.prod.yml $USER_PRODUCTION@$HOSTNAME_PRODUCTION:$PATH_PRODUCTION/docker-compose.back.yml
+    - scp docker-compose.prod.yml $USER_PRODUCTION@$HOSTNAME_PRODUCTION:$PATH_PRODUCTION/docker-compose.api.yml
     - scp .env.example $USER_PRODUCTION@$HOSTNAME_PRODUCTION:$PATH_PRODUCTION/.env.example
     - ssh -T $USER_PRODUCTION@$HOSTNAME_PRODUCTION "cd $PATH_PRODUCTION &&
       docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY"
     - ssh -T $USER_PRODUCTION@$HOSTNAME_PRODUCTION "cd $PATH_PRODUCTION &&
       docker pull $CI_REGISTRY_IMAGE:main"
     - ssh -T $USER_PRODUCTION@$HOSTNAME_PRODUCTION "cd $PATH_PRODUCTION &&
-      docker-compose -f docker-compose.back.yml up -d api"
+      docker-compose -f docker-compose.api.yml up -d api"
     - ssh -T $USER_PRODUCTION@$HOSTNAME_PRODUCTION "cd $PATH_PRODUCTION &&
-      docker-compose -f docker-compose.back.yml exec api migrate -database ${POSTGRESQL_URL} -path migrations/ up"
+      docker-compose -f docker-compose.api.yml exec api migrate -database ${POSTGRESQL_URL} -path migrations/ up"
     - ssh -T $USER_PRODUCTION@$HOSTNAME_PRODUCTION "cd $PATH_PRODUCTION &&
       docker image prune --force"
