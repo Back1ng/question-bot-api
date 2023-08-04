@@ -11,7 +11,8 @@ services:
       context: .
       dockerfile: build/golang/Dockerfile_prod
     environment:
-      - POSTGRESQL_URL=postgresql://${DB_USERNAME}:${DB_PASSWORD}@pgbouncer:${PGBOUNCER_PORT}/${DB_DATABASE}
+      - PGBOUNCER_URL=postgresql://${DB_USERNAME}:${DB_PASSWORD}@pgbouncer:${PGBOUNCER_PORT}/${DB_DATABASE}?sslmode=disable
+      - POSTGRESQL_URL=postgresql://${DB_USERNAME}:${DB_PASSWORD}@db:${DB_PORT}/${DB_DATABASE}?sslmode=disable
     restart: unless-stopped
     image: registry.gitlab.com/back1ng1/question-bot-api:main
     ports:

@@ -11,7 +11,8 @@ services:
       context: .
       dockerfile: build/golang/Dockerfile
     environment:
-      - POSTGRESQL_URL=postgresql://${DB_USERNAME}:${DB_PASSWORD}@pgbouncer:${PGBOUNCER_PORT}/${DB_DATABASE}?sslmode=disable
+      - PGBOUNCER_URL=postgresql://${DB_USERNAME}:${DB_PASSWORD}@pgbouncer:${PGBOUNCER_PORT}/${DB_DATABASE}?sslmode=disable
+      - POSTGRESQL_URL=postgresql://${DB_USERNAME}:${DB_PASSWORD}@db:${DB_PORT}/${DB_DATABASE}?sslmode=disable
     restart: unless-stopped
     ports:
       - "3000:3000"
