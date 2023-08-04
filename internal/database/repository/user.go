@@ -79,11 +79,11 @@ func (r UserRepository) FindUserByChatId(chatId int) (entity.User, error) {
 }
 
 func (r UserRepository) CreateUser(u entity.User) (entity.User, error) {
-	toInsert := map[string]interface{}{}
-
-	toInsert["chat_id"] = u.ChatId
-	toInsert["nickname"] = u.Nickname
-	toInsert["preset_id"] = u.PresetId
+	toInsert := map[string]interface{}{
+		"chat_id":   u.ChatId,
+		"nickname":  u.Nickname,
+		"preset_id": u.PresetId,
+	}
 
 	if u.Interval != 0 {
 		toInsert["interval"] = u.Interval
