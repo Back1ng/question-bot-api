@@ -13,7 +13,7 @@ services:
     environment:
       - POSTGRESQL_URL=postgresql://${DB_USERNAME}:${DB_PASSWORD}@pgbouncer:${PGBOUNCER_PORT}/${DB_DATABASE}
     restart: unless-stopped
-    image: registry.gitlab.com/back1ng1/question-bot:main
+    image: registry.gitlab.com/back1ng1/question-bot-api:main
     ports:
       - "3000:3000"
     networks:
