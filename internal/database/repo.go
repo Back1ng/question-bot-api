@@ -36,11 +36,17 @@ type UserRepository interface {
 	UpdateUser(u entity.User) (entity.User, error)
 }
 
+type AuthRepository interface {
+	HasToken(hash string) (bool, error)
+	GenerateToken(auth entity.Auth) (string, error)
+}
+
 type Repositories struct {
 	AnswerRepository
 	PresetRepository
 	QuestionRepository
 	UserRepository
+	AuthRepository
 }
 
 func GetRepositories(conn *pgx.Conn, sb squirrel.StatementBuilderType) Repositories {
@@ -51,5 +57,6 @@ func GetRepositories(conn *pgx.Conn, sb squirrel.StatementBuilderType) Repositor
 		PresetRepository:   repository.NewPresetRepository(pg),
 		QuestionRepository: repository.NewQuestionRepository(pg),
 		UserRepository:     repository.NewUserRepository(pg),
+		AuthRepository:     repository.NewAuthRepository(pg),
 	}
 }

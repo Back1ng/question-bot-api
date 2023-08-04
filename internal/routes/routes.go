@@ -22,11 +22,16 @@ type UserRoutes interface {
 	UserRoutes()
 }
 
+type AuthRoutes interface {
+	AuthRoutes()
+}
+
 type Routes struct {
 	QuestionRoutes
 	PresetRoutes
 	AnswerRoutes
 	UserRoutes
+	AuthRoutes
 }
 
 func RegisterRoutes(app *fiber.App, r database.Repositories) Routes {
@@ -35,12 +40,14 @@ func RegisterRoutes(app *fiber.App, r database.Repositories) Routes {
 		PresetRoutes:   &api.PresetApi{App: app, Repo: r.PresetRepository},
 		AnswerRoutes:   &api.AnswerApi{App: app, Repo: r.AnswerRepository},
 		UserRoutes:     &api.UserApi{App: app, Repo: r.UserRepository},
+		AuthRoutes:     &api.AuthApi{App: app, Repo: r.AuthRepository},
 	}
 
 	routes.PresetRoutes.PresetRoutes()
 	routes.AnswerRoutes.AnswerRoutes()
 	routes.QuestionRoutes.QuestionRoutes()
 	routes.UserRoutes.UserRoutes()
+	routes.AuthRoutes.AuthRoutes()
 
 	return routes
 }

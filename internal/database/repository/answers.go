@@ -30,6 +30,8 @@ func (r *AnswerRepository) FindAnswersInQuestion(questionId int) ([]entity.Answe
 		return answers, err
 	}
 
+	defer rows.Close()
+
 	for rows.Next() {
 		var answer entity.Answer
 		rows.Scan(&answer.ID, &answer.QuestionId, &answer.Title, &answer.IsCorrect)

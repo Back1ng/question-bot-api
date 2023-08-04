@@ -9,6 +9,7 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/joho/godotenv"
 	"gitlab.com/back1ng1/question-bot-api/internal/database"
+	"gitlab.com/back1ng1/question-bot-api/internal/middlewares/auth"
 	"gitlab.com/back1ng1/question-bot-api/internal/routes"
 	"os"
 )
@@ -30,8 +31,25 @@ func Run() {
 	repo := database.GetRepositories(conn, sb)
 
 	fmt.Println("Initializing api...")
+
+	ignoreAuthPaths := []string{
+		"/api/auth/login",
+	}
+
 	app := fiber.New()
 	app.Use(cors.New())
+	app.Use(auth.New(auth.Config{
+		Repo: repo.AuthRepository,
+		Filter: func(c *fiber.Ctx) bool {
+			for _, v := range ignoreAuthPaths {
+				if c.OriginalURL() == v {
+					return true
+				}
+			}
+
+			return false
+		},
+	}))
 	routes.RegisterRoutes(app, repo)
 
 	app.Listen(":3000")
