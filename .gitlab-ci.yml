@@ -41,6 +41,6 @@ deploy-main:
     - ssh -T $USER_PRODUCTION@$HOSTNAME_PRODUCTION "cd $PATH_PRODUCTION &&
       docker-compose -f docker-compose.api.yml up -d api"
     - ssh -T $USER_PRODUCTION@$HOSTNAME_PRODUCTION "cd $PATH_PRODUCTION &&
-      docker-compose -f docker-compose.api.yml exec api sh entrypoint.sh
+      docker-compose -f docker-compose.api.yml exec api sh entrypoint.sh"
     - ssh -T $USER_PRODUCTION@$HOSTNAME_PRODUCTION "cd $PATH_PRODUCTION &&
       docker image prune --force"
