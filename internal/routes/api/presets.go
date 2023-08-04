@@ -33,11 +33,12 @@ func (r *PresetApi) PresetRoutes() {
 			return err
 		}
 
-		if err := r.Repo.StorePreset(preset); err != nil {
+		p, err := r.Repo.StorePreset(preset)
+		if err != nil {
 			return err
 		}
 
-		return c.JSON(preset)
+		return c.JSON(p)
 	})
 	r.App.Put("/api/preset/:id", func(c *fiber.Ctx) error {
 		id, err := strconv.Atoi(c.Params("id"))

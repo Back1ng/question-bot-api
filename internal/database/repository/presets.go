@@ -55,7 +55,7 @@ func (r PresetRepository) FindPresets() ([]entity.Preset, error) {
 	return presets, nil
 }
 
-func (r PresetRepository) StorePreset(p entity.Preset) error {
+func (r PresetRepository) StorePreset(p entity.Preset) (entity.Preset, error) {
 	sql, args, err := r.Insert("presets").
 		Columns("title").
 		Values(p.Title).
@@ -63,7 +63,7 @@ func (r PresetRepository) StorePreset(p entity.Preset) error {
 		ToSql()
 
 	if err != nil {
-		return err
+		return p, err
 	}
 
 	row := r.QueryRow(
@@ -74,10 +74,10 @@ func (r PresetRepository) StorePreset(p entity.Preset) error {
 
 	var preset entity.Preset
 	if err := row.Scan(&preset.ID, &preset.Title); err != nil {
-		return err
+		return p, err
 	}
 
-	return nil
+	return preset, nil
 }
 
 func (r PresetRepository) UpdatePreset(id int, p entity.Preset) error {

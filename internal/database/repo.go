@@ -17,7 +17,7 @@ type AnswerRepository interface {
 
 type PresetRepository interface {
 	FindPresets() ([]entity.Preset, error)
-	StorePreset(p entity.Preset) error
+	StorePreset(p entity.Preset) (entity.Preset, error)
 	UpdatePreset(id int, p entity.Preset) error
 	DeletePreset(id int) error
 }
