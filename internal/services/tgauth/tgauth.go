@@ -14,8 +14,6 @@ type Auth struct {
 	Hash      string `json:"hash"`
 	Id        int    `json:"id"`
 	Username  string `json:"username"`
-
-	Token string `json:"token,omitempty"`
 }
 
 func (a Auth) IsValid() bool {
