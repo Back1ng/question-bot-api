@@ -3,9 +3,10 @@ package repository
 import (
 	"context"
 	"errors"
+	"log"
+
 	"gitlab.com/back1ng1/question-bot-api/internal/database/entity"
 	"gitlab.com/back1ng1/question-bot-api/pkg/postgres"
-	"log"
 
 	"github.com/jackc/pgx/v5"
 )
@@ -21,14 +22,18 @@ func NewQuestionRepository(pg postgres.PgConfig) *QuestionRepository {
 func (r QuestionRepository) FindQuestionsInPreset(presetId int) ([]entity.Question, error) {
 	var questions []entity.Question
 
+	sql, args, err := r.Select("id", "preset_id", "title").
+		From("questions").
+		Where("preset_id = ?", presetId).
+		ToSql()
+	if err != nil {
+		return questions, err
+	}
+
 	rows, err := r.Query(
 		context.Background(),
-		`SELECT id, preset_id, title 
-		FROM questions 
-		WHERE preset_id=@preset_id`,
-		pgx.NamedArgs{
-			"preset_id": presetId,
-		},
+		sql,
+		args...,
 	)
 
 	if err != nil {
@@ -53,19 +58,23 @@ func (r QuestionRepository) FindQuestionsInPreset(presetId int) ([]entity.Questi
 }
 
 func (r QuestionRepository) StoreQuestion(q entity.Question) error {
+	sql, args, err := r.Insert("questions").
+		Columns("preset_id", "title").
+		Values(q.PresetId, q.Title).
+		ToSql()
+
+	if err != nil {
+		return err
+	}
+
 	row := r.QueryRow(
 		context.Background(),
-		`INSERT INTO questions(preset_id, title) 
-		VALUES(@preset_id, @title) 
-		RETURNING id, preset_id, title`,
-		pgx.NamedArgs{
-			"preset_id": q.PresetId,
-			"title":     q.Title,
-		},
+		sql,
+		args...,
 	)
 
 	var question entity.Question
-	err := row.Scan(&question.ID, &question.PresetId, &question.Title)
+	err = row.Scan(&question.ID, &question.PresetId, &question.Title)
 
 	if err != nil {
 		return err
@@ -79,13 +88,18 @@ func (r QuestionRepository) UpdateQuestionTitle(id int, q entity.Question) error
 		return errors.New("title is null in update question")
 	}
 
+	sql, args, err := r.Update("questions").
+		Set("title", q.Title).
+		Where("id = ?", id).
+		ToSql()
+	if err != nil {
+		return err
+	}
+
 	commandTag, err := r.Exec(
 		context.Background(),
-		`UPDATE questions SET title=@title WHERE id=@id`,
-		pgx.NamedArgs{
-			"title": q.Title,
-			"id":    id,
-		},
+		sql,
+		args...,
 	)
 	if err != nil {
 		return err

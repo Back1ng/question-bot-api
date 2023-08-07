@@ -3,11 +3,10 @@ package repository
 import (
 	"context"
 	"errors"
-	"gitlab.com/back1ng1/question-bot-api/internal/database/entity"
-	"gitlab.com/back1ng1/question-bot-api/pkg/postgres"
 	"log"
 
-	"github.com/jackc/pgx/v5"
+	"gitlab.com/back1ng1/question-bot-api/internal/database/entity"
+	"gitlab.com/back1ng1/question-bot-api/pkg/postgres"
 )
 
 type PresetRepository struct {
@@ -85,13 +84,18 @@ func (r PresetRepository) UpdatePreset(id int, p entity.Preset) error {
 		return errors.New("title is null in update preset")
 	}
 
+	sql, args, err := r.Update("presets").
+		Set("title", p.Title).Where("id = ?", id).
+		ToSql()
+
+	if err != nil {
+		return err
+	}
+
 	commandTag, err := r.Exec(
 		context.Background(),
-		`UPDATE presets SET title=@title WHERE id=@id`,
-		pgx.NamedArgs{
-			"title": p.Title,
-			"id":    id,
-		},
+		sql,
+		args...,
 	)
 
 	if err != nil {
@@ -106,12 +110,18 @@ func (r PresetRepository) UpdatePreset(id int, p entity.Preset) error {
 }
 
 func (r PresetRepository) DeletePreset(id int) error {
+	sql, args, err := r.Delete("presets").
+		Where("id = ?", id).
+		ToSql()
+
+	if err != nil {
+		return err
+	}
+
 	commandTag, err := r.Exec(
 		context.Background(),
-		`DELETE FROM presets WHERE id=@id`,
-		pgx.NamedArgs{
-			"id": id,
-		},
+		sql,
+		args...,
 	)
 
 	if err != nil {

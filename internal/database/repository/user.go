@@ -3,11 +3,10 @@ package repository
 import (
 	"context"
 	"errors"
-	"gitlab.com/back1ng1/question-bot-api/internal/database/entity"
-	"gitlab.com/back1ng1/question-bot-api/pkg/postgres"
 	"log"
 
-	"github.com/jackc/pgx/v5"
+	"gitlab.com/back1ng1/question-bot-api/internal/database/entity"
+	"gitlab.com/back1ng1/question-bot-api/pkg/postgres"
 )
 
 type UserRepository struct {
@@ -18,22 +17,28 @@ func NewUserRepository(pg postgres.PgConfig) *UserRepository {
 	return &UserRepository{pg}
 }
 
-func (r UserRepository) FindUserByInterval(i int) []entity.User {
+func (r UserRepository) FindUserByInterval(i int) ([]entity.User, error) {
+	var users []entity.User
+	sql, args, err := r.
+		Select("id", "chat_id", "nickname", "interval", "interval_enabled").
+		From("users").
+		Where("interval = ?", i).
+		Where("interval = ?", true).
+		ToSql()
+
+	if err != nil {
+		return users, err
+	}
+
 	rows, err := r.Query(
 		context.Background(),
-		`SELECT id, chat_id, nickname, interval, interval_enabled 
-		FROM users 
-		WHERE interval = @interval AND interval_enabled = true`,
-		pgx.NamedArgs{
-			"interval": i,
-		},
+		sql,
+		args...,
 	)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer rows.Close()
-
-	var users []entity.User
 
 	for rows.Next() {
 		user := entity.User{}
@@ -45,20 +50,25 @@ func (r UserRepository) FindUserByInterval(i int) []entity.User {
 		log.Fatal(err)
 	}
 
-	return users
+	return users, nil
 }
 
 func (r UserRepository) FindUserByChatId(chatId int) (entity.User, error) {
 	var user entity.User
 
+	sql, args, err := r.Select("id", "chat_id", "nickname", "interval", "interval_enabled").
+		From("users").
+		Where("chat_id = ?", chatId).
+		ToSql()
+
+	if err != nil {
+		return user, err
+	}
+
 	rows, err := r.Query(
 		context.Background(),
-		`SELECT id, chat_id, nickname, interval, interval_enabled
-			FROM users
-			WHERE chat_id = @chat_id`,
-		pgx.NamedArgs{
-			"chat_id": chatId,
-		},
+		sql,
+		args...,
 	)
 	if err != nil {
 		return user, err
