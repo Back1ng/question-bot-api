@@ -27,7 +27,7 @@ func TestAuthIsValid(t *testing.T) {
 }
 
 func TestAuthNotValid(t *testing.T) {
-	os.Setenv("TGBOT_TOKEN", "6322394098:AAE0gsPnHEv6xHHs4xkf0WIW9JRTLqEY0EQ")
+	os.Setenv("TGBOT_TOKEN", tgbot_token)
 
 	// without last char in hash
 	auth := tgauth.Auth{
