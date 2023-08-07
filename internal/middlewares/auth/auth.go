@@ -6,6 +6,12 @@ import (
 	"strings"
 )
 
+var (
+	ErrorNoValidAuth   = errors.New("auth: no valid authorization")
+	ErrorTokenNotValid = errors.New("auth: authorization token not valid")
+	ErrorWrongHeader   = errors.New("auth: wrong authentication header. expected: bearer token")
+)
+
 func New(config Config) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		if config.Filter(c) {
@@ -15,12 +21,12 @@ func New(config Config) fiber.Handler {
 		headers := c.GetReqHeaders()
 
 		if headers["Authorization"] == "" {
-			return errors.New("auth: no valid authorization")
+			return ErrorNoValidAuth
 		}
 
 		authString := strings.Split(headers["Authorization"], " ")
 		if len(authString) != 2 {
-			return errors.New("auth: wrong authentication header. expected: bearer token")
+			return ErrorWrongHeader
 		}
 
 		hasToken, err := config.Repo.HasToken(authString[1])
@@ -32,6 +38,6 @@ func New(config Config) fiber.Handler {
 			return c.Next()
 		}
 
-		return errors.New("auth: authorization token not valid")
+		return ErrorTokenNotValid
 	}
 }

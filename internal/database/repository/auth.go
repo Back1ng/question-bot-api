@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"errors"
 	"gitlab.com/back1ng1/question-bot-api/internal/services/tgauth"
 	"gitlab.com/back1ng1/question-bot-api/pkg/postgres"
 )
@@ -56,7 +55,7 @@ func (r AuthRepository) HasToken(hash string) (bool, error) {
 
 func (r AuthRepository) GenerateToken(auth tgauth.Auth) (string, error) {
 	if auth.IsOutdated() {
-		return "", errors.New("auth: data is outdated")
+		return "", AuthDataIsOutdated
 	}
 
 	hasToken, err := r.HasToken(auth.Hash)
@@ -68,29 +67,29 @@ func (r AuthRepository) GenerateToken(auth tgauth.Auth) (string, error) {
 		return auth.Hash, nil
 	}
 
-	if auth.IsValid() {
-		sql, args, err := r.Insert("tokens").
-			Columns("auth_date", "first_name", "hash", "user_id", "username").
-			Values(auth.AuthDate, auth.FirstName, auth.Hash, auth.Id, auth.Username).ToSql()
-		if err != nil {
-			return "", err
-		}
-
-		commandTag, err := r.Exec(
-			context.Background(),
-			sql,
-			args...,
-		)
-		if err != nil {
-			return "", err
-		}
-
-		if commandTag.RowsAffected() != 1 {
-			return "", errors.New("auth: cannot store token")
-		}
-
-		return auth.Hash, nil
+	if !auth.IsValid() {
+		return "", AuthFailedCheck
 	}
 
-	return "", errors.New("failed check auth")
+	sql, args, err := r.Insert("tokens").
+		Columns("auth_date", "first_name", "hash", "user_id", "username").
+		Values(auth.AuthDate, auth.FirstName, auth.Hash, auth.Id, auth.Username).ToSql()
+	if err != nil {
+		return "", err
+	}
+
+	commandTag, err := r.Exec(
+		context.Background(),
+		sql,
+		args...,
+	)
+	if err != nil {
+		return "", err
+	}
+
+	if commandTag.RowsAffected() != 1 {
+		return "", AuthCannotStoreToken
+	}
+
+	return auth.Hash, nil
 }

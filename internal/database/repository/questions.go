@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"errors"
 	"log"
 
 	"gitlab.com/back1ng1/question-bot-api/internal/database/entity"
@@ -85,7 +84,7 @@ func (r QuestionRepository) StoreQuestion(q entity.Question) error {
 
 func (r QuestionRepository) UpdateQuestionTitle(id int, q entity.Question) error {
 	if len(q.Title) == 0 {
-		return errors.New("title is null in update question")
+		return UpdateQuestionEmptyTitle
 	}
 
 	sql, args, err := r.Update("questions").
@@ -106,7 +105,7 @@ func (r QuestionRepository) UpdateQuestionTitle(id int, q entity.Question) error
 	}
 
 	if commandTag.RowsAffected() != 1 {
-		return errors.New("cannot update question")
+		return UpdateQuestionError
 	}
 
 	return nil
@@ -126,7 +125,7 @@ func (r QuestionRepository) DeleteQuestion(id int) error {
 	}
 
 	if commandTag.RowsAffected() != 1 {
-		return errors.New("cannot delete question")
+		return DeleteQuestionError
 	}
 
 	return nil

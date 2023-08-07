@@ -2,8 +2,6 @@ package repository
 
 import (
 	"context"
-	"errors"
-
 	"gitlab.com/back1ng1/question-bot-api/internal/database/entity"
 	"gitlab.com/back1ng1/question-bot-api/pkg/postgres"
 )
@@ -77,7 +75,7 @@ func (r *AnswerRepository) StoreAnswer(answer entity.Answer) (entity.Answer, err
 
 func (r *AnswerRepository) UpdateAnswer(answer entity.Answer) error {
 	if len(answer.Title) == 0 {
-		return errors.New("title is null in update answer")
+		return UpdateAnswerEmptyTitle
 	}
 
 	sql, args, err := r.Update("answers").
@@ -101,7 +99,7 @@ func (r *AnswerRepository) UpdateAnswer(answer entity.Answer) error {
 	}
 
 	if commandTag.RowsAffected() != 1 {
-		return errors.New("cannot update answers")
+		return UpdateAnswerError
 	}
 
 	return nil
@@ -109,10 +107,11 @@ func (r *AnswerRepository) UpdateAnswer(answer entity.Answer) error {
 
 func (r *AnswerRepository) DeleteAnswer(answer entity.Answer) error {
 	if answer.ID == 0 {
-		return errors.New("id is not presented")
+		return DeleteAnswerIdNotPresented
 	}
 
-	sql, args, err := r.Delete("answers").Where("id = ?", answer.ID).ToSql()
+	sql, args, err := r.Delete("answers").
+		Where("id = ?", answer.ID).ToSql()
 
 	if err != nil {
 		return err
@@ -129,7 +128,7 @@ func (r *AnswerRepository) DeleteAnswer(answer entity.Answer) error {
 	}
 
 	if commandTag.RowsAffected() != 1 {
-		return errors.New("cannot delete answer")
+		return DeleteAnswerError
 	}
 
 	return nil

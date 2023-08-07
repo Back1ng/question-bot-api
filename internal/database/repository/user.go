@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"errors"
 	"log"
 
 	"gitlab.com/back1ng1/question-bot-api/internal/database/entity"
@@ -115,7 +114,7 @@ func (r UserRepository) CreateUser(u entity.User) (entity.User, error) {
 	}
 
 	if commandTag.RowsAffected() != 1 {
-		return u, errors.New("user cannot be created")
+		return u, CreateUserError
 	}
 
 	return u, nil
@@ -149,7 +148,7 @@ func (r UserRepository) UpdateUser(u entity.User) (entity.User, error) {
 	}
 
 	if commandTag.RowsAffected() != 1 {
-		return user, errors.New("cannot update user")
+		return user, UpdateUserError
 	}
 
 	return u, nil

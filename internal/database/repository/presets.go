@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"errors"
 	"log"
 
 	"gitlab.com/back1ng1/question-bot-api/internal/database/entity"
@@ -81,7 +80,7 @@ func (r PresetRepository) StorePreset(p entity.Preset) (entity.Preset, error) {
 
 func (r PresetRepository) UpdatePreset(id int, p entity.Preset) error {
 	if len(p.Title) == 0 {
-		return errors.New("title is null in update preset")
+		return UpdatePresetsEmptyTitle
 	}
 
 	sql, args, err := r.Update("presets").
@@ -103,7 +102,7 @@ func (r PresetRepository) UpdatePreset(id int, p entity.Preset) error {
 	}
 
 	if commandTag.RowsAffected() != 1 {
-		return errors.New("cannot update presets")
+		return UpdatePresetsError
 	}
 
 	return nil
@@ -129,7 +128,7 @@ func (r PresetRepository) DeletePreset(id int) error {
 	}
 
 	if commandTag.RowsAffected() != 1 {
-		return errors.New("cannot delete preset")
+		return DeletePresetsError
 	}
 
 	return nil
