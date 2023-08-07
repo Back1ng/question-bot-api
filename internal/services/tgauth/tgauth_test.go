@@ -15,28 +15,38 @@ const (
 func TestAuthIsValid(t *testing.T) {
 	os.Setenv("TGBOT_TOKEN", tgbotToken)
 
-	auth := tgauth.Auth{
-		AuthDate:  1691177636,
-		FirstName: "Кирилл",
-		Hash:      "88cf631a05adf9862b56367e84298529a2854cf8c41aa4e40b15bd817cd7d3ca",
-		Id:        1258947140,
-		Username:  "Ark21bit",
+	tests := []struct {
+		name   string
+		give   tgauth.Auth
+		wanted bool
+	}{
+		{
+			name: "assert auth is passed",
+			give: tgauth.Auth{
+				AuthDate:  1691177636,
+				FirstName: "Кирилл",
+				Hash:      "88cf631a05adf9862b56367e84298529a2854cf8c41aa4e40b15bd817cd7d3ca",
+				Id:        1258947140,
+				Username:  "Ark21bit",
+			},
+			wanted: true,
+		},
+		{
+			name: "assert auth is not passed",
+			give: tgauth.Auth{
+				AuthDate:  1691177636,
+				FirstName: "Кирилл",
+				Hash:      "88cf631a05adf9862b56367e84298529a2854cf8c41aa4e40b15bd817cd7d3c", // without last char
+				Id:        1258947140,
+				Username:  "Ark21bit",
+			},
+			wanted: false,
+		},
 	}
 
-	assert.True(t, auth.IsValid())
-}
-
-func TestAuthNotValid(t *testing.T) {
-	os.Setenv("TGBOT_TOKEN", tgbotToken)
-
-	// without last char in hash
-	auth := tgauth.Auth{
-		AuthDate:  1691177636,
-		FirstName: "Кирилл",
-		Hash:      "88cf631a05adf9862b56367e84298529a2854cf8c41aa4e40b15bd817cd7d3c",
-		Id:        1258947140,
-		Username:  "Ark21bit",
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.give.IsValid(), tt.wanted)
+		})
 	}
-
-	assert.False(t, auth.IsValid())
 }

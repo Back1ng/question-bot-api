@@ -5,7 +5,6 @@ import (
 	"errors"
 	"gitlab.com/back1ng1/question-bot-api/internal/services/tgauth"
 	"gitlab.com/back1ng1/question-bot-api/pkg/postgres"
-	"time"
 )
 
 type AuthRepository struct {
@@ -21,7 +20,6 @@ func (r AuthRepository) HasToken(hash string) (bool, error) {
 		From("tokens").
 		Where("hash = ?", hash).
 		ToSql()
-
 	if err != nil {
 		return false, err
 	}
@@ -32,7 +30,6 @@ func (r AuthRepository) HasToken(hash string) (bool, error) {
 		args...,
 	)
 	defer rows.Close()
-
 	if err != nil {
 		return false, err
 	}
@@ -47,7 +44,7 @@ func (r AuthRepository) HasToken(hash string) (bool, error) {
 	}
 
 	for _, v := range tokens {
-		if (time.Now().Unix() - v.AuthDate) > 86400 {
+		if v.IsOutdated() {
 			continue
 		}
 
@@ -58,26 +55,23 @@ func (r AuthRepository) HasToken(hash string) (bool, error) {
 }
 
 func (r AuthRepository) GenerateToken(auth tgauth.Auth) (string, error) {
-	if (time.Now().Unix() - auth.AuthDate) > 86400 {
+	if auth.IsOutdated() {
 		return "", errors.New("auth: data is outdated")
 	}
 
-	has, err := r.HasToken(auth.Hash)
+	hasToken, err := r.HasToken(auth.Hash)
 	if err != nil {
 		return "", err
 	}
 
-	if has {
+	if hasToken {
 		return auth.Hash, nil
 	}
 
 	if auth.IsValid() {
-		// success auth check
-
 		sql, args, err := r.Insert("tokens").
 			Columns("auth_date", "first_name", "hash", "user_id", "username").
 			Values(auth.AuthDate, auth.FirstName, auth.Hash, auth.Id, auth.Username).ToSql()
-
 		if err != nil {
 			return "", err
 		}
@@ -87,7 +81,6 @@ func (r AuthRepository) GenerateToken(auth tgauth.Auth) (string, error) {
 			sql,
 			args...,
 		)
-
 		if err != nil {
 			return "", err
 		}

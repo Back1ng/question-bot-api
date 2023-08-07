@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"os"
+	"time"
 )
 
 type Auth struct {
@@ -24,6 +25,10 @@ func (a Auth) IsValid() bool {
 	hm.Write([]byte(a.CheckString()))
 
 	return hex.EncodeToString(hm.Sum(nil)) == a.Hash
+}
+
+func (a Auth) IsOutdated() bool {
+	return (time.Now().Unix() - a.AuthDate) > 86400
 }
 
 func (a Auth) CheckString() string {
