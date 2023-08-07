@@ -1,6 +1,12 @@
-package entity
+package tgauth
 
-import "fmt"
+import (
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/hex"
+	"fmt"
+	"os"
+)
 
 type Auth struct {
 	AuthDate  int64  `json:"auth_date"`
@@ -10,6 +16,16 @@ type Auth struct {
 	Username  string `json:"username"`
 
 	Token string `json:"token,omitempty"`
+}
+
+func (a Auth) IsValid() bool {
+	key := sha256.New()
+	key.Write([]byte(os.Getenv("TGBOT_TOKEN")))
+
+	hm := hmac.New(sha256.New, key.Sum(nil))
+	hm.Write([]byte(a.CheckString()))
+
+	return hex.EncodeToString(hm.Sum(nil)) == a.Hash
 }
 
 func (a Auth) CheckString() string {

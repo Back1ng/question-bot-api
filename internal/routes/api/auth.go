@@ -3,7 +3,7 @@ package api
 import (
 	"github.com/gofiber/fiber/v2"
 	"gitlab.com/back1ng1/question-bot-api/internal/database"
-	"gitlab.com/back1ng1/question-bot-api/internal/database/entity"
+	"gitlab.com/back1ng1/question-bot-api/internal/services/tgauth"
 )
 
 type AuthApi struct {
@@ -13,7 +13,7 @@ type AuthApi struct {
 
 func (r *AuthApi) AuthRoutes() {
 	r.App.Post("/api/auth/login", func(c *fiber.Ctx) error {
-		var auth entity.Auth
+		var auth tgauth.Auth
 		if err := c.BodyParser(&auth); err != nil {
 			return err
 		}

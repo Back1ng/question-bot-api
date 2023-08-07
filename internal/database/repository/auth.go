@@ -2,13 +2,9 @@ package repository
 
 import (
 	"context"
-	"crypto/hmac"
-	"crypto/sha256"
-	"encoding/hex"
 	"errors"
-	"gitlab.com/back1ng1/question-bot-api/internal/database/entity"
+	"gitlab.com/back1ng1/question-bot-api/internal/services/tgauth"
 	"gitlab.com/back1ng1/question-bot-api/pkg/postgres"
-	"os"
 	"time"
 )
 
@@ -41,9 +37,9 @@ func (r AuthRepository) HasToken(hash string) (bool, error) {
 		return false, err
 	}
 
-	var tokens []entity.Auth
+	var tokens []tgauth.Auth
 	for rows.Next() {
-		var auth entity.Auth
+		var auth tgauth.Auth
 		if err := rows.Scan(&auth.AuthDate, &auth.Hash); err != nil {
 			return false, err
 		}
@@ -61,7 +57,7 @@ func (r AuthRepository) HasToken(hash string) (bool, error) {
 	return false, nil
 }
 
-func (r AuthRepository) GenerateToken(auth entity.Auth) (string, error) {
+func (r AuthRepository) GenerateToken(auth tgauth.Auth) (string, error) {
 	if (time.Now().Unix() - auth.AuthDate) > 86400 {
 		return "", errors.New("auth: data is outdated")
 	}
@@ -75,13 +71,7 @@ func (r AuthRepository) GenerateToken(auth entity.Auth) (string, error) {
 		return auth.Hash, nil
 	}
 
-	key := sha256.New()
-	key.Write([]byte(os.Getenv("TGBOT_TOKEN")))
-
-	hm := hmac.New(sha256.New, key.Sum(nil))
-	hm.Write([]byte(auth.CheckString()))
-
-	if hex.EncodeToString(hm.Sum(nil)) == auth.Hash {
+	if auth.IsValid() {
 		// success auth check
 
 		sql, args, err := r.Insert("tokens").
