@@ -5,8 +5,8 @@ import (
 	"github.com/jackc/pgx/v5"
 	"gitlab.com/back1ng1/question-bot-api/internal/database/entity"
 	"gitlab.com/back1ng1/question-bot-api/internal/database/repository"
-	"gitlab.com/back1ng1/question-bot-api/internal/services/tgauth"
 	"gitlab.com/back1ng1/question-bot-api/pkg/postgres"
+	"gitlab.com/back1ng1/question-bot-api/pkg/tgauth"
 )
 
 type AnswerRepository interface {

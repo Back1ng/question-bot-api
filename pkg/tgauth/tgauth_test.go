@@ -1,7 +1,7 @@
 package tgauth_test
 
 import (
-	"gitlab.com/back1ng1/question-bot-api/internal/services/tgauth"
+	"gitlab.com/back1ng1/question-bot-api/pkg/tgauth"
 	"os"
 	"testing"
 

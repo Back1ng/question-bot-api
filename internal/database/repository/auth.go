@@ -2,8 +2,8 @@ package repository
 
 import (
 	"context"
-	"gitlab.com/back1ng1/question-bot-api/internal/services/tgauth"
 	"gitlab.com/back1ng1/question-bot-api/pkg/postgres"
+	"gitlab.com/back1ng1/question-bot-api/pkg/tgauth"
 )
 
 type AuthRepository struct {
@@ -47,7 +47,9 @@ func (r AuthRepository) HasToken(hash string) (bool, error) {
 			continue
 		}
 
-		return v.Hash != "", nil
+		if v.Hash == hash {
+			return true, nil
+		}
 	}
 
 	return false, nil
@@ -89,6 +91,20 @@ func (r AuthRepository) GenerateToken(auth tgauth.Auth) (string, error) {
 
 	if commandTag.RowsAffected() != 1 {
 		return "", AuthCannotStoreToken
+	}
+
+	sql, args, err = r.Delete("tokens").
+		Where("hash != ?", auth.Hash).
+		Where("user_id = ?", auth.Id).
+		ToSql()
+
+	_, err = r.Exec(
+		context.Background(),
+		sql,
+		args...,
+	)
+	if err != nil {
+		return "", err
 	}
 
 	return auth.Hash, nil
