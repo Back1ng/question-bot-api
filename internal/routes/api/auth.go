@@ -11,20 +11,22 @@ type AuthApi struct {
 	Repo database.AuthRepository
 }
 
-func (r *AuthApi) AuthRoutes() {
-	r.App.Post("/api/auth/login", func(c *fiber.Ctx) error {
-		var auth tgauth.Auth
-		if err := c.BodyParser(&auth); err != nil {
-			return err
-		}
+func (r *AuthApi) RegisterAuthRoutes() {
+	r.App.Post("/api/auth/login", r.AuthLogin)
+}
 
-		// todo move generation to service
-		token, err := r.Repo.GenerateToken(auth)
+func (r *AuthApi) AuthLogin(c *fiber.Ctx) error {
+	var auth tgauth.Auth
+	if err := c.BodyParser(&auth); err != nil {
+		return err
+	}
 
-		if err != nil {
-			return err
-		}
+	// todo move generation to service
+	token, err := r.Repo.GenerateToken(auth)
 
-		return c.JSON(token)
-	})
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(token)
 }

@@ -7,23 +7,39 @@ import (
 )
 
 type QuestionRoutes interface {
-	QuestionRoutes()
+	RegisterQuestionRoutes()
+	GetQuestions(c *fiber.Ctx) error
+	StoreQuestions(c *fiber.Ctx) error
+	UpdateQuestion(c *fiber.Ctx) error
+	DeleteQuestion(c *fiber.Ctx) error
 }
 
 type PresetRoutes interface {
-	PresetRoutes()
+	RegisterPresetRoutes()
+	GetPresets(c *fiber.Ctx) error
+	StorePreset(c *fiber.Ctx) error
+	UpdatePreset(c *fiber.Ctx) error
+	DeletePreset(c *fiber.Ctx) error
 }
 
 type AnswerRoutes interface {
-	AnswerRoutes()
+	RegisterAnswerRoutes()
+	GetAnswers(c *fiber.Ctx) error
+	StoreAnswers(c *fiber.Ctx) error
+	UpdateAnswer(c *fiber.Ctx) error
+	DeleteAnswer(c *fiber.Ctx) error
 }
 
 type UserRoutes interface {
-	UserRoutes()
+	RegisterUserRoutes()
+	GetUser(c *fiber.Ctx) error
+	StoreUser(c *fiber.Ctx) error
+	UpdateUser(c *fiber.Ctx) error
 }
 
 type AuthRoutes interface {
-	AuthRoutes()
+	RegisterAuthRoutes()
+	AuthLogin(c *fiber.Ctx) error
 }
 
 type Routes struct {
@@ -43,11 +59,11 @@ func RegisterRoutes(app *fiber.App, r database.Repositories) Routes {
 		AuthRoutes:     &api.AuthApi{App: app, Repo: r.AuthRepository},
 	}
 
-	routes.PresetRoutes.PresetRoutes()
-	routes.AnswerRoutes.AnswerRoutes()
-	routes.QuestionRoutes.QuestionRoutes()
-	routes.UserRoutes.UserRoutes()
-	routes.AuthRoutes.AuthRoutes()
+	routes.PresetRoutes.RegisterPresetRoutes()
+	routes.AnswerRoutes.RegisterAnswerRoutes()
+	routes.QuestionRoutes.RegisterQuestionRoutes()
+	routes.UserRoutes.RegisterUserRoutes()
+	routes.AuthRoutes.RegisterAuthRoutes()
 
 	return routes
 }
