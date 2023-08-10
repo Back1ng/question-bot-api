@@ -1,11 +1,11 @@
 package api
 
-import "C"
 import (
+	"strconv"
+
 	"github.com/gofiber/fiber/v2"
 	"gitlab.com/back1ng1/question-bot-api/internal/database"
 	"gitlab.com/back1ng1/question-bot-api/internal/database/entity"
-	"strconv"
 )
 
 type UserApi struct {
