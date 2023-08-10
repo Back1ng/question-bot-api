@@ -5,42 +5,55 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"io"
 	"os"
-	"strconv"
 	"time"
 )
 
 type Auth struct {
-	AuthDate  string `json:"auth_date"`
+	AuthDate  int64  `json:"auth_date"`
 	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
 	Hash      string `json:"hash"`
-	Id        string `json:"id"`
+	Id        int64  `json:"id"`
 	Username  string `json:"username"`
+	PhotoURL  string `json:"photo_url"`
 }
 
 func (a Auth) IsValid() bool {
 	key := sha256.New()
-	key.Write([]byte(os.Getenv("TGBOT_TOKEN")))
+	io.WriteString(key, os.Getenv("TGBOT_TOKEN"))
 
 	hm := hmac.New(sha256.New, key.Sum(nil))
-	hm.Write([]byte(a.CheckString()))
+	io.WriteString(hm, a.CheckString())
 
 	fmt.Println(hex.EncodeToString(hm.Sum(nil)), a.Hash)
 	return hex.EncodeToString(hm.Sum(nil)) == a.Hash
 }
 
 func (a Auth) IsOutdated() bool {
-	authDate, _ := strconv.Atoi(a.AuthDate)
-
-	return (time.Now().Unix() - int64(authDate)) > 86400
+	return (time.Now().Unix() - a.AuthDate) > 86400
 }
 
 func (a Auth) CheckString() string {
-	return fmt.Sprintf(
-		"auth_date=%v\nfirst_name=%s\nid=%v\nusername=%s",
+	s := fmt.Sprintf(
+		"auth_date=%v\nfirst_name=%s\nid=%v",
 		a.AuthDate,
 		a.FirstName,
 		a.Id,
-		a.Username,
 	)
+
+	if len(a.LastName) > 0 {
+		s = fmt.Sprint(s, "\nlast_name=", a.LastName)
+	}
+
+	if len(a.PhotoURL) > 0 {
+		s = fmt.Sprint(s, "\nphoto_url=", a.PhotoURL)
+	}
+
+	if len(a.Username) > 0 {
+		s = fmt.Sprint(s, "\nusername=", a.Username)
+	}
+
+	return s
 }
