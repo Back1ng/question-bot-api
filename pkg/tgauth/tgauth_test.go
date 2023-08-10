@@ -23,10 +23,10 @@ func TestAuthIsValid(t *testing.T) {
 		{
 			name: "assert auth is passed",
 			give: tgauth.Auth{
-				AuthDate:  1691177636,
+				AuthDate:  "1691177636",
 				FirstName: "Кирилл",
 				Hash:      "88cf631a05adf9862b56367e84298529a2854cf8c41aa4e40b15bd817cd7d3ca",
-				Id:        1258947140,
+				Id:        "1258947140",
 				Username:  "Ark21bit",
 			},
 			wanted: true,
@@ -34,10 +34,10 @@ func TestAuthIsValid(t *testing.T) {
 		{
 			name: "assert auth is not passed",
 			give: tgauth.Auth{
-				AuthDate:  1691177636,
+				AuthDate:  "1691177636",
 				FirstName: "Кирилл",
 				Hash:      "88cf631a05adf9862b56367e84298529a2854cf8c41aa4e40b15bd817cd7d3c", // without last char
-				Id:        1258947140,
+				Id:        "1258947140",
 				Username:  "Ark21bit",
 			},
 			wanted: false,

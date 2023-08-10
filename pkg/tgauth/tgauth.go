@@ -6,14 +6,15 @@ import (
 	"encoding/hex"
 	"fmt"
 	"os"
+	"strconv"
 	"time"
 )
 
 type Auth struct {
-	AuthDate  int64  `json:"auth_date"`
+	AuthDate  string `json:"auth_date"`
 	FirstName string `json:"first_name"`
 	Hash      string `json:"hash"`
-	Id        int    `json:"id"`
+	Id        string `json:"id"`
 	Username  string `json:"username"`
 }
 
@@ -24,16 +25,19 @@ func (a Auth) IsValid() bool {
 	hm := hmac.New(sha256.New, key.Sum(nil))
 	hm.Write([]byte(a.CheckString()))
 
+	fmt.Println(hex.EncodeToString(hm.Sum(nil)), a.Hash)
 	return hex.EncodeToString(hm.Sum(nil)) == a.Hash
 }
 
 func (a Auth) IsOutdated() bool {
-	return (time.Now().Unix() - a.AuthDate) > 86400
+	authDate, _ := strconv.Atoi(a.AuthDate)
+
+	return (time.Now().Unix() - int64(authDate)) > 86400
 }
 
 func (a Auth) CheckString() string {
 	return fmt.Sprintf(
-		"auth_date=%d\nfirst_name=%s\nid=%d\nusername=%s",
+		"auth_date=%v\nfirst_name=%s\nid=%v\nusername=%s",
 		a.AuthDate,
 		a.FirstName,
 		a.Id,
