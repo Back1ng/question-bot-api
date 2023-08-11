@@ -1,10 +1,10 @@
 image: docker
 
-services:
-  - "docker:dind"
+# services:
+#   - "docker:dind"
 
 stages:
-  - build
+  # - build
   - deploy
 
 before_script:
@@ -17,30 +17,45 @@ before_script:
   - ssh-keyscan $HOSTNAME_PRODUCTION >> ~/.ssh/known_hosts
   - chmod 644 ~/.ssh/known_hosts
 
-build-main:
-  stage: build
-  only:
-    - main
-  script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker build --pull -t $CI_REGISTRY_IMAGE:main -f build/golang/Dockerfile_prod --build-arg REPOSITORY_NAME=$REPOSITORY_NAME .
-    - docker push "$CI_REGISTRY_IMAGE:main"
-    - docker system prune --force
+# build-main:
+#   stage: build
+#   only:
+#     - main
+#   script:
+#     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+#     - docker build --pull -t $CI_REGISTRY_IMAGE:main -f build/golang/Dockerfile_prod --build-arg REPOSITORY_NAME=$REPOSITORY_NAME .
+#     - docker push "$CI_REGISTRY_IMAGE:main"
+#     - docker system prune --force
 
-deploy-main:
+deploy-tp:
+  # ВОТ ЭТОТ ОБРАЗ, телепорт там уже установлен 
+  image: registry.gitlab.com/back1ng1/question-bot-api/teleport-bot:v13.3.1
   stage: deploy
-  only:
-    - main
+  id_tokens:
+    # See https://docs.gitlab.com/ee/ci/secrets/id_token_authentication.html
+    # for further explanation of the id_tokens configuration.
+    TBOT_GITLAB_JWT:
+      # An environment variable named TBOT_GITLAB_JWT must exist and contain
+      # an ID token with an audience that matches your Teleport cluster's name.
+      aud: tp.flagsoft.ru
   script:
-    - scp docker-compose.prod.yml $USER_PRODUCTION@$HOSTNAME_PRODUCTION:$PATH_PRODUCTION/docker-compose.api.yml
-    - scp .env.example $USER_PRODUCTION@$HOSTNAME_PRODUCTION:$PATH_PRODUCTION/.env.example
-    - ssh -T $USER_PRODUCTION@$HOSTNAME_PRODUCTION "cd $PATH_PRODUCTION &&
-      docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY"
-    - ssh -T $USER_PRODUCTION@$HOSTNAME_PRODUCTION "cd $PATH_PRODUCTION &&
-      docker pull $CI_REGISTRY_IMAGE:main"
-    - ssh -T $USER_PRODUCTION@$HOSTNAME_PRODUCTION "cd $PATH_PRODUCTION &&
-      docker-compose -f docker-compose.api.yml up -d api"
-    - ssh -T $USER_PRODUCTION@$HOSTNAME_PRODUCTION "cd $PATH_PRODUCTION &&
-      docker-compose -f docker-compose.api.yml exec -T api sh entrypoint.sh"
-    - ssh -T $USER_PRODUCTION@$HOSTNAME_PRODUCTION "cd $PATH_PRODUCTION &&
-      docker image prune --force"
+    - tbot start --token=gitlab-ak-bot --destination-dir=/tmp/tbot-user --data-dir=/tmp/tbot-data --auth-server=tp.flagsoft.ru:443 --join-method=gitlab --oneshot
+    - tsh -i /tmp/tbot-user/identity --proxy tp.flagsoft.ru:443 ssh root@vm-23abc95b "echo $CI_JOB_ID >> ~/gitlab_run_log"
+
+# deploy-main:
+#   stage: deploy
+#   only:
+#     - main
+#   script:
+#     - scp docker-compose.prod.yml $USER_PRODUCTION@$HOSTNAME_PRODUCTION:$PATH_PRODUCTION/docker-compose.api.yml
+#     - scp .env.example $USER_PRODUCTION@$HOSTNAME_PRODUCTION:$PATH_PRODUCTION/.env.example
+#     - ssh -T $USER_PRODUCTION@$HOSTNAME_PRODUCTION "cd $PATH_PRODUCTION &&
+#       docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY"
+#     - ssh -T $USER_PRODUCTION@$HOSTNAME_PRODUCTION "cd $PATH_PRODUCTION &&
+#       docker pull $CI_REGISTRY_IMAGE:main"
+#     - ssh -T $USER_PRODUCTION@$HOSTNAME_PRODUCTION "cd $PATH_PRODUCTION &&
+#       docker-compose -f docker-compose.api.yml up -d api"
+#     - ssh -T $USER_PRODUCTION@$HOSTNAME_PRODUCTION "cd $PATH_PRODUCTION &&
+#       docker-compose -f docker-compose.api.yml exec -T api sh entrypoint.sh"
+#     - ssh -T $USER_PRODUCTION@$HOSTNAME_PRODUCTION "cd $PATH_PRODUCTION &&
+#       docker image prune --force"
