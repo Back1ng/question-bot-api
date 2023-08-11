@@ -15,7 +15,6 @@ before_script:
   - chmod 400 ~/.ssh/id_rsa
   - chmod 400 ~/.ssh/id_rsa.pub
   - ssh-keyscan $HOSTNAME_PRODUCTION >> ~/.ssh/known_hosts
-  - chmod 644 ~/.ssh/known_hosts
 
 # build-main:
 #   stage: build
