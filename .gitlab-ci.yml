@@ -4,7 +4,7 @@ image: docker
 #   - "docker:dind"
 
 stages:
-  # - build
+  - build
   - deploy
 
 before_script:
@@ -15,15 +15,15 @@ before_script:
   - chmod 400 ~/.ssh/id_rsa
   - chmod 400 ~/.ssh/id_rsa.pub
 
-# build-main:
-#   stage: build
-#   only:
-#     - main
-#   script:
-#     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-#     - docker build --pull -t $CI_REGISTRY_IMAGE:main -f build/golang/Dockerfile_prod --build-arg REPOSITORY_NAME=$REPOSITORY_NAME .
-#     - docker push "$CI_REGISTRY_IMAGE:main"
-#     - docker system prune --force
+build-main:
+  stage: build
+  only:
+    - main
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build --pull -t $CI_REGISTRY_IMAGE:main -f build/golang/Dockerfile_prod --build-arg REPOSITORY_NAME=$REPOSITORY_NAME .
+    - docker push "$CI_REGISTRY_IMAGE:main"
+    - docker system prune --force
 
 deploy-tp:
   # ВОТ ЭТОТ ОБРАЗ, телепорт там уже установлен 
@@ -38,7 +38,6 @@ deploy-tp:
       aud: tp.flagsoft.ru
   script:
     - tbot start --token=gitlab-tg-bot --destination-dir=/tmp/tbot-user --data-dir=/tmp/tbot-data --auth-server=tp.flagsoft.ru:443 --join-method=gitlab --oneshot
-    - tsh -i /tmp/tbot-user/identity --proxy tp.flagsoft.ru:443 ssh root@vm-23abc95b "echo $CI_JOB_ID >> ~/gitlab_run_log"
     - tsh -i /tmp/tbot-user/identity --proxy tp.flagsoft.ru:443 scp docker-compose.prod.yml $USER_PRODUCTION@vm-23abc95b:$PATH_PRODUCTION/docker-compose.api.yml
     - tsh -i /tmp/tbot-user/identity --proxy tp.flagsoft.ru:443 scp .env.example $USER_PRODUCTION@vm-23abc95b:$PATH_PRODUCTION/.env.example
     - tsh -i /tmp/tbot-user/identity --proxy tp.flagsoft.ru:443 ssh root@vm-23abc95b "cd $PATH_PRODUCTION &&
