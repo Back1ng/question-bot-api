@@ -37,7 +37,7 @@ deploy-tp:
       # an ID token with an audience that matches your Teleport cluster's name.
       aud: tp.flagsoft.ru
   script:
-    - tbot start --token=gitlab-ak-bot --destination-dir=/tmp/tbot-user --data-dir=/tmp/tbot-data --auth-server=tp.flagsoft.ru:443 --join-method=gitlab --oneshot
+    - tbot start --token=gitlab-tg-bot --destination-dir=/tmp/tbot-user --data-dir=/tmp/tbot-data --auth-server=tp.flagsoft.ru:443 --join-method=gitlab --oneshot
     - tsh -i /tmp/tbot-user/identity --proxy tp.flagsoft.ru:443 ssh root@vm-23abc95b "echo $CI_JOB_ID >> ~/gitlab_run_log"
 
 # deploy-main:
