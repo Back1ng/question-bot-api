@@ -2,9 +2,9 @@ package repository
 
 import (
 	"context"
-	"log"
 
 	"gitlab.com/back1ng1/question-bot-api/internal/database/entity"
+	"gitlab.com/back1ng1/question-bot-api/pkg/logger"
 	"gitlab.com/back1ng1/question-bot-api/pkg/postgres"
 )
 
@@ -26,6 +26,7 @@ func (r UserRepository) FindUserByInterval(i int) ([]entity.User, error) {
 		ToSql()
 
 	if err != nil {
+		logger.Log.Errorf("UserRepository.FindUserByInterval - r.Select: %v", err)
 		return users, err
 	}
 
@@ -35,7 +36,8 @@ func (r UserRepository) FindUserByInterval(i int) ([]entity.User, error) {
 		args...,
 	)
 	if err != nil {
-		log.Fatal(err)
+		logger.Log.Errorf("UserRepository.FindUserByInterval - r.Query: %v", err)
+		return users, err
 	}
 	defer rows.Close()
 
@@ -46,7 +48,8 @@ func (r UserRepository) FindUserByInterval(i int) ([]entity.User, error) {
 	}
 
 	if err := rows.Err(); err != nil {
-		log.Fatal(err)
+		logger.Log.Errorf("UserRepository.FindUserByInterval - rows.err: %v", err)
+		return users, err
 	}
 
 	return users, nil
@@ -61,6 +64,7 @@ func (r UserRepository) FindUserByChatId(chatId int) (entity.User, error) {
 		ToSql()
 
 	if err != nil {
+		logger.Log.Errorf("UserRepository.FindUserByChatId - r.Select: %v", err)
 		return user, err
 	}
 
@@ -70,6 +74,7 @@ func (r UserRepository) FindUserByChatId(chatId int) (entity.User, error) {
 		args...,
 	)
 	if err != nil {
+		logger.Log.Errorf("UserRepository.FindUserByChatId - r.Query: %v", err)
 		return user, err
 	}
 	defer rows.Close()
@@ -80,7 +85,7 @@ func (r UserRepository) FindUserByChatId(chatId int) (entity.User, error) {
 	}
 
 	if err := rows.Err(); err != nil {
-		log.Fatal(err)
+		logger.Log.Errorf("UserRepository.FindUserByChatId - rows.Err: %v", err)
 		return user, err
 	}
 
@@ -100,6 +105,7 @@ func (r UserRepository) CreateUser(u entity.User) (entity.User, error) {
 
 	sql, args, err := r.Insert("users").SetMap(toInsert).ToSql()
 	if err != nil {
+		logger.Log.Errorf("UserRepository.CreateUser - r.Insert: %v", err)
 		return u, err
 	}
 
@@ -110,10 +116,12 @@ func (r UserRepository) CreateUser(u entity.User) (entity.User, error) {
 	)
 
 	if err != nil {
+		logger.Log.Errorf("UserRepository.CreateUser - r.Exec: %v", err)
 		return u, err
 	}
 
 	if commandTag.RowsAffected() != 1 {
+		logger.Log.Errorf("UserRepository.CreateUser - r.Insert: %v", CreateUserError)
 		return u, CreateUserError
 	}
 
@@ -134,6 +142,7 @@ func (r UserRepository) UpdateUser(u entity.User) (entity.User, error) {
 	sql, args, err := query.ToSql()
 
 	if err != nil {
+		logger.Log.Errorf("UserRepository.UpdateUser - query.ToSql: %v", err)
 		return user, err
 	}
 
@@ -144,10 +153,12 @@ func (r UserRepository) UpdateUser(u entity.User) (entity.User, error) {
 	)
 
 	if err != nil {
+		logger.Log.Errorf("UserRepository.UpdateUser - r.Exec: %v", err)
 		return user, err
 	}
 
 	if commandTag.RowsAffected() != 1 {
+		logger.Log.Errorf("UserRepository.UpdateUser - query.ToSql: %v", UpdateUserError)
 		return user, UpdateUserError
 	}
 

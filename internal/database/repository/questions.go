@@ -2,9 +2,9 @@ package repository
 
 import (
 	"context"
-	"log"
 
 	"gitlab.com/back1ng1/question-bot-api/internal/database/entity"
+	"gitlab.com/back1ng1/question-bot-api/pkg/logger"
 	"gitlab.com/back1ng1/question-bot-api/pkg/postgres"
 
 	"github.com/jackc/pgx/v5"
@@ -25,7 +25,9 @@ func (r QuestionRepository) FindQuestionsInPreset(presetId int) ([]entity.Questi
 		From("questions").
 		Where("preset_id = ?", presetId).
 		ToSql()
+
 	if err != nil {
+		logger.Log.Errorf("QuestionRepository.FindQuestionsInPreset - r.Select: %v", err)
 		return questions, err
 	}
 
@@ -36,7 +38,7 @@ func (r QuestionRepository) FindQuestionsInPreset(presetId int) ([]entity.Questi
 	)
 
 	if err != nil {
-		log.Fatal(err)
+		logger.Log.Errorf("QuestionRepository.FindQuestionsInPreset - r.Query: %v", err)
 		return questions, err
 	}
 
@@ -49,7 +51,7 @@ func (r QuestionRepository) FindQuestionsInPreset(presetId int) ([]entity.Questi
 	}
 
 	if err := rows.Err(); err != nil {
-		log.Fatal(err)
+		logger.Log.Errorf("QuestionRepository.FindQuestionsInPreset - rows.Err: %v", err)
 		return questions, err
 	}
 
@@ -63,6 +65,7 @@ func (r QuestionRepository) StoreQuestion(q entity.Question) error {
 		ToSql()
 
 	if err != nil {
+		logger.Log.Errorf("QuestionRepository.StoreQuestion - r.Insert: %v", err)
 		return err
 	}
 
@@ -76,6 +79,7 @@ func (r QuestionRepository) StoreQuestion(q entity.Question) error {
 	err = row.Scan(&question.ID, &question.PresetId, &question.Title)
 
 	if err != nil {
+		logger.Log.Errorf("QuestionRepository.StoreQuestion - rows.Scan: %v", err)
 		return err
 	}
 
@@ -84,6 +88,7 @@ func (r QuestionRepository) StoreQuestion(q entity.Question) error {
 
 func (r QuestionRepository) UpdateQuestionTitle(id int, q entity.Question) error {
 	if len(q.Title) == 0 {
+		logger.Log.Errorf("QuestionRepository.UpdateQuestionTitle - len(q.Title): %v", UpdateQuestionEmptyTitle)
 		return UpdateQuestionEmptyTitle
 	}
 
@@ -92,6 +97,7 @@ func (r QuestionRepository) UpdateQuestionTitle(id int, q entity.Question) error
 		Where("id = ?", id).
 		ToSql()
 	if err != nil {
+		logger.Log.Errorf("QuestionRepository.UpdateQuestionTitle - r.Update: %v", err)
 		return err
 	}
 
@@ -101,10 +107,12 @@ func (r QuestionRepository) UpdateQuestionTitle(id int, q entity.Question) error
 		args...,
 	)
 	if err != nil {
+		logger.Log.Errorf("QuestionRepository.UpdateQuestionTitle - r.Exec: %v", err)
 		return err
 	}
 
 	if commandTag.RowsAffected() != 1 {
+		logger.Log.Errorf("QuestionRepository.UpdateQuestionTitle - r.Exec: %v", UpdateQuestionError)
 		return UpdateQuestionError
 	}
 
@@ -121,10 +129,12 @@ func (r QuestionRepository) DeleteQuestion(id int) error {
 	)
 
 	if err != nil {
+		logger.Log.Errorf("QuestionRepository.DeleteQuestion - r.Exec: %v", err)
 		return err
 	}
 
 	if commandTag.RowsAffected() != 1 {
+		logger.Log.Errorf("QuestionRepository.DeleteQuestion - r.Exec: %v", DeleteQuestionError)
 		return DeleteQuestionError
 	}
 

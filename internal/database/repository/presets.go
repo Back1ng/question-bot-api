@@ -2,9 +2,9 @@ package repository
 
 import (
 	"context"
-	"log"
 
 	"gitlab.com/back1ng1/question-bot-api/internal/database/entity"
+	"gitlab.com/back1ng1/question-bot-api/pkg/logger"
 	"gitlab.com/back1ng1/question-bot-api/pkg/postgres"
 )
 
@@ -24,6 +24,7 @@ func (r PresetRepository) FindPresets() ([]entity.Preset, error) {
 		ToSql()
 
 	if err != nil {
+		logger.Log.Errorf("PresetRepository.FindPresets - r.Select: %v", err)
 		return presets, err
 	}
 
@@ -33,7 +34,7 @@ func (r PresetRepository) FindPresets() ([]entity.Preset, error) {
 	)
 
 	if err != nil {
-		log.Fatal(err)
+		logger.Log.Errorf("PresetRepository.FindPresets - r.Query: %v", err)
 		return presets, err
 	}
 
@@ -46,7 +47,7 @@ func (r PresetRepository) FindPresets() ([]entity.Preset, error) {
 	}
 
 	if err := rows.Err(); err != nil {
-		log.Fatal(err)
+		logger.Log.Errorf("PresetRepository.FindPresets - rows.Err: %v", err)
 		return presets, err
 	}
 
@@ -61,6 +62,7 @@ func (r PresetRepository) StorePreset(p entity.Preset) (entity.Preset, error) {
 		ToSql()
 
 	if err != nil {
+		logger.Log.Errorf("PresetRepository.StorePreset - r.Insert: %v", err)
 		return p, err
 	}
 
@@ -72,6 +74,7 @@ func (r PresetRepository) StorePreset(p entity.Preset) (entity.Preset, error) {
 
 	var preset entity.Preset
 	if err := row.Scan(&preset.ID, &preset.Title); err != nil {
+		logger.Log.Errorf("PresetRepository.StorePreset - rows.Scan: %v", err)
 		return p, err
 	}
 
@@ -80,6 +83,7 @@ func (r PresetRepository) StorePreset(p entity.Preset) (entity.Preset, error) {
 
 func (r PresetRepository) UpdatePreset(id int, p entity.Preset) error {
 	if len(p.Title) == 0 {
+		logger.Log.Errorf("PresetRepository.UpdatePreset - len(p.title): %v", UpdatePresetsEmptyTitle)
 		return UpdatePresetsEmptyTitle
 	}
 
@@ -88,6 +92,7 @@ func (r PresetRepository) UpdatePreset(id int, p entity.Preset) error {
 		ToSql()
 
 	if err != nil {
+		logger.Log.Errorf("PresetRepository.UpdatePreset - r.Update: %v", err)
 		return err
 	}
 
@@ -98,10 +103,12 @@ func (r PresetRepository) UpdatePreset(id int, p entity.Preset) error {
 	)
 
 	if err != nil {
+		logger.Log.Errorf("PresetRepository.UpdatePreset - r.Exec: %v", err)
 		return err
 	}
 
 	if commandTag.RowsAffected() != 1 {
+		logger.Log.Errorf("PresetRepository.UpdatePreset - r.Update: %v", UpdatePresetsError)
 		return UpdatePresetsError
 	}
 
@@ -114,6 +121,7 @@ func (r PresetRepository) DeletePreset(id int) error {
 		ToSql()
 
 	if err != nil {
+		logger.Log.Errorf("PresetRepository.DeletePreset - r.Delete: %v", err)
 		return err
 	}
 
@@ -124,10 +132,12 @@ func (r PresetRepository) DeletePreset(id int) error {
 	)
 
 	if err != nil {
+		logger.Log.Errorf("PresetRepository.DeletePreset - r.Exec: %v", err)
 		return err
 	}
 
 	if commandTag.RowsAffected() != 1 {
+		logger.Log.Errorf("PresetRepository.DeletePreset - r.Exec: %v", DeletePresetsError)
 		return DeletePresetsError
 	}
 

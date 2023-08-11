@@ -2,7 +2,9 @@ package repository
 
 import (
 	"context"
+
 	"gitlab.com/back1ng1/question-bot-api/internal/database/entity"
+	"gitlab.com/back1ng1/question-bot-api/pkg/logger"
 	"gitlab.com/back1ng1/question-bot-api/pkg/postgres"
 )
 
@@ -23,6 +25,7 @@ func (r *AnswerRepository) FindAnswersInQuestion(questionId int) ([]entity.Answe
 		ToSql()
 
 	if err != nil {
+		logger.Log.Errorf("AnswerRepository.FindAnswersInQuestion - r.Select: %v", err)
 		return answers, err
 	}
 
@@ -32,6 +35,7 @@ func (r *AnswerRepository) FindAnswersInQuestion(questionId int) ([]entity.Answe
 		args...,
 	)
 	if err != nil {
+		logger.Log.Errorf("AnswerRepository.FindAnswersInQuestion - r.Query: %v", err)
 		return answers, err
 	}
 
@@ -44,6 +48,7 @@ func (r *AnswerRepository) FindAnswersInQuestion(questionId int) ([]entity.Answe
 	}
 
 	if err := rows.Err(); err != nil {
+		logger.Log.Errorf("AnswerRepository.FindAnswersInQuestion - rows.Err: %v", err)
 		return answers, err
 	}
 
@@ -57,6 +62,7 @@ func (r *AnswerRepository) StoreAnswer(answer entity.Answer) (entity.Answer, err
 		Suffix("RETURNING id, is_correct").
 		ToSql()
 	if err != nil {
+		logger.Log.Errorf("AnswerRepository.StoreAnswer - r.Insert: %v", err)
 		return answer, err
 	}
 
@@ -67,6 +73,7 @@ func (r *AnswerRepository) StoreAnswer(answer entity.Answer) (entity.Answer, err
 	)
 
 	if err := row.Scan(&answer.ID, &answer.IsCorrect); err != nil {
+		logger.Log.Errorf("AnswerRepository.StoreAnswer - row.Scan: %v", err)
 		return answer, err
 	}
 
@@ -75,6 +82,7 @@ func (r *AnswerRepository) StoreAnswer(answer entity.Answer) (entity.Answer, err
 
 func (r *AnswerRepository) UpdateAnswer(answer entity.Answer) error {
 	if len(answer.Title) == 0 {
+		logger.Log.Errorf("AnswerRepository.UpdateAnswer - answer.Title: %v", UpdateAnswerEmptyTitle)
 		return UpdateAnswerEmptyTitle
 	}
 
@@ -85,6 +93,7 @@ func (r *AnswerRepository) UpdateAnswer(answer entity.Answer) error {
 		ToSql()
 
 	if err != nil {
+		logger.Log.Errorf("AnswerRepository.UpdateAnswer - r.Update: %v", err)
 		return err
 	}
 
@@ -95,10 +104,12 @@ func (r *AnswerRepository) UpdateAnswer(answer entity.Answer) error {
 	)
 
 	if err != nil {
+		logger.Log.Errorf("AnswerRepository.UpdateAnswer - r.Exec: %v", err)
 		return err
 	}
 
 	if commandTag.RowsAffected() != 1 {
+		logger.Log.Errorf("AnswerRepository.UpdateAnswer - r.Exec: %v", UpdateAnswerError)
 		return UpdateAnswerError
 	}
 
@@ -107,6 +118,7 @@ func (r *AnswerRepository) UpdateAnswer(answer entity.Answer) error {
 
 func (r *AnswerRepository) DeleteAnswer(answer entity.Answer) error {
 	if answer.ID == 0 {
+		logger.Log.Errorf("AnswerRepository.DeleteAnswer - answer.ID: %v", DeleteAnswerIdNotPresented)
 		return DeleteAnswerIdNotPresented
 	}
 
@@ -114,6 +126,7 @@ func (r *AnswerRepository) DeleteAnswer(answer entity.Answer) error {
 		Where("id = ?", answer.ID).ToSql()
 
 	if err != nil {
+		logger.Log.Errorf("AnswerRepository.DeleteAnswer - r.Delete: %v", err)
 		return err
 	}
 
@@ -124,10 +137,12 @@ func (r *AnswerRepository) DeleteAnswer(answer entity.Answer) error {
 	)
 
 	if err != nil {
+		logger.Log.Errorf("AnswerRepository.DeleteAnswer - r.Exec: %v", err)
 		return err
 	}
 
 	if commandTag.RowsAffected() != 1 {
+		logger.Log.Errorf("AnswerRepository.DeleteAnswer - r.Exec: %v", DeleteAnswerError)
 		return DeleteAnswerError
 	}
 

@@ -13,17 +13,21 @@ import (
 	"gitlab.com/back1ng1/question-bot-api/internal/database"
 	"gitlab.com/back1ng1/question-bot-api/internal/middlewares/auth"
 	"gitlab.com/back1ng1/question-bot-api/internal/routes"
+	"gitlab.com/back1ng1/question-bot-api/pkg/logger"
 )
 
 func Run() {
 	fmt.Println("Initializing configuration...")
 	godotenv.Load(".env")
 
+	fmt.Println("Initializing logging...")
+	logger.New()
+
 	fmt.Println("Initializing postgres connection...")
 	sb := squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
 	conn, err := pgx.Connect(context.Background(), os.Getenv("POSTGRESQL_URL"))
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "unable to connect to database: %v\n", err)
+		logger.Log.Errorf("app.Run - pgx.Connect: %v", err)
 		os.Exit(1)
 	}
 	defer conn.Close(context.Background())

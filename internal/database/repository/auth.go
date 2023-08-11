@@ -2,6 +2,8 @@ package repository
 
 import (
 	"context"
+
+	"gitlab.com/back1ng1/question-bot-api/pkg/logger"
 	"gitlab.com/back1ng1/question-bot-api/pkg/postgres"
 	"gitlab.com/back1ng1/question-bot-api/pkg/tgauth"
 )
@@ -20,6 +22,7 @@ func (r AuthRepository) HasToken(hash string) (bool, error) {
 		Where("hash = ?", hash).
 		ToSql()
 	if err != nil {
+		logger.Log.Errorf("AuthRepository.HasToken - r.Select: %v", err)
 		return false, err
 	}
 
@@ -28,17 +31,21 @@ func (r AuthRepository) HasToken(hash string) (bool, error) {
 		sql,
 		args...,
 	)
-	defer rows.Close()
 	if err != nil {
+		logger.Log.Errorf("AuthRepository.HasToken - r.Query: %v", err)
 		return false, err
 	}
+	defer rows.Close()
 
 	var tokens []tgauth.Auth
 	for rows.Next() {
 		var auth tgauth.Auth
+
 		if err := rows.Scan(&auth.AuthDate, &auth.Hash); err != nil {
+			logger.Log.Errorf("AuthRepository.HasToken - rows.Scan: %v", err)
 			return false, err
 		}
+
 		tokens = append(tokens, auth)
 	}
 
@@ -57,11 +64,13 @@ func (r AuthRepository) HasToken(hash string) (bool, error) {
 
 func (r AuthRepository) GenerateToken(auth tgauth.Auth) (string, error) {
 	if auth.IsOutdated() {
+		logger.Log.Error("AuthRepository.GenerateToken - auth.IsOutdated: Given token is outdated")
 		return "", AuthDataIsOutdated
 	}
 
 	hasToken, err := r.HasToken(auth.Hash)
 	if err != nil {
+		logger.Log.Errorf("AuthRepository.GenerateToken - r.HasToken: %v", err)
 		return "", err
 	}
 
@@ -70,6 +79,7 @@ func (r AuthRepository) GenerateToken(auth tgauth.Auth) (string, error) {
 	}
 
 	if !auth.IsValid() {
+		logger.Log.Errorf("AuthRepository.GenerateToken - auth.IsValid: %v", AuthFailedCheck)
 		return "", AuthFailedCheck
 	}
 
@@ -77,6 +87,7 @@ func (r AuthRepository) GenerateToken(auth tgauth.Auth) (string, error) {
 		Columns("auth_date", "first_name", "hash", "user_id", "username").
 		Values(auth.AuthDate, auth.FirstName, auth.Hash, auth.Id, auth.Username).ToSql()
 	if err != nil {
+		logger.Log.Errorf("AuthRepository.GenerateToken - r.Insert: %v", err)
 		return "", err
 	}
 
@@ -86,10 +97,12 @@ func (r AuthRepository) GenerateToken(auth tgauth.Auth) (string, error) {
 		args...,
 	)
 	if err != nil {
+		logger.Log.Errorf("AuthRepository.GenerateToken - r.Exec: %v", err)
 		return "", err
 	}
 
 	if commandTag.RowsAffected() != 1 {
+		logger.Log.Errorf("AuthRepository.GenerateToken - r.Exec: %v", AuthCannotStoreToken)
 		return "", AuthCannotStoreToken
 	}
 
@@ -98,12 +111,19 @@ func (r AuthRepository) GenerateToken(auth tgauth.Auth) (string, error) {
 		Where("user_id = ?", auth.Id).
 		ToSql()
 
+	if err != nil {
+		logger.Log.Errorf("AuthRepository.GenerateToken - r.Delete: %v", err)
+		return "", err
+	}
+
 	_, err = r.Exec(
 		context.Background(),
 		sql,
 		args...,
 	)
+
 	if err != nil {
+		logger.Log.Errorf("AuthRepository.GenerateToken - r.Exec: %v", err)
 		return "", err
 	}
 
