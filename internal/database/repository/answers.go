@@ -89,7 +89,7 @@ func (r *AnswerRepository) UpdateAnswer(answer entity.Answer) error {
 	sql, args, err := r.Update("answers").
 		Set("title", answer.Title).
 		Set("is_correct", answer.IsCorrect).
-		Where("id", answer.ID).
+		Where("id = ?", answer.ID).
 		ToSql()
 
 	if err != nil {
