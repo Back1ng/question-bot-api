@@ -17,7 +17,7 @@ type UserApi struct {
 func (r *UserApi) RegisterUserRoutes() {
 	r.App.Get("/api/user/:chat_id", r.GetUser)
 	r.App.Post("/api/user", r.StoreUser)
-	r.App.Put("/api/user", r.UpdateUser)
+	r.App.Put("/api/user/:id", r.UpdateUser)
 }
 
 func (r *UserApi) GetUser(c *fiber.Ctx) error {
@@ -56,13 +56,20 @@ func (r *UserApi) StoreUser(c *fiber.Ctx) error {
 }
 
 func (r *UserApi) UpdateUser(c *fiber.Ctx) error {
-	user := entity.User{}
+	id, err := strconv.Atoi(c.Params("id"))
+
+	if err != nil {
+		logger.Log.Errorf("UserApi.UpdateUser - strconv.Atoi: %v", err)
+		return err
+	}
+
+	user := entity.User{ID: int64(id)}
 	if err := c.BodyParser(&user); err != nil {
 		logger.Log.Errorf("UserApi.UpdateUser - c.BodyParser: %v", err)
 		return err
 	}
 
-	user, err := r.Repo.UpdateUser(user)
+	user, err = r.Repo.UpdateUser(user)
 	if err != nil {
 		logger.Log.Errorf("UserApi.UpdateUser - r.Repo.UpdateUser: %v", err)
 		return err

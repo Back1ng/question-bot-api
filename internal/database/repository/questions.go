@@ -62,6 +62,7 @@ func (r QuestionRepository) StoreQuestion(q entity.Question) error {
 	sql, args, err := r.Insert("questions").
 		Columns("preset_id", "title").
 		Values(q.PresetId, q.Title).
+		Suffix("RETURNING id, preset_id, title").
 		ToSql()
 
 	if err != nil {

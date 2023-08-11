@@ -18,7 +18,7 @@ type AnswerApi struct {
 func (r *AnswerApi) RegisterAnswerRoutes() {
 	r.App.Get("/api/answers/:questionid", r.GetAnswers)
 	r.App.Post("/api/answer", r.StoreAnswers)
-	r.App.Put("/api/answer", r.UpdateAnswer)
+	r.App.Put("/api/answer/:id", r.UpdateAnswer)
 	r.App.Delete("/api/answer/:id", r.DeleteAnswer)
 }
 
@@ -60,7 +60,13 @@ func (r *AnswerApi) StoreAnswers(c *fiber.Ctx) error {
 }
 
 func (r *AnswerApi) UpdateAnswer(c *fiber.Ctx) error {
-	answer := entity.Answer{}
+	id, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		logger.Log.Errorf("AnswerApi.UpdateAnswer - strconv.Atoi: %v", err)
+		return err
+	}
+
+	answer := entity.Answer{ID: int64(id)}
 	if err := c.BodyParser(&answer); err != nil {
 		logger.Log.Errorf("AnswerApi.UpdateAnswer - c.BodyParser: %v", err)
 		return err
