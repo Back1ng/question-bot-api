@@ -32,6 +32,7 @@ type AnswerRoutes interface {
 
 type UserRoutes interface {
 	RegisterUserRoutes()
+	GetUsersByInterval(c *fiber.Ctx) error
 	GetUser(c *fiber.Ctx) error
 	StoreUser(c *fiber.Ctx) error
 	UpdateUser(c *fiber.Ctx) error

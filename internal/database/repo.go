@@ -31,7 +31,7 @@ type QuestionRepository interface {
 }
 
 type UserRepository interface {
-	FindUserByInterval(i int) ([]entity.User, error)
+	FindUsersByInterval(i int) ([]int64, error)
 	FindUserByChatId(chatId int) (entity.User, error)
 	CreateUser(u entity.User) (entity.User, error)
 	UpdateUser(u entity.User) (entity.User, error)

@@ -15,9 +15,30 @@ type UserApi struct {
 }
 
 func (r *UserApi) RegisterUserRoutes() {
+	r.App.Get("/api/user/interval/:id", r.GetUsersByInterval)
 	r.App.Get("/api/user/:chat_id", r.GetUser)
 	r.App.Post("/api/user", r.StoreUser)
 	r.App.Put("/api/user/:id", r.UpdateUser)
+}
+
+func (r *UserApi) GetUsersByInterval(c *fiber.Ctx) error {
+	intervalId, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		logger.Log.Errorf("UserApi.GetUsersByInterval - strconv.Atoi: %v", err)
+		return err
+	}
+
+	users, err := r.Repo.FindUsersByInterval(intervalId)
+	if err != nil {
+		logger.Log.Errorf("UserApi.GetUsersByInterval - r.Repo.FindUsersByInterval: %v", err)
+		return err
+	}
+
+	if len(users) == 0 {
+		return c.JSON([]string{})
+	}
+
+	return c.JSON(users)
 }
 
 func (r *UserApi) GetUser(c *fiber.Ctx) error {

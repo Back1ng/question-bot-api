@@ -16,17 +16,17 @@ func NewUserRepository(pg postgres.PgConfig) *UserRepository {
 	return &UserRepository{pg}
 }
 
-func (r UserRepository) FindUserByInterval(i int) ([]entity.User, error) {
-	var users []entity.User
+func (r UserRepository) FindUsersByInterval(i int) ([]int64, error) {
+	var users []int64
 	sql, args, err := r.
-		Select("id", "chat_id", "nickname", "interval", "interval_enabled").
+		Select("chat_id").
 		From("users").
 		Where("interval = ?", i).
-		Where("interval = ?", true).
+		Where("interval_enabled = ?", true).
 		ToSql()
 
 	if err != nil {
-		logger.Log.Errorf("UserRepository.FindUserByInterval - r.Select: %v", err)
+		logger.Log.Errorf("UserRepository.FindUsersByInterval - r.Select: %v", err)
 		return users, err
 	}
 
@@ -36,15 +36,15 @@ func (r UserRepository) FindUserByInterval(i int) ([]entity.User, error) {
 		args...,
 	)
 	if err != nil {
-		logger.Log.Errorf("UserRepository.FindUserByInterval - r.Query: %v", err)
+		logger.Log.Errorf("UserRepository.FindUsersByInterval - r.Query: %v", err)
 		return users, err
 	}
 	defer rows.Close()
 
 	for rows.Next() {
-		user := entity.User{}
-		rows.Scan(&user.ID, &user.ChatId, &user.Nickname, &user.Interval, &user.IntervalEnabled)
-		users = append(users, user)
+		var chatId int64
+		rows.Scan(&chatId)
+		users = append(users, chatId)
 	}
 
 	if err := rows.Err(); err != nil {
