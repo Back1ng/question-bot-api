@@ -58,7 +58,7 @@ func (r UserRepository) FindUsersByInterval(i int) ([]int64, error) {
 func (r UserRepository) FindUserByChatId(chatId int) (entity.User, error) {
 	var user entity.User
 
-	sql, args, err := r.Select("id", "chat_id", "nickname", "interval", "interval_enabled").
+	sql, args, err := r.Select("id", "chat_id", "preset_id", "nickname", "interval", "interval_enabled").
 		From("users").
 		Where("chat_id = ?", chatId).
 		ToSql()
@@ -80,7 +80,7 @@ func (r UserRepository) FindUserByChatId(chatId int) (entity.User, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		rows.Scan(&user.ID, &user.ChatId, &user.Nickname, &user.Interval, &user.IntervalEnabled)
+		rows.Scan(&user.ID, &user.ChatId, &user.PresetId, &user.Nickname, &user.Interval, &user.IntervalEnabled)
 		break
 	}
 
