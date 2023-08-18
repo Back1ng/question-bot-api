@@ -39,6 +39,7 @@ func Run() {
 
 	ignoreAuthPaths := []string{
 		"/api/auth/login",
+		"/swagger",
 	}
 
 	app := fiber.New()
@@ -48,6 +49,10 @@ func Run() {
 		Filter: func(c *fiber.Ctx) bool {
 			for _, v := range ignoreAuthPaths {
 				if c.OriginalURL() == v {
+					return true
+				}
+
+				if len(v) < len(c.OriginalURL()) && c.OriginalURL()[:len(v)] == v {
 					return true
 				}
 			}

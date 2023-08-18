@@ -4,7 +4,12 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"gitlab.com/back1ng1/question-bot-api/internal/database"
 	"gitlab.com/back1ng1/question-bot-api/internal/routes/api"
+	"gitlab.com/back1ng1/question-bot-api/internal/routes/web"
 )
+
+type SwaggerRoutes interface {
+	RegisterSwaggerRoutes()
+}
 
 type QuestionRoutes interface {
 	RegisterQuestionRoutes()
@@ -49,6 +54,7 @@ type Routes struct {
 	AnswerRoutes
 	UserRoutes
 	AuthRoutes
+	SwaggerRoutes
 }
 
 func RegisterRoutes(app *fiber.App, r database.Repositories) Routes {
@@ -58,6 +64,7 @@ func RegisterRoutes(app *fiber.App, r database.Repositories) Routes {
 		AnswerRoutes:   &api.AnswerApi{App: app, Repo: r.AnswerRepository},
 		UserRoutes:     &api.UserApi{App: app, Repo: r.UserRepository},
 		AuthRoutes:     &api.AuthApi{App: app, Repo: r.AuthRepository},
+		SwaggerRoutes:  &web.SwaggerApi{App: app},
 	}
 
 	routes.PresetRoutes.RegisterPresetRoutes()
@@ -65,6 +72,7 @@ func RegisterRoutes(app *fiber.App, r database.Repositories) Routes {
 	routes.QuestionRoutes.RegisterQuestionRoutes()
 	routes.UserRoutes.RegisterUserRoutes()
 	routes.AuthRoutes.RegisterAuthRoutes()
+	routes.SwaggerRoutes.RegisterSwaggerRoutes()
 
 	return routes
 }
