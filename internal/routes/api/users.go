@@ -84,7 +84,7 @@ func (r *UserApi) UpdateUser(c *fiber.Ctx) error {
 		return err
 	}
 
-	user := entity.User{ID: int64(id)}
+	user := entity.User{ChatId: int64(id)}
 	if err := c.BodyParser(&user); err != nil {
 		logger.Log.Errorf("UserApi.UpdateUser - c.BodyParser: %v", err)
 		return err
