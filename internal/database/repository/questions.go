@@ -58,7 +58,9 @@ func (r QuestionRepository) FindQuestionsInPreset(presetId int) ([]entity.Questi
 	return questions, nil
 }
 
-func (r QuestionRepository) StoreQuestion(q entity.Question) error {
+func (r QuestionRepository) StoreQuestion(q entity.Question) (entity.Question, error) {
+	var question entity.Question
+
 	sql, args, err := r.Insert("questions").
 		Columns("preset_id", "title").
 		Values(q.PresetId, q.Title).
@@ -67,7 +69,7 @@ func (r QuestionRepository) StoreQuestion(q entity.Question) error {
 
 	if err != nil {
 		logger.Log.Errorf("QuestionRepository.StoreQuestion - r.Insert: %v", err)
-		return err
+		return question, err
 	}
 
 	row := r.QueryRow(
@@ -76,15 +78,14 @@ func (r QuestionRepository) StoreQuestion(q entity.Question) error {
 		args...,
 	)
 
-	var question entity.Question
 	err = row.Scan(&question.ID, &question.PresetId, &question.Title)
 
 	if err != nil {
 		logger.Log.Errorf("QuestionRepository.StoreQuestion - rows.Scan: %v", err)
-		return err
+		return question, err
 	}
 
-	return nil
+	return question, nil
 }
 
 func (r QuestionRepository) UpdateQuestionTitle(id int, q entity.Question) error {

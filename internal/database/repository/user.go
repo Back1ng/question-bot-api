@@ -103,26 +103,24 @@ func (r UserRepository) CreateUser(u entity.User) (entity.User, error) {
 		toInsert["interval"] = u.Interval
 	}
 
-	sql, args, err := r.Insert("users").SetMap(toInsert).ToSql()
+	sql, args, err := r.Insert("users").
+		Suffix("RETURNING id").
+		SetMap(toInsert).
+		ToSql()
 	if err != nil {
 		logger.Log.Errorf("UserRepository.CreateUser - r.Insert: %v", err)
 		return u, err
 	}
 
-	commandTag, err := r.Exec(
+	row := r.QueryRow(
 		context.Background(),
 		sql,
 		args...,
 	)
 
-	if err != nil {
-		logger.Log.Errorf("UserRepository.CreateUser - r.Exec: %v", err)
+	if err := row.Scan(&u.ID); err != nil {
+		logger.Log.Errorf("UserRepository.CreateUser - r.QueryRow: %v", err)
 		return u, err
-	}
-
-	if commandTag.RowsAffected() != 1 {
-		logger.Log.Errorf("UserRepository.CreateUser - r.Insert: %v", CreateUserError)
-		return u, CreateUserError
 	}
 
 	return u, nil

@@ -25,7 +25,7 @@ type PresetRepository interface {
 
 type QuestionRepository interface {
 	FindQuestionsInPreset(presetId int) ([]entity.Question, error)
-	StoreQuestion(q entity.Question) error
+	StoreQuestion(q entity.Question) (entity.Question, error)
 	UpdateQuestionTitle(id int, q entity.Question) error
 	DeleteQuestion(id int) error
 }

@@ -49,12 +49,13 @@ func (r *QuestionApi) StoreQuestions(c *fiber.Ctx) error {
 		return err
 	}
 
-	if err := r.Repo.StoreQuestion(question); err != nil {
+	responseQuestion, err := r.Repo.StoreQuestion(question)
+	if err != nil {
 		logger.Log.Errorf("QuestionApi.StoreQuestions - r.Repo.StoreQuestion: %v", err)
 		return err
 	}
 
-	return c.JSON(question)
+	return c.JSON(responseQuestion)
 }
 
 func (r *QuestionApi) UpdateQuestion(c *fiber.Ctx) error {
