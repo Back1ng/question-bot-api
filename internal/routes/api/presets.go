@@ -68,6 +68,8 @@ func (r *PresetApi) UpdatePreset(c *fiber.Ctx) error {
 		return err
 	}
 
+	preset.ID = int64(id)
+
 	if err = r.Repo.UpdatePreset(id, preset); err != nil {
 		logger.Log.Errorf("PresetApi.UpdatePreset - r.Repo.UpdatePreset: %v", err)
 		return err
