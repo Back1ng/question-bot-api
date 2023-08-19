@@ -137,6 +137,10 @@ func (r UserRepository) UpdateUser(u entity.User) (entity.User, error) {
 		query = query.Set("interval", u.Interval)
 	}
 
+	if u.PresetId > 0 {
+		query = query.Set("preset_id", u.PresetId)
+	}
+
 	sql, args, err := query.ToSql()
 
 	if err != nil {
