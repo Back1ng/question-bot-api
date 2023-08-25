@@ -24,13 +24,13 @@ func (r *UserApi) RegisterUserRoutes() {
 func (r *UserApi) GetUsersByInterval(c *fiber.Ctx) error {
 	intervalId, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
-		logger.Log.Errorf("UserApi.GetUsersByInterval - strconv.Atoi: %v", err)
+		logger.Log.Errorf("UserApi.GetUsersByInterval - strconv.Atoi: %v. c.Params(\"id\"): %#+v", err, c.Params("id"))
 		return err
 	}
 
 	users, err := r.Repo.FindUsersByInterval(intervalId)
 	if err != nil {
-		logger.Log.Errorf("UserApi.GetUsersByInterval - r.Repo.FindUsersByInterval: %v", err)
+		logger.Log.Errorf("UserApi.GetUsersByInterval - r.Repo.FindUsersByInterval: %v. IntervalId: %d", err, intervalId)
 		return err
 	}
 
@@ -44,13 +44,13 @@ func (r *UserApi) GetUsersByInterval(c *fiber.Ctx) error {
 func (r *UserApi) GetUser(c *fiber.Ctx) error {
 	chatId, err := strconv.Atoi(c.Params("chat_id"))
 	if err != nil {
-		logger.Log.Errorf("UserApi.GetUser - strconv.Atoi: %v", err)
+		logger.Log.Errorf("UserApi.GetUser - strconv.Atoi: %v. c.Params(\"chat_id\"): %#+v", err, c.Params("chat_id"))
 		return err
 	}
 
 	user, err := r.Repo.FindUserByChatId(chatId)
 	if err != nil {
-		logger.Log.Errorf("UserApi.GetUser - r.Repo.FindUserByChatId: %v", err)
+		logger.Log.Errorf("UserApi.GetUser - r.Repo.FindUserByChatId: %v. ChatId: %d", err, chatId)
 		return err
 	}
 
@@ -69,7 +69,7 @@ func (r *UserApi) StoreUser(c *fiber.Ctx) error {
 
 	u, err := r.Repo.CreateUser(user)
 	if err != nil {
-		logger.Log.Errorf("UserApi.StoreUser - r.Repo.CreateUser: %v", err)
+		logger.Log.Errorf("UserApi.StoreUser - r.Repo.CreateUser: %v. User: %#+v", err, user)
 		return err
 	}
 
@@ -80,7 +80,7 @@ func (r *UserApi) UpdateUser(c *fiber.Ctx) error {
 	id, err := strconv.Atoi(c.Params("id"))
 
 	if err != nil {
-		logger.Log.Errorf("UserApi.UpdateUser - strconv.Atoi: %v", err)
+		logger.Log.Errorf("UserApi.UpdateUser - strconv.Atoi: %v. c.Params(\"id\"): %#+v", err, c.Params("id"))
 		return err
 	}
 
@@ -92,7 +92,7 @@ func (r *UserApi) UpdateUser(c *fiber.Ctx) error {
 
 	user, err = r.Repo.UpdateUser(user)
 	if err != nil {
-		logger.Log.Errorf("UserApi.UpdateUser - r.Repo.UpdateUser: %v", err)
+		logger.Log.Errorf("UserApi.UpdateUser - r.Repo.UpdateUser: %v. User: %#+v", err, user)
 		return err
 	}
 

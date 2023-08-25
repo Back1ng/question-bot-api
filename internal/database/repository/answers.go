@@ -35,7 +35,7 @@ func (r *AnswerRepository) FindAnswersInQuestion(questionId int) ([]entity.Answe
 		args...,
 	)
 	if err != nil {
-		logger.Log.Errorf("AnswerRepository.FindAnswersInQuestion - r.Query: %v", err)
+		logger.Log.Errorf("AnswerRepository.FindAnswersInQuestion - r.Query: %v. QuestionId: %d", err, questionId)
 		return answers, err
 	}
 
@@ -48,7 +48,7 @@ func (r *AnswerRepository) FindAnswersInQuestion(questionId int) ([]entity.Answe
 	}
 
 	if err := rows.Err(); err != nil {
-		logger.Log.Errorf("AnswerRepository.FindAnswersInQuestion - rows.Err: %v", err)
+		logger.Log.Errorf("AnswerRepository.FindAnswersInQuestion - rows.Err: %v. QuestionId: %d", err, questionId)
 		return answers, err
 	}
 
@@ -62,7 +62,7 @@ func (r *AnswerRepository) StoreAnswer(answer entity.Answer) (entity.Answer, err
 		Suffix("RETURNING id, is_correct").
 		ToSql()
 	if err != nil {
-		logger.Log.Errorf("AnswerRepository.StoreAnswer - r.Insert: %v", err)
+		logger.Log.Errorf("AnswerRepository.StoreAnswer - r.Insert: %v. Answer: %#+v", err, answer)
 		return answer, err
 	}
 
@@ -73,7 +73,7 @@ func (r *AnswerRepository) StoreAnswer(answer entity.Answer) (entity.Answer, err
 	)
 
 	if err := row.Scan(&answer.ID, &answer.IsCorrect); err != nil {
-		logger.Log.Errorf("AnswerRepository.StoreAnswer - row.Scan: %v", err)
+		logger.Log.Errorf("AnswerRepository.StoreAnswer - row.Scan: %v. Answer: %#+v", err, answer)
 		return answer, err
 	}
 
@@ -82,7 +82,7 @@ func (r *AnswerRepository) StoreAnswer(answer entity.Answer) (entity.Answer, err
 
 func (r *AnswerRepository) UpdateAnswer(answer entity.Answer) error {
 	if len(answer.Title) == 0 {
-		logger.Log.Errorf("AnswerRepository.UpdateAnswer - answer.Title: %v", UpdateAnswerEmptyTitle)
+		logger.Log.Errorf("AnswerRepository.UpdateAnswer - answer.Title: %v. Answer: %#+v", UpdateAnswerEmptyTitle, answer)
 		return UpdateAnswerEmptyTitle
 	}
 
@@ -93,7 +93,7 @@ func (r *AnswerRepository) UpdateAnswer(answer entity.Answer) error {
 		ToSql()
 
 	if err != nil {
-		logger.Log.Errorf("AnswerRepository.UpdateAnswer - r.Update: %v", err)
+		logger.Log.Errorf("AnswerRepository.UpdateAnswer - r.Update: %v. Answer: %#+v", err, answer)
 		return err
 	}
 
@@ -104,12 +104,12 @@ func (r *AnswerRepository) UpdateAnswer(answer entity.Answer) error {
 	)
 
 	if err != nil {
-		logger.Log.Errorf("AnswerRepository.UpdateAnswer - r.Exec: %v", err)
+		logger.Log.Errorf("AnswerRepository.UpdateAnswer - r.Exec: %v. Answer: %#+v", err, answer)
 		return err
 	}
 
 	if commandTag.RowsAffected() != 1 {
-		logger.Log.Errorf("AnswerRepository.UpdateAnswer - r.Exec: %v", UpdateAnswerError)
+		logger.Log.Errorf("AnswerRepository.UpdateAnswer - r.Exec: %v. Answer: %#+v", UpdateAnswerError, answer)
 		return UpdateAnswerError
 	}
 
@@ -118,7 +118,7 @@ func (r *AnswerRepository) UpdateAnswer(answer entity.Answer) error {
 
 func (r *AnswerRepository) DeleteAnswer(answer entity.Answer) error {
 	if answer.ID == 0 {
-		logger.Log.Errorf("AnswerRepository.DeleteAnswer - answer.ID: %v", DeleteAnswerIdNotPresented)
+		logger.Log.Errorf("AnswerRepository.DeleteAnswer - answer.ID: %v. Answer: %#+v", DeleteAnswerIdNotPresented, answer)
 		return DeleteAnswerIdNotPresented
 	}
 
@@ -126,7 +126,7 @@ func (r *AnswerRepository) DeleteAnswer(answer entity.Answer) error {
 		Where("id = ?", answer.ID).ToSql()
 
 	if err != nil {
-		logger.Log.Errorf("AnswerRepository.DeleteAnswer - r.Delete: %v", err)
+		logger.Log.Errorf("AnswerRepository.DeleteAnswer - r.Delete: %v. Answer: %#+v", err, answer)
 		return err
 	}
 
@@ -137,12 +137,12 @@ func (r *AnswerRepository) DeleteAnswer(answer entity.Answer) error {
 	)
 
 	if err != nil {
-		logger.Log.Errorf("AnswerRepository.DeleteAnswer - r.Exec: %v", err)
+		logger.Log.Errorf("AnswerRepository.DeleteAnswer - r.Exec: %v. Answer: %#+v", err, answer)
 		return err
 	}
 
 	if commandTag.RowsAffected() != 1 {
-		logger.Log.Errorf("AnswerRepository.DeleteAnswer - r.Exec: %v", DeleteAnswerError)
+		logger.Log.Errorf("AnswerRepository.DeleteAnswer - r.Exec: %v. Answer: %#+v", DeleteAnswerError, answer)
 		return DeleteAnswerError
 	}
 

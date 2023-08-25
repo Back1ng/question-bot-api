@@ -27,7 +27,7 @@ func (r QuestionRepository) FindQuestionsInPreset(presetId int) ([]entity.Questi
 		ToSql()
 
 	if err != nil {
-		logger.Log.Errorf("QuestionRepository.FindQuestionsInPreset - r.Select: %v", err)
+		logger.Log.Errorf("QuestionRepository.FindQuestionsInPreset - r.Select: %v. PresetId: %d", err, presetId)
 		return questions, err
 	}
 
@@ -38,7 +38,7 @@ func (r QuestionRepository) FindQuestionsInPreset(presetId int) ([]entity.Questi
 	)
 
 	if err != nil {
-		logger.Log.Errorf("QuestionRepository.FindQuestionsInPreset - r.Query: %v", err)
+		logger.Log.Errorf("QuestionRepository.FindQuestionsInPreset - r.Query: %v. Sql: %v", err, sql)
 		return questions, err
 	}
 
@@ -51,7 +51,7 @@ func (r QuestionRepository) FindQuestionsInPreset(presetId int) ([]entity.Questi
 	}
 
 	if err := rows.Err(); err != nil {
-		logger.Log.Errorf("QuestionRepository.FindQuestionsInPreset - rows.Err: %v", err)
+		logger.Log.Errorf("QuestionRepository.FindQuestionsInPreset - rows.Err: %v. PresetId: %d", err, presetId)
 		return questions, err
 	}
 
@@ -68,7 +68,7 @@ func (r QuestionRepository) StoreQuestion(q entity.Question) (entity.Question, e
 		ToSql()
 
 	if err != nil {
-		logger.Log.Errorf("QuestionRepository.StoreQuestion - r.Insert: %v", err)
+		logger.Log.Errorf("QuestionRepository.StoreQuestion - r.Insert: %v. Question: %#+v", err, q)
 		return question, err
 	}
 
@@ -81,7 +81,7 @@ func (r QuestionRepository) StoreQuestion(q entity.Question) (entity.Question, e
 	err = row.Scan(&question.ID, &question.PresetId, &question.Title)
 
 	if err != nil {
-		logger.Log.Errorf("QuestionRepository.StoreQuestion - rows.Scan: %v", err)
+		logger.Log.Errorf("QuestionRepository.StoreQuestion - rows.Scan: %v. Question: %#+v", err, q)
 		return question, err
 	}
 
@@ -90,7 +90,7 @@ func (r QuestionRepository) StoreQuestion(q entity.Question) (entity.Question, e
 
 func (r QuestionRepository) UpdateQuestionTitle(id int, q entity.Question) error {
 	if len(q.Title) == 0 {
-		logger.Log.Errorf("QuestionRepository.UpdateQuestionTitle - len(q.Title): %v", UpdateQuestionEmptyTitle)
+		logger.Log.Errorf("QuestionRepository.UpdateQuestionTitle - len(q.Title): %v. Question: %#+v", UpdateQuestionEmptyTitle, q)
 		return UpdateQuestionEmptyTitle
 	}
 
@@ -99,7 +99,7 @@ func (r QuestionRepository) UpdateQuestionTitle(id int, q entity.Question) error
 		Where("id = ?", id).
 		ToSql()
 	if err != nil {
-		logger.Log.Errorf("QuestionRepository.UpdateQuestionTitle - r.Update: %v", err)
+		logger.Log.Errorf("QuestionRepository.UpdateQuestionTitle - r.Update: %v. Question: %#+v", err, q)
 		return err
 	}
 
@@ -109,12 +109,12 @@ func (r QuestionRepository) UpdateQuestionTitle(id int, q entity.Question) error
 		args...,
 	)
 	if err != nil {
-		logger.Log.Errorf("QuestionRepository.UpdateQuestionTitle - r.Exec: %v", err)
+		logger.Log.Errorf("QuestionRepository.UpdateQuestionTitle - r.Exec: %v. Question: %#+v", err, q)
 		return err
 	}
 
 	if commandTag.RowsAffected() != 1 {
-		logger.Log.Errorf("QuestionRepository.UpdateQuestionTitle - r.Exec: %v", UpdateQuestionError)
+		logger.Log.Errorf("QuestionRepository.UpdateQuestionTitle - r.Exec: %v. Question: %#+v", UpdateQuestionError, q)
 		return UpdateQuestionError
 	}
 
@@ -131,12 +131,12 @@ func (r QuestionRepository) DeleteQuestion(id int) error {
 	)
 
 	if err != nil {
-		logger.Log.Errorf("QuestionRepository.DeleteQuestion - r.Exec: %v", err)
+		logger.Log.Errorf("QuestionRepository.DeleteQuestion - r.Exec: %v. QuestionId: %d", err, id)
 		return err
 	}
 
 	if commandTag.RowsAffected() != 1 {
-		logger.Log.Errorf("QuestionRepository.DeleteQuestion - r.Exec: %v", DeleteQuestionError)
+		logger.Log.Errorf("QuestionRepository.DeleteQuestion - r.Exec: %v. QuestionId: %d", DeleteQuestionError, id)
 		return DeleteQuestionError
 	}
 

@@ -25,18 +25,18 @@ func (r *QuestionApi) RegisterQuestionRoutes() {
 func (r *QuestionApi) GetQuestions(c *fiber.Ctx) error {
 	id, err := strconv.Atoi(c.Params("presetid"))
 	if err != nil {
-		logger.Log.Errorf("QuestionApi.GetQuestions - strconv.Atoi: %v", err)
+		logger.Log.Errorf("QuestionApi.GetQuestions - strconv.Atoi: %v. c.Params(\"presetid\"): %#+v", err, c.Params("presetid"))
 		return err
 	}
 
 	questions, err := r.Repo.FindQuestionsInPreset(id)
 	if err != nil {
-		logger.Log.Errorf("QuestionApi.GetQuestions - r.Repo.FindQuestionsInPreset: %v", err)
+		logger.Log.Errorf("QuestionApi.GetQuestions - r.Repo.FindQuestionsInPreset: %v. PresetId: %d", err, id)
 		return err
 	}
 
 	if len(questions) == 0 {
-		logger.Log.Info("QuestionApi.GetQuestions - r.Repo.FindQuestionsInPreset: empty questions")
+		logger.Log.Infof("QuestionApi.GetQuestions - r.Repo.FindQuestionsInPreset: empty questions. PresetId: %d", id)
 		return c.JSON([]string{})
 	}
 	return c.JSON(questions)
@@ -51,7 +51,7 @@ func (r *QuestionApi) StoreQuestions(c *fiber.Ctx) error {
 
 	responseQuestion, err := r.Repo.StoreQuestion(question)
 	if err != nil {
-		logger.Log.Errorf("QuestionApi.StoreQuestions - r.Repo.StoreQuestion: %v", err)
+		logger.Log.Errorf("QuestionApi.StoreQuestions - r.Repo.StoreQuestion: %v. Question: %#+v", err, question)
 		return err
 	}
 
@@ -61,7 +61,7 @@ func (r *QuestionApi) StoreQuestions(c *fiber.Ctx) error {
 func (r *QuestionApi) UpdateQuestion(c *fiber.Ctx) error {
 	id, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
-		logger.Log.Errorf("QuestionApi.UpdateQuestion - strconv.Atoi: %v", err)
+		logger.Log.Errorf("QuestionApi.UpdateQuestion - strconv.Atoi: %v, c.Params(\"id\"): %#+v", err, c.Params("id"))
 		return err
 	}
 
@@ -72,7 +72,7 @@ func (r *QuestionApi) UpdateQuestion(c *fiber.Ctx) error {
 	}
 
 	if err = r.Repo.UpdateQuestionTitle(id, question); err != nil {
-		logger.Log.Errorf("QuestionApi.UpdateQuestion - r.Repo.UpdateQuestionTitle: %v", err)
+		logger.Log.Errorf("QuestionApi.UpdateQuestion - r.Repo.UpdateQuestionTitle: %v. Question: %#+v", err, question)
 		return err
 	}
 
@@ -82,12 +82,12 @@ func (r *QuestionApi) UpdateQuestion(c *fiber.Ctx) error {
 func (r *QuestionApi) DeleteQuestion(c *fiber.Ctx) error {
 	id, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
-		logger.Log.Errorf("QuestionApi.DeleteQuestion - strconv.Atoi: %v", err)
+		logger.Log.Errorf("QuestionApi.DeleteQuestion - strconv.Atoi: %v. c.Params(\"id\"): %#+v", err, c.Params("id"))
 		return err
 	}
 
 	if err = r.Repo.DeleteQuestion(id); err != nil {
-		logger.Log.Errorf("QuestionApi.DeleteQuestion - r.Repo.DeleteQuestion: %v", err)
+		logger.Log.Errorf("QuestionApi.DeleteQuestion - r.Repo.DeleteQuestion: %v. QuestionId: %d", err, id)
 		return err
 	}
 

@@ -27,7 +27,6 @@ func (a Auth) IsValid() bool {
 	hm := hmac.New(sha256.New, key.Sum(nil))
 	io.WriteString(hm, a.CheckString())
 
-	fmt.Println(hex.EncodeToString(hm.Sum(nil)), a.Hash)
 	return hex.EncodeToString(hm.Sum(nil)) == a.Hash
 }
 

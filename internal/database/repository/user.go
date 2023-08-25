@@ -27,7 +27,7 @@ func (r UserRepository) FindUsersByInterval(i int) ([]int64, error) {
 		ToSql()
 
 	if err != nil {
-		logger.Log.Errorf("UserRepository.FindUsersByInterval - r.Select: %v", err)
+		logger.Log.Errorf("UserRepository.FindUsersByInterval - r.Select: %v. UserId: %d", err, i)
 		return users, err
 	}
 
@@ -37,7 +37,7 @@ func (r UserRepository) FindUsersByInterval(i int) ([]int64, error) {
 		args...,
 	)
 	if err != nil {
-		logger.Log.Errorf("UserRepository.FindUsersByInterval - r.Query: %v", err)
+		logger.Log.Errorf("UserRepository.FindUsersByInterval - r.Query: %v. UserId: %d", err, i)
 		return users, err
 	}
 	defer rows.Close()
@@ -49,7 +49,7 @@ func (r UserRepository) FindUsersByInterval(i int) ([]int64, error) {
 	}
 
 	if err := rows.Err(); err != nil {
-		logger.Log.Errorf("UserRepository.FindUserByInterval - rows.err: %v", err)
+		logger.Log.Errorf("UserRepository.FindUserByInterval - rows.err: %v. UserId: %d", err, i)
 		return users, err
 	}
 
@@ -65,7 +65,7 @@ func (r UserRepository) FindUserByChatId(chatId int) (entity.User, error) {
 		ToSql()
 
 	if err != nil {
-		logger.Log.Errorf("UserRepository.FindUserByChatId - r.Select: %v", err)
+		logger.Log.Errorf("UserRepository.FindUserByChatId - r.Select: %v. ChatId: %d", err, chatId)
 		return user, err
 	}
 
@@ -75,7 +75,7 @@ func (r UserRepository) FindUserByChatId(chatId int) (entity.User, error) {
 		args...,
 	)
 	if err != nil {
-		logger.Log.Errorf("UserRepository.FindUserByChatId - r.Query: %v", err)
+		logger.Log.Errorf("UserRepository.FindUserByChatId - r.Query: %v. ChatId: %d", err, chatId)
 		return user, err
 	}
 	defer rows.Close()
@@ -86,7 +86,7 @@ func (r UserRepository) FindUserByChatId(chatId int) (entity.User, error) {
 	}
 
 	if err := rows.Err(); err != nil {
-		logger.Log.Errorf("UserRepository.FindUserByChatId - rows.Err: %v", err)
+		logger.Log.Errorf("UserRepository.FindUserByChatId - rows.Err: %v. ChatId: %d", err, chatId)
 		return user, err
 	}
 
@@ -109,7 +109,7 @@ func (r UserRepository) CreateUser(u entity.User) (entity.User, error) {
 		SetMap(toInsert).
 		ToSql()
 	if err != nil {
-		logger.Log.Errorf("UserRepository.CreateUser - r.Insert: %v", err)
+		logger.Log.Errorf("UserRepository.CreateUser - r.Insert: %v. User: %#+v", err, u)
 		return u, err
 	}
 
@@ -120,7 +120,7 @@ func (r UserRepository) CreateUser(u entity.User) (entity.User, error) {
 	)
 
 	if err := row.Scan(&u.ID); err != nil {
-		logger.Log.Errorf("UserRepository.CreateUser - r.QueryRow: %v", err)
+		logger.Log.Errorf("UserRepository.CreateUser - r.QueryRow: %v. User: %#+v", err, u)
 		return u, err
 	}
 
@@ -149,7 +149,7 @@ func (r UserRepository) UpdateUser(u entity.User) (entity.User, error) {
 	sql, args, err := query.ToSql()
 
 	if err != nil {
-		logger.Log.Errorf("UserRepository.UpdateUser - query.ToSql: %v", err)
+		logger.Log.Errorf("UserRepository.UpdateUser - query.ToSql: %v. User: %#+v", err, u)
 		return user, err
 	}
 
@@ -160,12 +160,12 @@ func (r UserRepository) UpdateUser(u entity.User) (entity.User, error) {
 	)
 
 	if err != nil {
-		logger.Log.Errorf("UserRepository.UpdateUser - r.Exec: %v", err)
+		logger.Log.Errorf("UserRepository.UpdateUser - r.Exec: %v. User: %#+v", err, u)
 		return user, err
 	}
 
 	if commandTag.RowsAffected() != 1 {
-		logger.Log.Errorf("UserRepository.UpdateUser - query.ToSql: %v", UpdateUserError)
+		logger.Log.Errorf("UserRepository.UpdateUser - query.ToSql: %v. User: %#+v", UpdateUserError, u)
 		return user, UpdateUserError
 	}
 

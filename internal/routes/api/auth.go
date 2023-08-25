@@ -27,7 +27,7 @@ func (r *AuthApi) AuthLogin(c *fiber.Ctx) error {
 	token, err := r.Repo.GenerateToken(auth)
 
 	if err != nil {
-		logger.Log.Errorf("AuthApi.AuthLogin - r.Repo.GenerateToken(auth): %v", err)
+		logger.Log.Errorf("AuthApi.AuthLogin - r.Repo.GenerateToken(auth): %v. Auth: %#+v", err, token)
 		return err
 	}
 

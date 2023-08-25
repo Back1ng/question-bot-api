@@ -25,18 +25,18 @@ func (r *AnswerApi) RegisterAnswerRoutes() {
 func (r *AnswerApi) GetAnswers(c *fiber.Ctx) error {
 	id, err := strconv.Atoi(c.Params("questionid"))
 	if err != nil {
-		logger.Log.Errorf("AnswerApi.GetAnswers - strconv.Atoi: %v", err)
+		logger.Log.Errorf("AnswerApi.GetAnswers - strconv.Atoi: %v. c.Params(\"questionid\"): %#+v", err, c.Params("questionid"))
 		return err
 	}
 
 	answers, err := r.Repo.FindAnswersInQuestion(id)
 	if err != nil {
-		logger.Log.Errorf("AnswerApi.GetAnswers - r.Repo.FindAnswersInQuestion: %v", err)
+		logger.Log.Errorf("AnswerApi.GetAnswers - r.Repo.FindAnswersInQuestion: %v. QuestionId: %d", err, id)
 		return err
 	}
 
 	if len(answers) == 0 {
-		logger.Log.Info("AnswerApi.GetAnswers - r.Repo.FindAnswersInQuestion: empty answers")
+		logger.Log.Infof("AnswerApi.GetAnswers - r.Repo.FindAnswersInQuestion: empty answers. QuestionId: %d", id)
 		return c.JSON([]string{})
 	}
 	return c.JSON(answers)
@@ -52,7 +52,7 @@ func (r *AnswerApi) StoreAnswers(c *fiber.Ctx) error {
 
 	storedAnswer, err := r.Repo.StoreAnswer(answer)
 	if err != nil {
-		logger.Log.Errorf("AnswerApi.StoreAnswers - r.Repo.StoreAnswer: %v", err)
+		logger.Log.Errorf("AnswerApi.StoreAnswers - r.Repo.StoreAnswer: %v. Answer: %#+v", err, answer)
 		return err
 	}
 
@@ -62,7 +62,7 @@ func (r *AnswerApi) StoreAnswers(c *fiber.Ctx) error {
 func (r *AnswerApi) UpdateAnswer(c *fiber.Ctx) error {
 	id, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
-		logger.Log.Errorf("AnswerApi.UpdateAnswer - strconv.Atoi: %v", err)
+		logger.Log.Errorf("AnswerApi.UpdateAnswer - strconv.Atoi: %v. c.Params(\"id\"): %#+v", err, c.Params("id"))
 		return err
 	}
 
@@ -73,7 +73,7 @@ func (r *AnswerApi) UpdateAnswer(c *fiber.Ctx) error {
 	}
 
 	if err := r.Repo.UpdateAnswer(answer); err != nil {
-		logger.Log.Errorf("AnswerApi.UpdateAnswer - r.Repo.UpdateAnswer: %v", err)
+		logger.Log.Errorf("AnswerApi.UpdateAnswer - r.Repo.UpdateAnswer: %v. Answer: %#+v", err, answer)
 		return err
 	}
 
@@ -83,15 +83,15 @@ func (r *AnswerApi) UpdateAnswer(c *fiber.Ctx) error {
 func (r *AnswerApi) DeleteAnswer(c *fiber.Ctx) error {
 	id, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
-		logger.Log.Errorf("AnswerApi.DeleteAnswer - strconv.Atoi: %v", err)
+		logger.Log.Errorf("AnswerApi.DeleteAnswer - strconv.Atoi: %v. c.Params(\"id\"): %#+v", err, c.Params("id"))
 		return err
 	}
 
-	err = r.Repo.DeleteAnswer(
-		entity.Answer{ID: int64(id)},
-	)
+	answer := entity.Answer{ID: int64(id)}
+
+	err = r.Repo.DeleteAnswer(answer)
 	if err != nil {
-		logger.Log.Errorf("AnswerApi.DeleteAnswer - r.Repo.DeleteAnswer: %v", err)
+		logger.Log.Errorf("AnswerApi.DeleteAnswer - r.Repo.DeleteAnswer: %v. Answer: %#+v", err, answer)
 		return err
 	}
 

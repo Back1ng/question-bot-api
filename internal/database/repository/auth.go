@@ -64,13 +64,13 @@ func (r AuthRepository) HasToken(hash string) (bool, error) {
 
 func (r AuthRepository) GenerateToken(auth tgauth.Auth) (string, error) {
 	if auth.IsOutdated() {
-		logger.Log.Error("AuthRepository.GenerateToken - auth.IsOutdated: Given token is outdated")
+		logger.Log.Errorf("AuthRepository.GenerateToken - auth.IsOutdated: Given token is outdated. TgAuth: %#+v", auth)
 		return "", AuthDataIsOutdated
 	}
 
 	hasToken, err := r.HasToken(auth.Hash)
 	if err != nil {
-		logger.Log.Errorf("AuthRepository.GenerateToken - r.HasToken: %v", err)
+		logger.Log.Errorf("AuthRepository.GenerateToken - r.HasToken: %v. TgAuth: %#+v", err, auth)
 		return "", err
 	}
 
@@ -79,7 +79,7 @@ func (r AuthRepository) GenerateToken(auth tgauth.Auth) (string, error) {
 	}
 
 	if !auth.IsValid() {
-		logger.Log.Errorf("AuthRepository.GenerateToken - auth.IsValid: %v", AuthFailedCheck)
+		logger.Log.Errorf("AuthRepository.GenerateToken - auth.IsValid: %v. TgAuth: %#+v", AuthFailedCheck, auth)
 		return "", AuthFailedCheck
 	}
 
@@ -87,7 +87,7 @@ func (r AuthRepository) GenerateToken(auth tgauth.Auth) (string, error) {
 		Columns("auth_date", "first_name", "hash", "user_id", "username").
 		Values(auth.AuthDate, auth.FirstName, auth.Hash, auth.Id, auth.Username).ToSql()
 	if err != nil {
-		logger.Log.Errorf("AuthRepository.GenerateToken - r.Insert: %v", err)
+		logger.Log.Errorf("AuthRepository.GenerateToken - r.Insert: %v. TgAuth: %#+v", err, auth)
 		return "", err
 	}
 
@@ -97,12 +97,12 @@ func (r AuthRepository) GenerateToken(auth tgauth.Auth) (string, error) {
 		args...,
 	)
 	if err != nil {
-		logger.Log.Errorf("AuthRepository.GenerateToken - r.Exec: %v", err)
+		logger.Log.Errorf("AuthRepository.GenerateToken - r.Exec: %v. TgAuth: %#+v", err, auth)
 		return "", err
 	}
 
 	if commandTag.RowsAffected() != 1 {
-		logger.Log.Errorf("AuthRepository.GenerateToken - r.Exec: %v", AuthCannotStoreToken)
+		logger.Log.Errorf("AuthRepository.GenerateToken - r.Exec: %v. TgAuth: %#+v", AuthCannotStoreToken, auth)
 		return "", AuthCannotStoreToken
 	}
 
@@ -112,7 +112,7 @@ func (r AuthRepository) GenerateToken(auth tgauth.Auth) (string, error) {
 		ToSql()
 
 	if err != nil {
-		logger.Log.Errorf("AuthRepository.GenerateToken - r.Delete: %v", err)
+		logger.Log.Errorf("AuthRepository.GenerateToken - r.Delete: %v. TgAuth: %#+v", err, auth)
 		return "", err
 	}
 
@@ -123,7 +123,7 @@ func (r AuthRepository) GenerateToken(auth tgauth.Auth) (string, error) {
 	)
 
 	if err != nil {
-		logger.Log.Errorf("AuthRepository.GenerateToken - r.Exec: %v", err)
+		logger.Log.Errorf("AuthRepository.GenerateToken - r.Exec: %v. TgAuth: %#+v", err, auth)
 		return "", err
 	}
 

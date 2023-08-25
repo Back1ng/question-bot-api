@@ -34,7 +34,7 @@ func (r PresetRepository) FindPresets() ([]entity.Preset, error) {
 	)
 
 	if err != nil {
-		logger.Log.Errorf("PresetRepository.FindPresets - r.Query: %v", err)
+		logger.Log.Errorf("PresetRepository.FindPresets - r.Query: %v. Sql: %#+v", err, sql)
 		return presets, err
 	}
 
@@ -47,7 +47,7 @@ func (r PresetRepository) FindPresets() ([]entity.Preset, error) {
 	}
 
 	if err := rows.Err(); err != nil {
-		logger.Log.Errorf("PresetRepository.FindPresets - rows.Err: %v", err)
+		logger.Log.Errorf("PresetRepository.FindPresets - rows.Err: %v. Sql: %#+v", err, sql)
 		return presets, err
 	}
 
@@ -62,7 +62,7 @@ func (r PresetRepository) StorePreset(p entity.Preset) (entity.Preset, error) {
 		ToSql()
 
 	if err != nil {
-		logger.Log.Errorf("PresetRepository.StorePreset - r.Insert: %v", err)
+		logger.Log.Errorf("PresetRepository.StorePreset - r.Insert: %v. Preset: %#+v", err, p)
 		return p, err
 	}
 
@@ -74,7 +74,7 @@ func (r PresetRepository) StorePreset(p entity.Preset) (entity.Preset, error) {
 
 	var preset entity.Preset
 	if err := row.Scan(&preset.ID, &preset.Title); err != nil {
-		logger.Log.Errorf("PresetRepository.StorePreset - rows.Scan: %v", err)
+		logger.Log.Errorf("PresetRepository.StorePreset - rows.Scan: %v. Preset: %#+v", err, p)
 		return p, err
 	}
 
@@ -83,7 +83,7 @@ func (r PresetRepository) StorePreset(p entity.Preset) (entity.Preset, error) {
 
 func (r PresetRepository) UpdatePreset(id int, p entity.Preset) error {
 	if len(p.Title) == 0 {
-		logger.Log.Errorf("PresetRepository.UpdatePreset - len(p.title): %v", UpdatePresetsEmptyTitle)
+		logger.Log.Errorf("PresetRepository.UpdatePreset - len(p.title): %v. Preset: %#+v", UpdatePresetsEmptyTitle, p)
 		return UpdatePresetsEmptyTitle
 	}
 
@@ -92,7 +92,7 @@ func (r PresetRepository) UpdatePreset(id int, p entity.Preset) error {
 		ToSql()
 
 	if err != nil {
-		logger.Log.Errorf("PresetRepository.UpdatePreset - r.Update: %v", err)
+		logger.Log.Errorf("PresetRepository.UpdatePreset - r.Update: %v. Preset: %#+v", err, p)
 		return err
 	}
 
@@ -103,12 +103,12 @@ func (r PresetRepository) UpdatePreset(id int, p entity.Preset) error {
 	)
 
 	if err != nil {
-		logger.Log.Errorf("PresetRepository.UpdatePreset - r.Exec: %v", err)
+		logger.Log.Errorf("PresetRepository.UpdatePreset - r.Exec: %v. Preset: %#+v", err, p)
 		return err
 	}
 
 	if commandTag.RowsAffected() != 1 {
-		logger.Log.Errorf("PresetRepository.UpdatePreset - r.Update: %v", UpdatePresetsError)
+		logger.Log.Errorf("PresetRepository.UpdatePreset - r.Update: %v. Preset: %#+v", UpdatePresetsError, p)
 		return UpdatePresetsError
 	}
 
@@ -121,7 +121,7 @@ func (r PresetRepository) DeletePreset(id int) error {
 		ToSql()
 
 	if err != nil {
-		logger.Log.Errorf("PresetRepository.DeletePreset - r.Delete: %v", err)
+		logger.Log.Errorf("PresetRepository.DeletePreset - r.Delete: %v. PresetId: %d", err, id)
 		return err
 	}
 
@@ -132,12 +132,12 @@ func (r PresetRepository) DeletePreset(id int) error {
 	)
 
 	if err != nil {
-		logger.Log.Errorf("PresetRepository.DeletePreset - r.Exec: %v", err)
+		logger.Log.Errorf("PresetRepository.DeletePreset - r.Exec: %v. PresetId: %d", err, id)
 		return err
 	}
 
 	if commandTag.RowsAffected() != 1 {
-		logger.Log.Errorf("PresetRepository.DeletePreset - r.Exec: %v", DeletePresetsError)
+		logger.Log.Errorf("PresetRepository.DeletePreset - r.Exec: %v. PresetId: %d", DeletePresetsError, id)
 		return DeletePresetsError
 	}
 

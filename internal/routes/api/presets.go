@@ -31,7 +31,7 @@ func (r *PresetApi) GetPresets(c *fiber.Ctx) error {
 	}
 
 	if len(presets) == 0 {
-		logger.Log.Info("PresetApi.GetPresets - r.Repo.FindPresets: empty presets")
+		logger.Log.Info("PresetApi.GetPresets - r.Repo.FindPresets: empty presets.")
 		return c.JSON([]string{})
 	}
 
@@ -48,7 +48,7 @@ func (r *PresetApi) StorePreset(c *fiber.Ctx) error {
 
 	p, err := r.Repo.StorePreset(preset)
 	if err != nil {
-		logger.Log.Errorf("PresetApi.StorePreset - r.Repo.StorePreset: %v", err)
+		logger.Log.Errorf("PresetApi.StorePreset - r.Repo.StorePreset: %v. Preset: %#+v", err, p)
 		return err
 	}
 
@@ -58,7 +58,7 @@ func (r *PresetApi) StorePreset(c *fiber.Ctx) error {
 func (r *PresetApi) UpdatePreset(c *fiber.Ctx) error {
 	id, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
-		logger.Log.Errorf("PresetApi.UpdatePreset - strconv.Atoi: %v", err)
+		logger.Log.Errorf("PresetApi.UpdatePreset - strconv.Atoi: %v. c.Params(\"id\")", err, c.Params("id"))
 		return err
 	}
 
@@ -71,7 +71,7 @@ func (r *PresetApi) UpdatePreset(c *fiber.Ctx) error {
 	preset.ID = int64(id)
 
 	if err = r.Repo.UpdatePreset(id, preset); err != nil {
-		logger.Log.Errorf("PresetApi.UpdatePreset - r.Repo.UpdatePreset: %v", err)
+		logger.Log.Errorf("PresetApi.UpdatePreset - r.Repo.UpdatePreset: %v. Preset: %#+v", err, preset)
 		return err
 	}
 
@@ -81,12 +81,12 @@ func (r *PresetApi) UpdatePreset(c *fiber.Ctx) error {
 func (r *PresetApi) DeletePreset(c *fiber.Ctx) error {
 	id, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
-		logger.Log.Errorf("PresetApi.DeletePreset - strconv.Atoi: %v", err)
+		logger.Log.Errorf("PresetApi.DeletePreset - strconv.Atoi: %v. c.Params(\"id\"); %#+v", err, c.Params("id"))
 		return err
 	}
 
 	if err := r.Repo.DeletePreset(id); err != nil {
-		logger.Log.Errorf("PresetApi.DeletePreset - r.Repo.DeletePreset: %v", err)
+		logger.Log.Errorf("PresetApi.DeletePreset - r.Repo.DeletePreset: %v. PresetId: %d", err, id)
 		return err
 	}
 
