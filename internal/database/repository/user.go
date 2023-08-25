@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"reflect"
 
 	"gitlab.com/back1ng1/question-bot-api/internal/database/entity"
 	"gitlab.com/back1ng1/question-bot-api/pkg/logger"
@@ -130,8 +131,12 @@ func (r UserRepository) UpdateUser(u entity.User) (entity.User, error) {
 	var user entity.User
 
 	query := r.Update("users").
-		Where("chat_id = ?", u.ChatId).
-		Set("interval_enabled", u.IntervalEnabled)
+		Where("chat_id = ?", u.ChatId)
+
+	i := reflect.ValueOf(u.IntervalEnabled)
+	if !i.IsZero() {
+		query.Set("interval_enabled", u.IntervalEnabled)
+	}
 
 	if u.Interval > 0 && u.Interval < 25 {
 		query = query.Set("interval", u.Interval)
