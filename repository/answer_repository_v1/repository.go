@@ -28,7 +28,7 @@ func (r *repository) Get(questionId int) ([]*entity.Answer, error) {
 		ToSql()
 
 	if err != nil {
-		return answers, err
+		return nil, err
 	}
 
 	rows, err := r.db.Query(
@@ -38,7 +38,7 @@ func (r *repository) Get(questionId int) ([]*entity.Answer, error) {
 	)
 
 	if err != nil {
-		return answers, err
+		return nil, err
 	}
 	defer rows.Close()
 
@@ -49,7 +49,7 @@ func (r *repository) Get(questionId int) ([]*entity.Answer, error) {
 	}
 
 	if err := rows.Err(); err != nil {
-		return answers, err
+		return nil, err
 	}
 
 	return answers, nil
@@ -63,7 +63,7 @@ func (r *repository) Create(in entity.Answer) (*entity.Answer, error) {
 		ToSql()
 
 	if err != nil {
-		return &in, err
+		return nil, err
 	}
 
 	row := r.db.QueryRow(
@@ -73,7 +73,7 @@ func (r *repository) Create(in entity.Answer) (*entity.Answer, error) {
 	)
 
 	if err := row.Scan(&in.ID, &in.IsCorrect); err != nil {
-		return &in, err
+		return nil, err
 	}
 
 	return &in, nil
@@ -82,7 +82,7 @@ func (r *repository) Create(in entity.Answer) (*entity.Answer, error) {
 
 func (r *repository) Update(in entity.Answer) (*entity.Answer, error) {
 	if len(in.Title) == 0 {
-		return &in, errors.New("empty answer title")
+		return nil, errors.New("empty answer title")
 	}
 
 	sql, args, err := r.sb.Update("answers").
@@ -92,7 +92,7 @@ func (r *repository) Update(in entity.Answer) (*entity.Answer, error) {
 		ToSql()
 
 	if err != nil {
-		return &in, err
+		return nil, err
 	}
 
 	commandTag, err := r.db.Exec(
@@ -102,11 +102,11 @@ func (r *repository) Update(in entity.Answer) (*entity.Answer, error) {
 	)
 
 	if err != nil {
-		return &in, err
+		return nil, err
 	}
 
 	if commandTag.RowsAffected() != 1 {
-		return &in, errors.New("cannot update answer")
+		return nil, errors.New("cannot update answer")
 	}
 
 	return &in, nil

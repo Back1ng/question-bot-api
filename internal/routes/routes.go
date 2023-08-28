@@ -59,15 +59,13 @@ type Routes struct {
 
 func RegisterRoutes(app *fiber.App, r database.Repositories) Routes {
 	routes := Routes{
-		QuestionRoutes: &api.QuestionApi{App: app, Repo: r.QuestionRepository},
-		PresetRoutes:   &api.PresetApi{App: app, Repo: r.PresetRepository},
-		UserRoutes:     &api.UserApi{App: app, Repo: r.UserRepository},
-		AuthRoutes:     &api.AuthApi{App: app, Repo: r.AuthRepository},
-		SwaggerRoutes:  &web.SwaggerApi{App: app},
+		PresetRoutes:  &api.PresetApi{App: app, Repo: r.PresetRepository},
+		UserRoutes:    &api.UserApi{App: app, Repo: r.UserRepository},
+		AuthRoutes:    &api.AuthApi{App: app, Repo: r.AuthRepository},
+		SwaggerRoutes: &web.SwaggerApi{App: app},
 	}
 
 	routes.PresetRoutes.RegisterPresetRoutes()
-	routes.QuestionRoutes.RegisterQuestionRoutes()
 	routes.UserRoutes.RegisterUserRoutes()
 	routes.AuthRoutes.RegisterAuthRoutes()
 	routes.SwaggerRoutes.RegisterSwaggerRoutes()

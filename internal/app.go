@@ -11,12 +11,15 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/joho/godotenv"
 	crud_answers "gitlab.com/back1ng1/question-bot-api/app/usecase/crud_answer"
+	"gitlab.com/back1ng1/question-bot-api/app/usecase/crud_question"
 	"gitlab.com/back1ng1/question-bot-api/handler/answer_handler"
+	"gitlab.com/back1ng1/question-bot-api/handler/question_handler"
 	"gitlab.com/back1ng1/question-bot-api/internal/database"
 	"gitlab.com/back1ng1/question-bot-api/internal/middlewares/auth"
 	"gitlab.com/back1ng1/question-bot-api/internal/routes"
 	"gitlab.com/back1ng1/question-bot-api/pkg/logger"
 	"gitlab.com/back1ng1/question-bot-api/repository/answer_repository_v1"
+	"gitlab.com/back1ng1/question-bot-api/repository/question_repository_v1"
 )
 
 func Run() {
@@ -46,6 +49,15 @@ func Run() {
 	}
 
 	app := fiber.New()
+
+	question_repo := question_repository_v1.NewRepository(conn, sb)
+	crud_question_uc := crud_question.NewUseCase(question_repo)
+	question_handler := question_handler.NewHandler(crud_question_uc)
+
+	app.Get("/api/questions/:presetid", question_handler.GetByPreset)
+	app.Post("/api/question", question_handler.Create)
+	app.Put("/api/question/:id", question_handler.Update)
+	app.Delete("/api/question/:id", question_handler.Delete)
 
 	answer_repo := answer_repository_v1.New(conn, sb)
 	crud_answer_uc := crud_answers.NewUseCase(answer_repo)
