@@ -10,10 +10,13 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/jackc/pgx/v5"
 	"github.com/joho/godotenv"
+	crud_answers "gitlab.com/back1ng1/question-bot-api/app/usecase/crud_answer"
+	"gitlab.com/back1ng1/question-bot-api/handler/answer_handler"
 	"gitlab.com/back1ng1/question-bot-api/internal/database"
 	"gitlab.com/back1ng1/question-bot-api/internal/middlewares/auth"
 	"gitlab.com/back1ng1/question-bot-api/internal/routes"
 	"gitlab.com/back1ng1/question-bot-api/pkg/logger"
+	"gitlab.com/back1ng1/question-bot-api/repository/answer_repository_v1"
 )
 
 func Run() {
@@ -43,6 +46,16 @@ func Run() {
 	}
 
 	app := fiber.New()
+
+	answer_repo := answer_repository_v1.New(conn, sb)
+	crud_answer_uc := crud_answers.NewUseCase(answer_repo)
+	answer_handler := answer_handler.NewHandler(crud_answer_uc)
+
+	app.Get("/api/answers/:questionid", answer_handler.GetAnswer)
+	app.Post("/api/answer", answer_handler.CreateAnswer)
+	app.Put("/api/answer/:id", answer_handler.UpdateAnswer)
+	app.Delete("/api/answer/:id", answer_handler.DeleteAnswer)
+
 	app.Use(cors.New())
 	app.Use(auth.New(auth.Config{
 		Repo: repo.AuthRepository,
