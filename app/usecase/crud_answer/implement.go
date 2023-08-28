@@ -14,27 +14,29 @@ func NewUseCase(answer_repo repository.AnswerRepository) UseCase {
 	return &usecase{answer_repo: answer_repo}
 }
 
-func (uc *usecase) Get(questionId int) ([]entity.Answer, error) {
+func (uc *usecase) Get(questionId int) ([]*entity.Answer, error) {
 	answers, err := uc.answer_repo.Get(questionId)
 
 	if err != nil {
 		logger.Log.Errorf("AnswerApi.GetAnswers - r.Repo.FindAnswersInQuestion: %v. QuestionId: %d", err, questionId)
+		return nil, err
 	}
 
 	return answers, nil
 }
 
-func (uc *usecase) Create(in entity.Answer) (entity.Answer, error) {
+func (uc *usecase) Create(in entity.Answer) (*entity.Answer, error) {
 	out, err := uc.answer_repo.Create(in)
 
 	if err != nil {
 		logger.Log.Errorf("AnswerApi.StoreAnswers - r.Repo.StoreAnswer: %v. Answer: %#+v", err, in)
+		return nil, err
 	}
 
 	return out, nil
 }
 
-func (uc *usecase) Update(in entity.Answer) (entity.Answer, error) {
+func (uc *usecase) Update(in entity.Answer) (*entity.Answer, error) {
 	out, err := uc.answer_repo.Update(in)
 
 	if err != nil {
@@ -45,11 +47,5 @@ func (uc *usecase) Update(in entity.Answer) (entity.Answer, error) {
 }
 
 func (uc *usecase) Delete(id int) error {
-	err := uc.answer_repo.Delete(id)
-
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return uc.answer_repo.Delete(id)
 }

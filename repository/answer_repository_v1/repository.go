@@ -19,8 +19,8 @@ func New(db *pgx.Conn, sb squirrel.StatementBuilderType) irepository.AnswerRepos
 	return &repository{db: db, sb: sb}
 }
 
-func (r *repository) Get(questionId int) ([]entity.Answer, error) {
-	var answers []entity.Answer
+func (r *repository) Get(questionId int) ([]*entity.Answer, error) {
+	var answers []*entity.Answer
 
 	sql, args, err := r.sb.Select("*").
 		From("answers").
@@ -43,7 +43,7 @@ func (r *repository) Get(questionId int) ([]entity.Answer, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		var answer entity.Answer
+		var answer *entity.Answer
 		rows.Scan(&answer.ID, &answer.QuestionId, &answer.Title, &answer.IsCorrect)
 		answers = append(answers, answer)
 	}
@@ -55,7 +55,7 @@ func (r *repository) Get(questionId int) ([]entity.Answer, error) {
 	return answers, nil
 }
 
-func (r *repository) Create(in entity.Answer) (entity.Answer, error) {
+func (r *repository) Create(in entity.Answer) (*entity.Answer, error) {
 	sql, args, err := r.sb.Insert("answers").
 		Columns("question_id", "title", "is_correct").
 		Values(in.QuestionId, in.Title, in.IsCorrect).
@@ -63,7 +63,7 @@ func (r *repository) Create(in entity.Answer) (entity.Answer, error) {
 		ToSql()
 
 	if err != nil {
-		return in, err
+		return &in, err
 	}
 
 	row := r.db.QueryRow(
@@ -73,16 +73,16 @@ func (r *repository) Create(in entity.Answer) (entity.Answer, error) {
 	)
 
 	if err := row.Scan(&in.ID, &in.IsCorrect); err != nil {
-		return in, err
+		return &in, err
 	}
 
-	return in, nil
+	return &in, nil
 
 }
 
-func (r *repository) Update(in entity.Answer) (entity.Answer, error) {
+func (r *repository) Update(in entity.Answer) (*entity.Answer, error) {
 	if len(in.Title) == 0 {
-		return in, errors.New("empty answer title")
+		return &in, errors.New("empty answer title")
 	}
 
 	sql, args, err := r.sb.Update("answers").
@@ -92,7 +92,7 @@ func (r *repository) Update(in entity.Answer) (entity.Answer, error) {
 		ToSql()
 
 	if err != nil {
-		return in, err
+		return &in, err
 	}
 
 	commandTag, err := r.db.Exec(
@@ -102,14 +102,14 @@ func (r *repository) Update(in entity.Answer) (entity.Answer, error) {
 	)
 
 	if err != nil {
-		return in, err
+		return &in, err
 	}
 
 	if commandTag.RowsAffected() != 1 {
-		return in, errors.New("cannot update answer")
+		return &in, errors.New("cannot update answer")
 	}
 
-	return in, nil
+	return &in, nil
 }
 
 func (r *repository) Delete(id int) error {
