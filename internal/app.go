@@ -51,49 +51,33 @@ func Run() {
 
 	ignoreAuthPaths := []string{
 		"/api/auth/login",
-		"/swagger",
 	}
 
 	app := fiber.New()
+
+	fmt.Println("Initializing cors...")
 	app.Use(cors.New())
 
+	fmt.Println("Initializing presets api...")
 	presetsRepo := preset_repository_v1.NewRepository(conn, sb)
 	crudPresetsUc := crud_presets.NewUseCase(presetsRepo)
-	presetHandler := preset_handler.NewHandler(crudPresetsUc)
+	preset_handler.NewHandler(crudPresetsUc, app)
 
-	app.Get("/api/presets", presetHandler.GetAll)
-	app.Post("/api/preset", presetHandler.Create)
-	app.Put("/api/preset/:id", presetHandler.Update)
-	app.Delete("/api/preset/:id", presetHandler.Delete)
-
+	fmt.Println("Initializing questions api...")
 	questionRepo := question_repository_v1.NewRepository(conn, sb)
 	crudQuestionUc := crud_question.NewUseCase(questionRepo)
-	questionHandler := question_handler.NewHandler(crudQuestionUc)
+	question_handler.NewHandler(crudQuestionUc, app)
 
-	app.Get("/api/questions/:presetid", questionHandler.GetByPreset)
-	app.Post("/api/question", questionHandler.Create)
-	app.Put("/api/question/:id", questionHandler.Update)
-	app.Delete("/api/question/:id", questionHandler.Delete)
-
+	fmt.Println("Initializing answers api...")
 	answerRepo := answer_repository_v1.NewRepository(conn, sb)
 	crudAnswerUc := crud_answers.NewUseCase(answerRepo)
-	answerHandler := answer_handler.NewHandler(crudAnswerUc)
+	answer_handler.NewHandler(crudAnswerUc, app)
 
-	app.Get("/api/answers/:questionid", answerHandler.GetAnswer)
-	app.Post("/api/answer", answerHandler.CreateAnswer)
-	app.Put("/api/answer/:id", answerHandler.UpdateAnswer)
-	app.Delete("/api/answer/:id", answerHandler.DeleteAnswer)
-
+	fmt.Println("Initializing users api...")
 	userRepo := user_repository_v1.NewRepository(conn, sb)
 	crudUserUc := crud_user.NewUseCase(userRepo)
-	userHandler := user_handler.NewHandler(crudUserUc)
+	user_handler.NewHandler(crudUserUc, app)
 
-	app.Get("/api/user/interval/:id", userHandler.GetByInterval)
-	app.Get("/api/user/:chat_id", userHandler.GetByChatId)
-	app.Post("/api/user", userHandler.Create)
-	app.Put("/api/user/:id", userHandler.Update)
-
-	fmt.Println("Enable cors...")
 	app.Use(auth.New(auth.Config{
 		Repo: repo.AuthRepository,
 		Filter: func(c *fiber.Ctx) bool {

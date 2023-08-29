@@ -12,10 +12,15 @@ type handler struct {
 	crudUserUc crud_user.UseCase
 }
 
-func NewHandler(crudUserUc crud_user.UseCase) RestHandler {
-	return &handler{
-		crudUserUc: crudUserUc,
-	}
+func NewHandler(crudUserUc crud_user.UseCase, app *fiber.App) RestHandler {
+	userHandler := handler{crudUserUc: crudUserUc}
+
+	app.Get("/api/user/interval/:id", userHandler.GetByInterval)
+	app.Get("/api/user/:chat_id", userHandler.GetByChatId)
+	app.Post("/api/user", userHandler.Create)
+	app.Put("/api/user/:id", userHandler.Update)
+
+	return &userHandler
 }
 
 func (h *handler) GetByInterval(c *fiber.Ctx) error {

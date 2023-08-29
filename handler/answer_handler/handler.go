@@ -12,8 +12,15 @@ type restHandler struct {
 	crudAnswerUc crud_answers.UseCase
 }
 
-func NewHandler(crudAnswerUc crud_answers.UseCase) RestHandler {
-	return &restHandler{crudAnswerUc: crudAnswerUc}
+func NewHandler(crudAnswerUc crud_answers.UseCase, app *fiber.App) RestHandler {
+	answerHandler := restHandler{crudAnswerUc: crudAnswerUc}
+
+	app.Get("/api/answers/:questionid", answerHandler.GetAnswer)
+	app.Post("/api/answer", answerHandler.CreateAnswer)
+	app.Put("/api/answer/:id", answerHandler.UpdateAnswer)
+	app.Delete("/api/answer/:id", answerHandler.DeleteAnswer)
+
+	return &answerHandler
 }
 
 func (h *restHandler) GetAnswer(c *fiber.Ctx) error {

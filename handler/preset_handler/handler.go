@@ -12,8 +12,15 @@ type handler struct {
 	crudPresetsUc crud_presets.UseCase
 }
 
-func NewHandler(crudPresetsUc crud_presets.UseCase) RestHandler {
-	return &handler{crudPresetsUc: crudPresetsUc}
+func NewHandler(crudPresetsUc crud_presets.UseCase, app *fiber.App) RestHandler {
+	presetHandler := handler{crudPresetsUc: crudPresetsUc}
+
+	app.Get("/api/presets", presetHandler.GetAll)
+	app.Post("/api/preset", presetHandler.Create)
+	app.Put("/api/preset/:id", presetHandler.Update)
+	app.Delete("/api/preset/:id", presetHandler.Delete)
+
+	return &presetHandler
 }
 
 func (h *handler) GetAll(c *fiber.Ctx) error {
