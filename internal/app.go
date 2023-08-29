@@ -11,14 +11,17 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/joho/godotenv"
 	crud_answers "gitlab.com/back1ng1/question-bot-api/app/usecase/crud_answer"
+	"gitlab.com/back1ng1/question-bot-api/app/usecase/crud_presets"
 	"gitlab.com/back1ng1/question-bot-api/app/usecase/crud_question"
 	"gitlab.com/back1ng1/question-bot-api/handler/answer_handler"
+	"gitlab.com/back1ng1/question-bot-api/handler/preset_handler"
 	"gitlab.com/back1ng1/question-bot-api/handler/question_handler"
 	"gitlab.com/back1ng1/question-bot-api/internal/database"
 	"gitlab.com/back1ng1/question-bot-api/internal/middlewares/auth"
 	"gitlab.com/back1ng1/question-bot-api/internal/routes"
 	"gitlab.com/back1ng1/question-bot-api/pkg/logger"
 	"gitlab.com/back1ng1/question-bot-api/repository/answer_repository_v1"
+	"gitlab.com/back1ng1/question-bot-api/repository/preset_repository_v1"
 	"gitlab.com/back1ng1/question-bot-api/repository/question_repository_v1"
 )
 
@@ -49,6 +52,16 @@ func Run() {
 	}
 
 	app := fiber.New()
+	app.Use(cors.New())
+
+	presets_repo := preset_repository_v1.NewRepository(conn, sb)
+	crud_presets_uc := crud_presets.NewUseCase(presets_repo)
+	preset_handler := preset_handler.NewHandler(crud_presets_uc)
+
+	app.Get("/api/presets", preset_handler.GetAll)
+	app.Post("/api/preset", preset_handler.Create)
+	app.Put("/api/preset/:id", preset_handler.Update)
+	app.Delete("/api/preset/:id", preset_handler.Delete)
 
 	question_repo := question_repository_v1.NewRepository(conn, sb)
 	crud_question_uc := crud_question.NewUseCase(question_repo)
@@ -68,7 +81,7 @@ func Run() {
 	app.Put("/api/answer/:id", answer_handler.UpdateAnswer)
 	app.Delete("/api/answer/:id", answer_handler.DeleteAnswer)
 
-	app.Use(cors.New())
+	fmt.Println("Enable cors...")
 	app.Use(auth.New(auth.Config{
 		Repo: repo.AuthRepository,
 		Filter: func(c *fiber.Ctx) bool {

@@ -16,7 +16,10 @@ type repository struct {
 }
 
 func New(db *pgx.Conn, sb squirrel.StatementBuilderType) irepository.AnswerRepository {
-	return &repository{db: db, sb: sb}
+	return &repository{
+		db: db,
+		sb: sb,
+	}
 }
 
 func (r *repository) Get(questionId int) ([]*entity.Answer, error) {
@@ -43,9 +46,9 @@ func (r *repository) Get(questionId int) ([]*entity.Answer, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		var answer *entity.Answer
+		var answer entity.Answer
 		rows.Scan(&answer.ID, &answer.QuestionId, &answer.Title, &answer.IsCorrect)
-		answers = append(answers, answer)
+		answers = append(answers, &answer)
 	}
 
 	if err := rows.Err(); err != nil {

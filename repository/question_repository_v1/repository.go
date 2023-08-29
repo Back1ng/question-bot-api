@@ -16,7 +16,10 @@ type repository struct {
 }
 
 func NewRepository(db *pgx.Conn, sb squirrel.StatementBuilderType) irepository.QuestionRepository {
-	return &repository{db: db, sb: sb}
+	return &repository{
+		db: db,
+		sb: sb,
+	}
 }
 
 func (r *repository) GetByPreset(presetId int) ([]*entity.Question, error) {
@@ -43,9 +46,9 @@ func (r *repository) GetByPreset(presetId int) ([]*entity.Question, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		question := &entity.Question{}
+		question := entity.Question{}
 		rows.Scan(&question.ID, &question.PresetId, &question.Title)
-		questions = append(questions, question)
+		questions = append(questions, &question)
 	}
 
 	if err := rows.Err(); err != nil {
@@ -56,7 +59,7 @@ func (r *repository) GetByPreset(presetId int) ([]*entity.Question, error) {
 }
 
 func (r *repository) Create(in entity.Question) (*entity.Question, error) {
-	var question *entity.Question
+	var question entity.Question
 
 	sql, args, err := r.sb.Insert("questions").
 		Columns("preset_id", "title").
@@ -80,7 +83,7 @@ func (r *repository) Create(in entity.Question) (*entity.Question, error) {
 		return nil, err
 	}
 
-	return question, nil
+	return &question, nil
 
 }
 
