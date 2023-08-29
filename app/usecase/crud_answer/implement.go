@@ -7,15 +7,15 @@ import (
 )
 
 type usecase struct {
-	answer_repo repository.AnswerRepository
+	answerRepo repository.AnswerRepository
 }
 
-func NewUseCase(answer_repo repository.AnswerRepository) UseCase {
-	return &usecase{answer_repo: answer_repo}
+func NewUseCase(answerRepo repository.AnswerRepository) UseCase {
+	return &usecase{answerRepo: answerRepo}
 }
 
 func (uc *usecase) Get(questionId int) ([]*entity.Answer, error) {
-	answers, err := uc.answer_repo.Get(questionId)
+	answers, err := uc.answerRepo.Get(questionId)
 
 	if err != nil {
 		logger.Log.Errorf("AnswerApi.GetAnswers - r.Repo.FindAnswersInQuestion: %v. QuestionId: %d", err, questionId)
@@ -26,7 +26,7 @@ func (uc *usecase) Get(questionId int) ([]*entity.Answer, error) {
 }
 
 func (uc *usecase) Create(in entity.Answer) (*entity.Answer, error) {
-	out, err := uc.answer_repo.Create(in)
+	out, err := uc.answerRepo.Create(in)
 
 	if err != nil {
 		logger.Log.Errorf("AnswerApi.StoreAnswers - r.Repo.StoreAnswer: %v. Answer: %#+v", err, in)
@@ -37,7 +37,7 @@ func (uc *usecase) Create(in entity.Answer) (*entity.Answer, error) {
 }
 
 func (uc *usecase) Update(in entity.Answer) (*entity.Answer, error) {
-	out, err := uc.answer_repo.Update(in)
+	out, err := uc.answerRepo.Update(in)
 
 	if err != nil {
 		logger.Log.Errorf("AnswerApi.UpdateAnswer - r.Repo.UpdateAnswer: %v. Answer: %#+v", err, in)
@@ -47,5 +47,5 @@ func (uc *usecase) Update(in entity.Answer) (*entity.Answer, error) {
 }
 
 func (uc *usecase) Delete(id int) error {
-	return uc.answer_repo.Delete(id)
+	return uc.answerRepo.Delete(id)
 }

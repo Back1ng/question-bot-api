@@ -9,11 +9,11 @@ import (
 )
 
 type restHandler struct {
-	crud_answer_uc crud_answers.UseCase
+	crudAnswerUc crud_answers.UseCase
 }
 
-func NewHandler(crud_answer_uc crud_answers.UseCase) RestHandler {
-	return &restHandler{crud_answer_uc: crud_answer_uc}
+func NewHandler(crudAnswerUc crud_answers.UseCase) RestHandler {
+	return &restHandler{crudAnswerUc: crudAnswerUc}
 }
 
 func (h *restHandler) GetAnswer(c *fiber.Ctx) error {
@@ -22,7 +22,7 @@ func (h *restHandler) GetAnswer(c *fiber.Ctx) error {
 		return err
 	}
 
-	out, err := h.crud_answer_uc.Get(id)
+	out, err := h.crudAnswerUc.Get(id)
 	if err != nil {
 		return err
 	}
@@ -37,7 +37,7 @@ func (h *restHandler) CreateAnswer(c *fiber.Ctx) error {
 		return err
 	}
 
-	out, err := h.crud_answer_uc.Create(answer)
+	out, err := h.crudAnswerUc.Create(answer)
 
 	if err != nil {
 		return err
@@ -57,7 +57,7 @@ func (h *restHandler) UpdateAnswer(c *fiber.Ctx) error {
 		return err
 	}
 
-	out, err := h.crud_answer_uc.Update(answer)
+	out, err := h.crudAnswerUc.Update(answer)
 	if err != nil {
 		return err
 	}
@@ -71,5 +71,5 @@ func (h *restHandler) DeleteAnswer(c *fiber.Ctx) error {
 		return c.JSON(ErrorResponse{Message: err.Error()})
 	}
 
-	return h.crud_answer_uc.Delete(id)
+	return h.crudAnswerUc.Delete(id)
 }

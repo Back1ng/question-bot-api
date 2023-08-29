@@ -9,12 +9,12 @@ import (
 )
 
 type handler struct {
-	crud_user_uc crud_user.UseCase
+	crudUserUc crud_user.UseCase
 }
 
-func NewHandler(crud_user_uc crud_user.UseCase) RestHandler {
+func NewHandler(crudUserUc crud_user.UseCase) RestHandler {
 	return &handler{
-		crud_user_uc: crud_user_uc,
+		crudUserUc: crudUserUc,
 	}
 }
 
@@ -25,7 +25,7 @@ func (h *handler) GetByInterval(c *fiber.Ctx) error {
 		return err
 	}
 
-	users, err := h.crud_user_uc.GetByInterval(interval)
+	users, err := h.crudUserUc.GetByInterval(interval)
 	if err != nil {
 		return err
 	}
@@ -43,7 +43,7 @@ func (h *handler) GetByChatId(c *fiber.Ctx) error {
 		return err
 	}
 
-	user, err := h.crud_user_uc.GetByChatId(chatId)
+	user, err := h.crudUserUc.GetByChatId(chatId)
 	if err != nil {
 		return err
 	}
@@ -61,7 +61,7 @@ func (h *handler) Create(c *fiber.Ctx) error {
 		return err
 	}
 
-	out, err := h.crud_user_uc.Create(user)
+	out, err := h.crudUserUc.Create(user)
 	if err != nil {
 		return err
 	}
@@ -81,7 +81,7 @@ func (h *handler) Update(c *fiber.Ctx) error {
 		return err
 	}
 
-	out, err := h.crud_user_uc.Update(user)
+	out, err := h.crudUserUc.Update(user)
 	if err != nil {
 		return err
 	}

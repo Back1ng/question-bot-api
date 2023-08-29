@@ -6,15 +6,15 @@ import (
 )
 
 type usecase struct {
-	question_repo repository.QuestionRepository
+	questionRepo repository.QuestionRepository
 }
 
-func NewUseCase(question_repo repository.QuestionRepository) UseCase {
-	return &usecase{question_repo: question_repo}
+func NewUseCase(questionRepo repository.QuestionRepository) UseCase {
+	return &usecase{questionRepo: questionRepo}
 }
 
 func (uc *usecase) GetByPreset(presetId int) ([]*entity.Question, error) {
-	out, err := uc.question_repo.GetByPreset(presetId)
+	out, err := uc.questionRepo.GetByPreset(presetId)
 
 	if err != nil {
 		return nil, err
@@ -24,7 +24,7 @@ func (uc *usecase) GetByPreset(presetId int) ([]*entity.Question, error) {
 }
 
 func (uc *usecase) Create(in entity.Question) (*entity.Question, error) {
-	out, err := uc.question_repo.Create(in)
+	out, err := uc.questionRepo.Create(in)
 
 	if err != nil {
 		return nil, err
@@ -34,7 +34,7 @@ func (uc *usecase) Create(in entity.Question) (*entity.Question, error) {
 }
 
 func (uc *usecase) Update(in entity.Question) (*entity.Question, error) {
-	out, err := uc.question_repo.Update(in)
+	out, err := uc.questionRepo.Update(in)
 
 	if err != nil {
 		return nil, err
@@ -44,5 +44,5 @@ func (uc *usecase) Update(in entity.Question) (*entity.Question, error) {
 }
 
 func (uc *usecase) Delete(id int) error {
-	return uc.question_repo.Delete(id)
+	return uc.questionRepo.Delete(id)
 }

@@ -9,15 +9,15 @@ import (
 )
 
 type handler struct {
-	crud_presets_uc crud_presets.UseCase
+	crudPresetsUc crud_presets.UseCase
 }
 
-func NewHandler(crud_presets_uc crud_presets.UseCase) RestHandler {
-	return &handler{crud_presets_uc: crud_presets_uc}
+func NewHandler(crudPresetsUc crud_presets.UseCase) RestHandler {
+	return &handler{crudPresetsUc: crudPresetsUc}
 }
 
 func (h *handler) GetAll(c *fiber.Ctx) error {
-	out, err := h.crud_presets_uc.GetAll()
+	out, err := h.crudPresetsUc.GetAll()
 	if err != nil {
 		return err
 	}
@@ -36,7 +36,7 @@ func (h *handler) Create(c *fiber.Ctx) error {
 		return err
 	}
 
-	out, err := h.crud_presets_uc.Create(preset)
+	out, err := h.crudPresetsUc.Create(preset)
 	if err != nil {
 		return err
 	}
@@ -55,7 +55,7 @@ func (h *handler) Update(c *fiber.Ctx) error {
 		return err
 	}
 
-	out, err := h.crud_presets_uc.Update(preset)
+	out, err := h.crudPresetsUc.Update(preset)
 	if err != nil {
 		return err
 	}
@@ -69,7 +69,7 @@ func (h *handler) Delete(c *fiber.Ctx) error {
 		return err
 	}
 
-	err = h.crud_presets_uc.Delete(int64(id))
+	err = h.crudPresetsUc.Delete(int64(id))
 	if err != nil {
 		return err
 	}

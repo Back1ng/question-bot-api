@@ -6,17 +6,17 @@ import (
 )
 
 type usecase struct {
-	user_repo repository.UserRepository
+	userRepo repository.UserRepository
 }
 
-func NewUseCase(user_repo repository.UserRepository) UseCase {
+func NewUseCase(userRepo repository.UserRepository) UseCase {
 	return &usecase{
-		user_repo: user_repo,
+		userRepo: userRepo,
 	}
 }
 
 func (uc *usecase) GetByInterval(interval int) ([]int64, error) {
-	users, err := uc.user_repo.GetByInterval(interval)
+	users, err := uc.userRepo.GetByInterval(interval)
 
 	if err != nil {
 		return nil, err
@@ -26,7 +26,7 @@ func (uc *usecase) GetByInterval(interval int) ([]int64, error) {
 }
 
 func (uc *usecase) GetByChatId(chatId int) (*entity.User, error) {
-	user, err := uc.user_repo.GetByChatId(chatId)
+	user, err := uc.userRepo.GetByChatId(chatId)
 
 	if err != nil {
 		return nil, err
@@ -36,7 +36,7 @@ func (uc *usecase) GetByChatId(chatId int) (*entity.User, error) {
 }
 
 func (uc *usecase) Create(in entity.User) (*entity.User, error) {
-	user, err := uc.user_repo.Create(in)
+	user, err := uc.userRepo.Create(in)
 
 	if err != nil {
 		return nil, err
@@ -46,7 +46,7 @@ func (uc *usecase) Create(in entity.User) (*entity.User, error) {
 }
 
 func (uc *usecase) Update(in entity.User) (*entity.User, error) {
-	user, err := uc.user_repo.Update(in)
+	user, err := uc.userRepo.Update(in)
 
 	if err != nil {
 		return nil, err

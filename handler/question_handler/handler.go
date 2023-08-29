@@ -9,11 +9,11 @@ import (
 )
 
 type handler struct {
-	crud_question_uc crud_question.UseCase
+	crudQuestionUc crud_question.UseCase
 }
 
-func NewHandler(crud_question_uc crud_question.UseCase) RestHandler {
-	return &handler{crud_question_uc: crud_question_uc}
+func NewHandler(crudQuestionUc crud_question.UseCase) RestHandler {
+	return &handler{crudQuestionUc: crudQuestionUc}
 }
 
 func (h *handler) GetByPreset(c *fiber.Ctx) error {
@@ -22,7 +22,7 @@ func (h *handler) GetByPreset(c *fiber.Ctx) error {
 		return err
 	}
 
-	questions, err := h.crud_question_uc.GetByPreset(id)
+	questions, err := h.crudQuestionUc.GetByPreset(id)
 	if err != nil {
 		return err
 	}
@@ -36,7 +36,7 @@ func (h *handler) Create(c *fiber.Ctx) error {
 		return err
 	}
 
-	out, err := h.crud_question_uc.Create(question)
+	out, err := h.crudQuestionUc.Create(question)
 	if err != nil {
 		return err
 	}
@@ -55,7 +55,7 @@ func (h *handler) Update(c *fiber.Ctx) error {
 		return err
 	}
 
-	out, err := h.crud_question_uc.Update(question)
+	out, err := h.crudQuestionUc.Update(question)
 	if err != nil {
 		return err
 	}
@@ -69,5 +69,5 @@ func (h *handler) Delete(c *fiber.Ctx) error {
 		return err
 	}
 
-	return h.crud_question_uc.Delete(id)
+	return h.crudQuestionUc.Delete(id)
 }
