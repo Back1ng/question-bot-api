@@ -15,7 +15,7 @@ type repository struct {
 	sb squirrel.StatementBuilderType
 }
 
-func New(db *pgx.Conn, sb squirrel.StatementBuilderType) irepository.AnswerRepository {
+func NewRepository(db *pgx.Conn, sb squirrel.StatementBuilderType) irepository.AnswerRepository {
 	return &repository{
 		db: db,
 		sb: sb,

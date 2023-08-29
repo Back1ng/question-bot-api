@@ -13,9 +13,11 @@ import (
 	crud_answers "gitlab.com/back1ng1/question-bot-api/app/usecase/crud_answer"
 	"gitlab.com/back1ng1/question-bot-api/app/usecase/crud_presets"
 	"gitlab.com/back1ng1/question-bot-api/app/usecase/crud_question"
+	"gitlab.com/back1ng1/question-bot-api/app/usecase/crud_user"
 	"gitlab.com/back1ng1/question-bot-api/handler/answer_handler"
 	"gitlab.com/back1ng1/question-bot-api/handler/preset_handler"
 	"gitlab.com/back1ng1/question-bot-api/handler/question_handler"
+	"gitlab.com/back1ng1/question-bot-api/handler/user_handler"
 	"gitlab.com/back1ng1/question-bot-api/internal/database"
 	"gitlab.com/back1ng1/question-bot-api/internal/middlewares/auth"
 	"gitlab.com/back1ng1/question-bot-api/internal/routes"
@@ -23,6 +25,7 @@ import (
 	"gitlab.com/back1ng1/question-bot-api/repository/answer_repository_v1"
 	"gitlab.com/back1ng1/question-bot-api/repository/preset_repository_v1"
 	"gitlab.com/back1ng1/question-bot-api/repository/question_repository_v1"
+	"gitlab.com/back1ng1/question-bot-api/repository/user_repository_v1"
 )
 
 func Run() {
@@ -72,7 +75,7 @@ func Run() {
 	app.Put("/api/question/:id", question_handler.Update)
 	app.Delete("/api/question/:id", question_handler.Delete)
 
-	answer_repo := answer_repository_v1.New(conn, sb)
+	answer_repo := answer_repository_v1.NewRepository(conn, sb)
 	crud_answer_uc := crud_answers.NewUseCase(answer_repo)
 	answer_handler := answer_handler.NewHandler(crud_answer_uc)
 
@@ -80,6 +83,15 @@ func Run() {
 	app.Post("/api/answer", answer_handler.CreateAnswer)
 	app.Put("/api/answer/:id", answer_handler.UpdateAnswer)
 	app.Delete("/api/answer/:id", answer_handler.DeleteAnswer)
+
+	user_repo := user_repository_v1.NewRepository(conn, sb)
+	crud_user_uc := crud_user.NewUseCase(user_repo)
+	user_handler := user_handler.NewHandler(crud_user_uc)
+
+	app.Get("/api/user/interval/:id", user_handler.GetByInterval)
+	app.Get("/api/user/:chat_id", user_handler.GetByChatId)
+	app.Post("/api/user", user_handler.Create)
+	app.Put("/api/user/:id", user_handler.Update)
 
 	fmt.Println("Enable cors...")
 	app.Use(auth.New(auth.Config{
