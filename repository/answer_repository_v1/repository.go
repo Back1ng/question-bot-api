@@ -115,6 +115,11 @@ func (r *repository) Create(in entity.Answer) (*entity.Answer, error) {
 
 func (r *repository) Update(in entity.Answer) (*entity.Answer, error) {
 	if len(in.Title) == 0 {
+		logger.Log.Errorf(
+			"repository.answer_repository_v1.repository.Update() - len(in.Title) == 0: %v. in: %#+v",
+			"empty answer title",
+			in,
+		)
 
 		return nil, errors.New("empty answer title")
 	}
@@ -126,6 +131,11 @@ func (r *repository) Update(in entity.Answer) (*entity.Answer, error) {
 		ToSql()
 
 	if err != nil {
+		logger.Log.Errorf(
+			"repository.answer_repository_v1.repository.Update() - r.sb.Update(\"answers\"): %v",
+			err,
+		)
+
 		return nil, err
 	}
 
@@ -136,10 +146,24 @@ func (r *repository) Update(in entity.Answer) (*entity.Answer, error) {
 	)
 
 	if err != nil {
+		logger.Log.Errorf(
+			"repository.answer_repository_v1.repository.Update() - r.db.Exec(): %v. sql: %#+v. args: %#+v",
+			err,
+			sql,
+			args,
+		)
+
 		return nil, err
 	}
 
 	if commandTag.RowsAffected() != 1 {
+		logger.Log.Errorf(
+			"repository.answer_repository_v1.repository.Update() - commandTag.RowsAffected() != 1: %v, sql: %#+v, args: %#+v",
+			"not affected rows",
+			sql,
+			args,
+		)
+
 		return nil, errors.New("cannot update answer")
 	}
 
@@ -148,6 +172,11 @@ func (r *repository) Update(in entity.Answer) (*entity.Answer, error) {
 
 func (r *repository) Delete(id int) error {
 	if id == 0 {
+		logger.Log.Errorf(
+			"repository.answer_repository_v1.repository.Delete() - id == 0: %v",
+			"id answer not presented",
+		)
+
 		return errors.New("id answer not presented")
 	}
 
@@ -155,6 +184,11 @@ func (r *repository) Delete(id int) error {
 		Where("id = ?", id).ToSql()
 
 	if err != nil {
+		logger.Log.Errorf(
+			"repository.answer_repository_v1.repository.Delete() - r.sb.Delete(\"answers\"): %v",
+			err,
+		)
+
 		return err
 	}
 
@@ -165,10 +199,24 @@ func (r *repository) Delete(id int) error {
 	)
 
 	if err != nil {
+		logger.Log.Errorf(
+			"repository.answer_repository_v1.repository.Delete() - r.db.Exec(): %v. sql: %#+v, args %#+v",
+			err,
+			sql,
+			args,
+		)
+
 		return err
 	}
 
 	if commandTag.RowsAffected() != 1 {
+		logger.Log.Errorf(
+			"repository.answer_repository_v1.repository.Delete() - commandTag.RowsAffected() != 1: %v, sql: %#+v, args: %#+v",
+			"not affected rows",
+			sql,
+			args,
+		)
+
 		return errors.New("cannot delete answer")
 	}
 
