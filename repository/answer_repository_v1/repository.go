@@ -8,6 +8,7 @@ import (
 	"github.com/jackc/pgx/v5"
 	irepository "gitlab.com/back1ng1/question-bot-api/app/repository"
 	"gitlab.com/back1ng1/question-bot-api/entity"
+	"gitlab.com/back1ng1/question-bot-api/pkg/logger"
 )
 
 type repository struct {
@@ -31,6 +32,11 @@ func (r *repository) Get(questionId int) ([]*entity.Answer, error) {
 		ToSql()
 
 	if err != nil {
+		logger.Log.Errorf(
+			"repository.answer_repository_v1.repository.Get() - r.sb.Select(\"*\"): %v",
+			err,
+		)
+
 		return nil, err
 	}
 
@@ -41,6 +47,13 @@ func (r *repository) Get(questionId int) ([]*entity.Answer, error) {
 	)
 
 	if err != nil {
+		logger.Log.Errorf(
+			"repository.answer_repository_v1.repository.Get() - r.db.Query(): %v. sql: %#+v. args: %#+v",
+			err,
+			sql,
+			args,
+		)
+
 		return nil, err
 	}
 	defer rows.Close()
@@ -52,6 +65,11 @@ func (r *repository) Get(questionId int) ([]*entity.Answer, error) {
 	}
 
 	if err := rows.Err(); err != nil {
+		logger.Log.Errorf(
+			"repository.answer_repository_v1.repository.Get() - rows.Err(): %v",
+			err,
+		)
+
 		return nil, err
 	}
 
@@ -66,6 +84,11 @@ func (r *repository) Create(in entity.Answer) (*entity.Answer, error) {
 		ToSql()
 
 	if err != nil {
+		logger.Log.Errorf(
+			"repository.answer_repository_v1.repository.Create() - r.sb.Insert(\"answers\"): %v",
+			err,
+		)
+
 		return nil, err
 	}
 
@@ -76,6 +99,13 @@ func (r *repository) Create(in entity.Answer) (*entity.Answer, error) {
 	)
 
 	if err := row.Scan(&in.ID, &in.IsCorrect); err != nil {
+		logger.Log.Errorf(
+			"repository.answer_repository_v1.repository.Create() - row.Scan(): %v, sql: %#+v, args: %#+v",
+			err,
+			sql,
+			args,
+		)
+
 		return nil, err
 	}
 
@@ -85,6 +115,7 @@ func (r *repository) Create(in entity.Answer) (*entity.Answer, error) {
 
 func (r *repository) Update(in entity.Answer) (*entity.Answer, error) {
 	if len(in.Title) == 0 {
+
 		return nil, errors.New("empty answer title")
 	}
 

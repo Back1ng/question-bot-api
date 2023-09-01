@@ -1,8 +1,8 @@
 package auth_usecase
 
 import (
-	"errors"
 	"gitlab.com/back1ng1/question-bot-api/app/repository"
+	"gitlab.com/back1ng1/question-bot-api/pkg/logger"
 	"gitlab.com/back1ng1/question-bot-api/pkg/tgauth"
 )
 
@@ -18,12 +18,21 @@ func NewUsecase(tokensRepo repository.TokenRepository) UseCase {
 
 func (uc *usecase) Authenticate(auth tgauth.Auth) (*string, error) {
 	if auth.IsOutdated() {
-		return nil, errors.New("token is outdated")
+		logger.Log.Errorf(
+			"app.usecase.auth_usecase.implement.Authenticate() - auth.IsOutdated(): %v",
+			tgauth.TokenIsOutdated,
+		)
+
+		return nil, tgauth.TokenIsOutdated
 	}
 
 	token, err := uc.tokensRepo.Get(auth.Hash)
 	if err != nil {
-		// token not find
+		logger.Log.Errorf(
+			"app.usecase.auth_usecase.implement.Authenticate() - uc.tokensRepo.Get(auth.Hash): %v",
+			err,
+		)
+
 		return nil, err
 	}
 
@@ -32,12 +41,28 @@ func (uc *usecase) Authenticate(auth tgauth.Auth) (*string, error) {
 	}
 
 	if !auth.IsValid() {
-		return nil, errors.New("auth usecase: auth not valid")
+		logger.Log.Errorf(
+			"app.usecase.auth_usecase.implement.Authenticate() - !auth.IsValid(): %v",
+			tgauth.AuthNotValid,
+		)
+		return nil, tgauth.AuthNotValid
 	}
 
 	createdToken, err := uc.tokensRepo.Create(auth)
+	if err != nil {
+		logger.Log.Errorf(
+			"app.usecase.auth_usecase.implement.Authenticate() - uc.tokensRepo.Create(auth): %v",
+			err,
+		)
+		return nil, err
+	}
 
 	if err := uc.tokensRepo.DeleteExcept(*createdToken); err != nil {
+		logger.Log.Errorf(
+			"app.usecase.auth_usecase.implement.Authenticate() - uc.tokensRepo.DeleteExcept(*createdToken): %v",
+			err,
+		)
+
 		return nil, err
 	}
 
