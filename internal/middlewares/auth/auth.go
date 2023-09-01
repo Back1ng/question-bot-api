@@ -29,12 +29,12 @@ func New(config Config) fiber.Handler {
 			return ErrorWrongHeader
 		}
 
-		hasToken, err := config.Repo.HasToken(authString[1])
+		token, err := config.Repo.Get(authString[1])
 		if err != nil {
 			return err
 		}
 
-		if hasToken {
+		if token.Hash != "" {
 			return c.Next()
 		}
 

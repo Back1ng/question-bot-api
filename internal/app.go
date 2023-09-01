@@ -3,6 +3,9 @@ package app
 import (
 	"context"
 	"fmt"
+	"gitlab.com/back1ng1/question-bot-api/app/usecase/auth_usecase"
+	"gitlab.com/back1ng1/question-bot-api/handler/auth_handler"
+	"gitlab.com/back1ng1/question-bot-api/repository/tokens_repository_v1"
 	"os"
 
 	"github.com/Masterminds/squirrel"
@@ -18,9 +21,7 @@ import (
 	"gitlab.com/back1ng1/question-bot-api/handler/preset_handler"
 	"gitlab.com/back1ng1/question-bot-api/handler/question_handler"
 	"gitlab.com/back1ng1/question-bot-api/handler/user_handler"
-	"gitlab.com/back1ng1/question-bot-api/internal/database"
 	"gitlab.com/back1ng1/question-bot-api/internal/middlewares/auth"
-	"gitlab.com/back1ng1/question-bot-api/internal/routes"
 	"gitlab.com/back1ng1/question-bot-api/pkg/logger"
 	"gitlab.com/back1ng1/question-bot-api/repository/answer_repository_v1"
 	"gitlab.com/back1ng1/question-bot-api/repository/preset_repository_v1"
@@ -43,9 +44,6 @@ func Run() {
 		os.Exit(1)
 	}
 	defer conn.Close(context.Background())
-
-	fmt.Println("Initializing repositories...")
-	repo := database.GetRepositories(conn, sb)
 
 	fmt.Println("Initializing api...")
 
@@ -78,8 +76,13 @@ func Run() {
 	crudUserUc := crud_user.NewUseCase(userRepo)
 	user_handler.NewHandler(crudUserUc, app)
 
+	fmt.Println("Initializing auth api...")
+	tokensRepo := tokens_repository_v1.NewRepository(conn, sb)
+	authUseCase := auth_usecase.NewUsecase(tokensRepo)
+	auth_handler.NewHandler(authUseCase, app)
+
 	app.Use(auth.New(auth.Config{
-		Repo: repo.AuthRepository,
+		Repo: tokensRepo,
 		Filter: func(c *fiber.Ctx) bool {
 			for _, v := range ignoreAuthPaths {
 				if c.OriginalURL() == v {
@@ -94,7 +97,6 @@ func Run() {
 			return false
 		},
 	}))
-	routes.RegisterRoutes(app, repo)
 
 	app.Listen(":3000")
 }
