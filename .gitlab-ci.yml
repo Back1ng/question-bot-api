@@ -39,10 +39,12 @@ deploy-tp:
   script:
     - tbot start --token=gitlab-tg-bot --destination-dir=/tmp/tbot-user --data-dir=/tmp/tbot-data --auth-server=tp.flagsoft.ru:443 --join-method=gitlab --oneshot
     - tsh -i /tmp/tbot-user/identity --proxy tp.flagsoft.ru:443 scp docker-compose.prod.yml $USER_PRODUCTION@$HOSTNAME_PRODUCTION:$PATH_PRODUCTION/docker-compose.api.yml
+    - tsh -i /tmp/tbot-user/identity --proxy tp.flagsoft.ru:443 scp docker-compose.postgres.yml $USER_PRODUCTION@$HOSTNAME_PRODUCTION:$PATH_PRODUCTION/docker-compose.postgres.yml
     - tsh -i /tmp/tbot-user/identity --proxy tp.flagsoft.ru:443 scp .env.example $USER_PRODUCTION@$HOSTNAME_PRODUCTION:$PATH_PRODUCTION/.env.example
     - tsh -i /tmp/tbot-user/identity --proxy tp.flagsoft.ru:443 ssh root@$HOSTNAME_PRODUCTION "cd $PATH_PRODUCTION &&
       docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY &&
       docker pull $CI_REGISTRY_IMAGE:main && 
+      docker-compose -f docker-compose.postgres.yml up -d db pgbouncer &&
       docker-compose -f docker-compose.api.yml up -d api &&
       docker-compose -f docker-compose.api.yml exec -T api sh entrypoint.sh &&
       docker image prune --force"
