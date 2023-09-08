@@ -3,10 +3,11 @@ package app
 import (
 	"context"
 	"fmt"
+	"os"
+
 	"gitlab.com/back1ng1/question-bot-api/app/usecase/auth_usecase"
 	"gitlab.com/back1ng1/question-bot-api/handler/auth_handler"
 	"gitlab.com/back1ng1/question-bot-api/repository/tokens_repository_v1"
-	"os"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/gofiber/fiber/v2"
@@ -38,7 +39,7 @@ func Run() {
 
 	fmt.Println("Initializing postgres connection...")
 	sb := squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
-	conn, err := pgx.Connect(context.Background(), os.Getenv("POSTGRESQL_URL"))
+	conn, err := pgx.Connect(context.Background(), os.Getenv("PGBOUNCER_URL"))
 	if err != nil {
 		logger.Log.Errorf("app.Run - pgx.Connect: %v", err)
 		os.Exit(1)
