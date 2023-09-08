@@ -12,6 +12,7 @@ import (
 	"github.com/Masterminds/squirrel"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	fiber_logger "github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/jackc/pgx/v5"
 	"github.com/joho/godotenv"
 	crud_answers "gitlab.com/back1ng1/question-bot-api/app/usecase/crud_answer"
@@ -53,6 +54,9 @@ func Run() {
 	}
 
 	app := fiber.New()
+
+	fmt.Println("Initializing fiber logging...")
+	app.Use(fiber_logger.New())
 
 	fmt.Println("Initializing cors...")
 	app.Use(cors.New())
