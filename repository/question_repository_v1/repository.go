@@ -8,6 +8,7 @@ import (
 	"github.com/jackc/pgx/v5"
 	irepository "gitlab.com/back1ng1/question-bot-api/app/repository"
 	"gitlab.com/back1ng1/question-bot-api/entity"
+	"gitlab.com/back1ng1/question-bot-api/pkg/logger"
 )
 
 type repository struct {
@@ -31,6 +32,11 @@ func (r *repository) GetByPreset(presetId int) ([]*entity.Question, error) {
 		ToSql()
 
 	if err != nil {
+		logger.Log.Errorf(
+			"repository.question_repository_v1.repository.GetByPreset() - r.sb.Select(): %v. presetId: %d",
+			err,
+			presetId,
+		)
 		return nil, err
 	}
 
@@ -41,6 +47,11 @@ func (r *repository) GetByPreset(presetId int) ([]*entity.Question, error) {
 	)
 
 	if err != nil {
+		logger.Log.Errorf(
+			"repository.question_repository_v1.repository.GetByPreset() - r.db.Query(): %v. presetId: %d",
+			err,
+			presetId,
+		)
 		return nil, err
 	}
 	defer rows.Close()
@@ -52,6 +63,11 @@ func (r *repository) GetByPreset(presetId int) ([]*entity.Question, error) {
 	}
 
 	if err := rows.Err(); err != nil {
+		logger.Log.Errorf(
+			"repository.question_repository_v1.repository.GetByPreset() - rows.Err(): %v. presetId: %d",
+			err,
+			presetId,
+		)
 		return nil, err
 	}
 
@@ -68,6 +84,11 @@ func (r *repository) Create(in entity.Question) (*entity.Question, error) {
 		ToSql()
 
 	if err != nil {
+		logger.Log.Errorf(
+			"repository.question_repository_v1.repository.Create() - r.sb.Insert(): %v. question: %#+v",
+			err,
+			in,
+		)
 		return nil, err
 	}
 
@@ -80,6 +101,11 @@ func (r *repository) Create(in entity.Question) (*entity.Question, error) {
 	err = row.Scan(&question.ID, &question.PresetId, &question.Title)
 
 	if err != nil {
+		logger.Log.Errorf(
+			"repository.question_repository_v1.repository.Create() - row.Scan(): %v. question: %#+v",
+			err,
+			in,
+		)
 		return nil, err
 	}
 
@@ -98,6 +124,11 @@ func (r *repository) Update(in entity.Question) (*entity.Question, error) {
 		ToSql()
 
 	if err != nil {
+		logger.Log.Errorf(
+			"repository.question_repository_v1.repository.Update() - r.sb.Update(): %v. question: %#+v",
+			err,
+			in,
+		)
 		return nil, err
 	}
 
@@ -107,10 +138,20 @@ func (r *repository) Update(in entity.Question) (*entity.Question, error) {
 		args...,
 	)
 	if err != nil {
+		logger.Log.Errorf(
+			"repository.question_repository_v1.repository.Update() - r.db.Exec(): %v. question: %#+v",
+			err,
+			in,
+		)
 		return nil, err
 	}
 
 	if commandTag.RowsAffected() != 1 {
+		logger.Log.Errorf(
+			"repository.question_repository_v1.repository.Update() - commandTag.RowsAffected(): %v. question: %#+v",
+			"update questions: rows not affected",
+			in,
+		)
 		return nil, errors.New("update questions: rows not affected")
 	}
 
@@ -124,6 +165,11 @@ func (r *repository) Delete(id int) error {
 		ToSql()
 
 	if err != nil {
+		logger.Log.Errorf(
+			"repository.question_repository_v1.repository.Delete() - r.sb.Delete(): %v. id: %d",
+			err,
+			id,
+		)
 		return err
 	}
 
@@ -134,10 +180,20 @@ func (r *repository) Delete(id int) error {
 	)
 
 	if err != nil {
+		logger.Log.Errorf(
+			"repository.question_repository_v1.repository.Delete() - r.db.Exec(): %v. id: %d",
+			err,
+			id,
+		)
 		return err
 	}
 
 	if commandTag.RowsAffected() != 1 {
+		logger.Log.Errorf(
+			"repository.question_repository_v1.repository.Delete() - r.sb.Update(): %v. id: %d",
+			"delete question: rows not affected",
+			id,
+		)
 		return errors.New("delete question: rows not affected")
 	}
 

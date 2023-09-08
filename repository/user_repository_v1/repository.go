@@ -9,6 +9,7 @@ import (
 	"github.com/jackc/pgx/v5"
 	irepository "gitlab.com/back1ng1/question-bot-api/app/repository"
 	"gitlab.com/back1ng1/question-bot-api/entity"
+	"gitlab.com/back1ng1/question-bot-api/pkg/logger"
 )
 
 type repository struct {
@@ -33,6 +34,10 @@ func (r *repository) GetByInterval(interval int) ([]int64, error) {
 		ToSql()
 
 	if err != nil {
+		logger.Log.Errorf(
+			"repository.user_repository_v1.repository.GetByInterval() - r.sb.Select(): %v",
+			err,
+		)
 		return users, err
 	}
 
@@ -43,6 +48,10 @@ func (r *repository) GetByInterval(interval int) ([]int64, error) {
 	)
 
 	if err != nil {
+		logger.Log.Errorf(
+			"repository.user_repository_v1.repository.GetByInterval() - r.db.Query(): %v",
+			err,
+		)
 		return users, err
 	}
 
@@ -55,6 +64,10 @@ func (r *repository) GetByInterval(interval int) ([]int64, error) {
 	}
 
 	if err := rows.Err(); err != nil {
+		logger.Log.Errorf(
+			"repository.user_repository_v1.repository.GetByInterval() - rows.Err(): %v",
+			err,
+		)
 		return users, err
 	}
 
@@ -68,6 +81,11 @@ func (r *repository) GetByChatId(chatId int) (*entity.User, error) {
 		ToSql()
 
 	if err != nil {
+		logger.Log.Errorf(
+			"repository.user_repository_v1.repository.GetByChatId() - r.sb.Select(): %v. ChatId: %d",
+			err,
+			chatId,
+		)
 		return nil, err
 	}
 
@@ -77,6 +95,11 @@ func (r *repository) GetByChatId(chatId int) (*entity.User, error) {
 		args...,
 	)
 	if err != nil {
+		logger.Log.Errorf(
+			"repository.user_repository_v1.repository.GetByChatId() - r.db.Query(): %v. ChatId: %d",
+			err,
+			chatId,
+		)
 		return nil, err
 	}
 
@@ -89,6 +112,11 @@ func (r *repository) GetByChatId(chatId int) (*entity.User, error) {
 	}
 
 	if err := rows.Err(); err != nil {
+		logger.Log.Errorf(
+			"repository.user_repository_v1.repository.GetByChatId() - rows.Err(): %v. ChatId: %d",
+			err,
+			chatId,
+		)
 		return nil, err
 	}
 
@@ -112,6 +140,11 @@ func (r *repository) Create(in entity.User) (*entity.User, error) {
 		ToSql()
 
 	if err != nil {
+		logger.Log.Errorf(
+			"repository.user_repository_v1.repository.Create() - r.sb.Insert(): %v. User: %#+v",
+			err,
+			in,
+		)
 		return nil, err
 	}
 
@@ -122,6 +155,11 @@ func (r *repository) Create(in entity.User) (*entity.User, error) {
 	)
 
 	if err := row.Scan(&in.ID); err != nil {
+		logger.Log.Errorf(
+			"repository.user_repository_v1.repository.Create() - row.Scan(): %v. User: %#+v",
+			err,
+			in,
+		)
 		return nil, err
 	}
 
@@ -148,6 +186,11 @@ func (r *repository) Update(in entity.User) (*entity.User, error) {
 	sql, args, err := query.ToSql()
 
 	if err != nil {
+		logger.Log.Errorf(
+			"repository.user_repository_v1.repository.Update() - query.ToSql(): %v. User: %#+v",
+			err,
+			in,
+		)
 		return nil, err
 	}
 
@@ -158,10 +201,20 @@ func (r *repository) Update(in entity.User) (*entity.User, error) {
 	)
 
 	if err != nil {
+		logger.Log.Errorf(
+			"repository.user_repository_v1.repository.Update() - r.db.Exec(): %v. User: %#+v",
+			err,
+			in,
+		)
 		return nil, err
 	}
 
 	if commandTag.RowsAffected() != 1 {
+		logger.Log.Errorf(
+			"repository.user_repository_v1.repository.Update() - r.db.Exec(): %v. User: %#+v",
+			"update user: no affected rows",
+			in,
+		)
 		return nil, errors.New("update user: no affected rows")
 	}
 

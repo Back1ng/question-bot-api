@@ -8,6 +8,7 @@ import (
 	"github.com/jackc/pgx/v5"
 	irepository "gitlab.com/back1ng1/question-bot-api/app/repository"
 	"gitlab.com/back1ng1/question-bot-api/entity"
+	"gitlab.com/back1ng1/question-bot-api/pkg/logger"
 )
 
 type repository struct {
@@ -30,6 +31,10 @@ func (r *repository) GetAll() ([]*entity.Preset, error) {
 		ToSql()
 
 	if err != nil {
+		logger.Log.Errorf(
+			"repository.preset_repository_v1.repository.GetAll() - r.sb.Select(): %v",
+			err,
+		)
 		return nil, err
 	}
 
@@ -39,6 +44,10 @@ func (r *repository) GetAll() ([]*entity.Preset, error) {
 	)
 
 	if err != nil {
+		logger.Log.Errorf(
+			"repository.preset_repository_v1.repository.GetAll() - r.db.Query(): %v",
+			err,
+		)
 		return nil, err
 	}
 
@@ -51,6 +60,10 @@ func (r *repository) GetAll() ([]*entity.Preset, error) {
 	}
 
 	if err := rows.Err(); err != nil {
+		logger.Log.Errorf(
+			"repository.preset_repository_v1.repository.GetAll() - rows.Err(): %v",
+			err,
+		)
 		return nil, err
 	}
 
@@ -65,6 +78,11 @@ func (r *repository) Create(in entity.Preset) (*entity.Preset, error) {
 		ToSql()
 
 	if err != nil {
+		logger.Log.Errorf(
+			"repository.preset_repository_v1.repository.Create() - r.sb.Insert(): %v. Preset: %#+v",
+			err,
+			in,
+		)
 		return nil, err
 	}
 
@@ -76,6 +94,11 @@ func (r *repository) Create(in entity.Preset) (*entity.Preset, error) {
 
 	var preset entity.Preset
 	if err := row.Scan(&preset.ID, &preset.Title); err != nil {
+		logger.Log.Errorf(
+			"repository.preset_repository_v1.repository.Create() - row.Scan(): %v. Preset: %#+v",
+			err,
+			in,
+		)
 		return nil, err
 	}
 
@@ -92,6 +115,11 @@ func (r *repository) Update(in entity.Preset) (*entity.Preset, error) {
 		ToSql()
 
 	if err != nil {
+		logger.Log.Errorf(
+			"repository.preset_repository_v1.repository.Update() - r.sb.Update(): %v. Preset: %#+v",
+			err,
+			in,
+		)
 		return nil, err
 	}
 
@@ -102,10 +130,20 @@ func (r *repository) Update(in entity.Preset) (*entity.Preset, error) {
 	)
 
 	if err != nil {
+		logger.Log.Errorf(
+			"repository.preset_repository_v1.repository.Update() - r.db.Exec(): %v. Preset: %#+v",
+			err,
+			in,
+		)
 		return nil, err
 	}
 
 	if commandTag.RowsAffected() != 1 {
+		logger.Log.Errorf(
+			"repository.preset_repository_v1.repository.Update() - commandTag.RowsAffected(): %v. Preset: %#+v",
+			"update preset: no afftected rows",
+			in,
+		)
 		return nil, errors.New("update preset: no afftected rows")
 	}
 
@@ -118,6 +156,11 @@ func (r *repository) Delete(id int64) error {
 		ToSql()
 
 	if err != nil {
+		logger.Log.Errorf(
+			"repository.preset_repository_v1.repository.Delete() - r.sb.Delete(): %v. Id: %d",
+			err,
+			id,
+		)
 		return err
 	}
 
@@ -128,10 +171,20 @@ func (r *repository) Delete(id int64) error {
 	)
 
 	if err != nil {
+		logger.Log.Errorf(
+			"repository.preset_repository_v1.repository.Delete() - r.db.Exec(): %v. Id: %d",
+			err,
+			id,
+		)
 		return err
 	}
 
 	if commandTag.RowsAffected() != 1 {
+		logger.Log.Errorf(
+			"repository.preset_repository_v1.repository.Delete() - r.sb.Delete(): %v. Id: %d",
+			"delete preset: no affected rows",
+			id,
+		)
 		return errors.New("delete preset: no affected rows")
 	}
 

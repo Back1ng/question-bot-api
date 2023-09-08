@@ -3,9 +3,11 @@ package tokens_repository_v1
 import (
 	"context"
 	"errors"
+
 	"github.com/Masterminds/squirrel"
 	"github.com/jackc/pgx/v5"
 	irepository "gitlab.com/back1ng1/question-bot-api/app/repository"
+	"gitlab.com/back1ng1/question-bot-api/pkg/logger"
 	"gitlab.com/back1ng1/question-bot-api/pkg/tgauth"
 )
 
@@ -28,6 +30,10 @@ func (r *repository) Get(hash string) (*tgauth.Auth, error) {
 		ToSql()
 
 	if err != nil {
+		logger.Log.Errorf(
+			"repository.tokens_repository_v1.repository.Get() - r.sb.Select(): %v",
+			err,
+		)
 		return nil, err
 	}
 
@@ -37,6 +43,10 @@ func (r *repository) Get(hash string) (*tgauth.Auth, error) {
 		args...,
 	)
 	if err != nil {
+		logger.Log.Errorf(
+			"repository.tokens_repository_v1.repository.Get() - r.db.Query(): %v",
+			err,
+		)
 		return nil, err
 	}
 
@@ -46,6 +56,10 @@ func (r *repository) Get(hash string) (*tgauth.Auth, error) {
 		var auth tgauth.Auth
 
 		if err := rows.Scan(&auth.AuthDate, &auth.Hash); err != nil {
+			logger.Log.Errorf(
+				"repository.tokens_repository_v1.repository.Get() - rows.Scan(): %v",
+				err,
+			)
 			return nil, err
 		}
 
@@ -61,6 +75,11 @@ func (r *repository) Create(auth tgauth.Auth) (*tgauth.Auth, error) {
 		Values(auth.AuthDate, auth.FirstName, auth.Hash, auth.Id, auth.Username).ToSql()
 
 	if err != nil {
+		logger.Log.Errorf(
+			"repository.tokens_repository_v1.repository.Create() - r.sb.Insert(): %v. auth: %#+v",
+			err,
+			auth,
+		)
 		return nil, err
 	}
 
@@ -71,10 +90,20 @@ func (r *repository) Create(auth tgauth.Auth) (*tgauth.Auth, error) {
 	)
 
 	if err != nil {
+		logger.Log.Errorf(
+			"repository.tokens_repository_v1.repository.Create() - r.db.Exec(): %v. auth: %#+v",
+			err,
+			auth,
+		)
 		return nil, err
 	}
 
 	if commandTag.RowsAffected() != 1 {
+		logger.Log.Errorf(
+			"repository.tokens_repository_v1.repository.Create() - commandTag.RowsAfftected(): %v. auth: %#+v",
+			"no rows affected at authRepository.Create()",
+			auth,
+		)
 		return nil, errors.New("no rows affected at authRepository.Create()")
 	}
 
@@ -88,6 +117,11 @@ func (r *repository) DeleteExcept(auth tgauth.Auth) error {
 		ToSql()
 
 	if err != nil {
+		logger.Log.Errorf(
+			"repository.tokens_repository_v1.repository.DeleteExcept() - r.sb.Delete(): %v. auth: %#+v",
+			err,
+			auth,
+		)
 		return err
 	}
 
@@ -98,6 +132,11 @@ func (r *repository) DeleteExcept(auth tgauth.Auth) error {
 	)
 
 	if err != nil {
+		logger.Log.Errorf(
+			"repository.tokens_repository_v1.repository.DeleteExcept() - r.db.Exec(): %v. auth: %#+v",
+			err,
+			auth,
+		)
 		return err
 	}
 
