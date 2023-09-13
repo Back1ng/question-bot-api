@@ -5,21 +5,19 @@ import (
 	"fmt"
 	"os"
 
-	"gitlab.com/back1ng1/question-bot-api/app/usecase/auth_usecase"
-	"gitlab.com/back1ng1/question-bot-api/handler/auth_handler"
-	"gitlab.com/back1ng1/question-bot-api/repository/tokens_repository_v1"
-
 	"github.com/Masterminds/squirrel"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	fiber_logger "github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/jackc/pgx/v5"
 	"github.com/joho/godotenv"
+	"gitlab.com/back1ng1/question-bot-api/app/usecase/auth_usecase"
 	crud_answers "gitlab.com/back1ng1/question-bot-api/app/usecase/crud_answer"
 	"gitlab.com/back1ng1/question-bot-api/app/usecase/crud_presets"
 	"gitlab.com/back1ng1/question-bot-api/app/usecase/crud_question"
 	"gitlab.com/back1ng1/question-bot-api/app/usecase/crud_user"
 	"gitlab.com/back1ng1/question-bot-api/handler/answer_handler"
+	"gitlab.com/back1ng1/question-bot-api/handler/auth_handler"
 	"gitlab.com/back1ng1/question-bot-api/handler/preset_handler"
 	"gitlab.com/back1ng1/question-bot-api/handler/question_handler"
 	"gitlab.com/back1ng1/question-bot-api/handler/user_handler"
@@ -28,6 +26,7 @@ import (
 	"gitlab.com/back1ng1/question-bot-api/repository/answer_repository_v1"
 	"gitlab.com/back1ng1/question-bot-api/repository/preset_repository_v1"
 	"gitlab.com/back1ng1/question-bot-api/repository/question_repository_v1"
+	"gitlab.com/back1ng1/question-bot-api/repository/tokens_repository_v1"
 	"gitlab.com/back1ng1/question-bot-api/repository/user_repository_v1"
 )
 

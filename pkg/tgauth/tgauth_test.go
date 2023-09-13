@@ -4,9 +4,8 @@ import (
 	"os"
 	"testing"
 
-	"gitlab.com/back1ng1/question-bot-api/pkg/tgauth"
-
 	"github.com/stretchr/testify/assert"
+	"gitlab.com/back1ng1/question-bot-api/pkg/tgauth"
 )
 
 const (
