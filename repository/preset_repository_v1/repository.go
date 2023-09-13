@@ -29,7 +29,6 @@ func (r *repository) GetAll() ([]*entity.Preset, error) {
 	sql, _, err := r.sb.Select("id", "title").
 		From("presets").
 		ToSql()
-
 	if err != nil {
 		logger.Log.Errorf(
 			"repository.preset_repository_v1.repository.GetAll() - r.sb.Select(): %v",
@@ -42,7 +41,6 @@ func (r *repository) GetAll() ([]*entity.Preset, error) {
 		context.Background(),
 		sql,
 	)
-
 	if err != nil {
 		logger.Log.Errorf(
 			"repository.preset_repository_v1.repository.GetAll() - r.db.Query(): %v",
@@ -76,7 +74,6 @@ func (r *repository) Create(in entity.Preset) (*entity.Preset, error) {
 		Values(in.Title).
 		Suffix("RETURNING id, title").
 		ToSql()
-
 	if err != nil {
 		logger.Log.Errorf(
 			"repository.preset_repository_v1.repository.Create() - r.sb.Insert(): %v. Preset: %#+v",
@@ -113,7 +110,6 @@ func (r *repository) Update(in entity.Preset) (*entity.Preset, error) {
 	sql, args, err := r.sb.Update("presets").
 		Set("title", in.Title).Where("id = ?", in.ID).
 		ToSql()
-
 	if err != nil {
 		logger.Log.Errorf(
 			"repository.preset_repository_v1.repository.Update() - r.sb.Update(): %v. Preset: %#+v",
@@ -128,7 +124,6 @@ func (r *repository) Update(in entity.Preset) (*entity.Preset, error) {
 		sql,
 		args...,
 	)
-
 	if err != nil {
 		logger.Log.Errorf(
 			"repository.preset_repository_v1.repository.Update() - r.db.Exec(): %v. Preset: %#+v",
@@ -154,7 +149,6 @@ func (r *repository) Delete(id int64) error {
 	sql, args, err := r.sb.Delete("presets").
 		Where("id = ?", id).
 		ToSql()
-
 	if err != nil {
 		logger.Log.Errorf(
 			"repository.preset_repository_v1.repository.Delete() - r.sb.Delete(): %v. Id: %d",
@@ -169,7 +163,6 @@ func (r *repository) Delete(id int64) error {
 		sql,
 		args...,
 	)
-
 	if err != nil {
 		logger.Log.Errorf(
 			"repository.preset_repository_v1.repository.Delete() - r.db.Exec(): %v. Id: %d",

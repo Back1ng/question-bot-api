@@ -16,7 +16,6 @@ func NewUseCase(presetRepo repository.PresetRepository) UseCase {
 
 func (uc *usecase) GetAll() ([]*entity.Preset, error) {
 	out, err := uc.presetRepo.GetAll()
-
 	if err != nil {
 		logger.Log.Errorf(
 			"app.usecase.crud_presets.implement.GetAll() - uc.presetRepo.GetAll(): %v",
@@ -31,7 +30,6 @@ func (uc *usecase) GetAll() ([]*entity.Preset, error) {
 
 func (uc *usecase) Create(in entity.Preset) (*entity.Preset, error) {
 	out, err := uc.presetRepo.Create(in)
-
 	if err != nil {
 		logger.Log.Errorf(
 			"app.usecase.crud_presets.implement.Create() - uc.presetRepo.Create(in): %v. Preset: %#+v",
@@ -47,7 +45,6 @@ func (uc *usecase) Create(in entity.Preset) (*entity.Preset, error) {
 
 func (uc *usecase) Update(in entity.Preset) (*entity.Preset, error) {
 	out, err := uc.presetRepo.Update(in)
-
 	if err != nil {
 		logger.Log.Errorf(
 			"app.usecase.crud_presets.implement.Update() - uc.presetRepo.Update(in): %v. Preset: %#+v",
@@ -63,7 +60,6 @@ func (uc *usecase) Update(in entity.Preset) (*entity.Preset, error) {
 
 func (uc *usecase) Delete(id int64) error {
 	err := uc.presetRepo.Delete(id)
-
 	if err != nil {
 		logger.Log.Errorf(
 			"app.usecase.crud_presets.implement.Delete() - uc.presetRepo.Delete(id): %v. id: %d",

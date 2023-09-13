@@ -45,7 +45,6 @@ func (h *restHandler) CreateAnswer(c *fiber.Ctx) error {
 	}
 
 	out, err := h.crudAnswerUc.Create(answer)
-
 	if err != nil {
 		return err
 	}

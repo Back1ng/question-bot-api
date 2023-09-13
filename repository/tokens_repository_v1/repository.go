@@ -28,7 +28,6 @@ func (r *repository) Get(hash string) (*tgauth.Auth, error) {
 		From("tokens").
 		Where("hash = ?", hash).
 		ToSql()
-
 	if err != nil {
 		logger.Log.Errorf(
 			"repository.tokens_repository_v1.repository.Get() - r.sb.Select(): %v",
@@ -73,7 +72,6 @@ func (r *repository) Create(auth tgauth.Auth) (*tgauth.Auth, error) {
 	sql, args, err := r.sb.Insert("tokens").
 		Columns("auth_date", "first_name", "hash", "user_id", "username").
 		Values(auth.AuthDate, auth.FirstName, auth.Hash, auth.Id, auth.Username).ToSql()
-
 	if err != nil {
 		logger.Log.Errorf(
 			"repository.tokens_repository_v1.repository.Create() - r.sb.Insert(): %v. auth: %#+v",
@@ -88,7 +86,6 @@ func (r *repository) Create(auth tgauth.Auth) (*tgauth.Auth, error) {
 		sql,
 		args...,
 	)
-
 	if err != nil {
 		logger.Log.Errorf(
 			"repository.tokens_repository_v1.repository.Create() - r.db.Exec(): %v. auth: %#+v",
@@ -115,7 +112,6 @@ func (r *repository) DeleteExcept(auth tgauth.Auth) error {
 		Where("hash != ?", auth.Hash).
 		Where("user_id = ?", auth.Id).
 		ToSql()
-
 	if err != nil {
 		logger.Log.Errorf(
 			"repository.tokens_repository_v1.repository.DeleteExcept() - r.sb.Delete(): %v. auth: %#+v",

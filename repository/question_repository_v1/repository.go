@@ -30,7 +30,6 @@ func (r *repository) GetByPreset(presetId int) ([]*entity.Question, error) {
 		From("questions").
 		Where("preset_id = ?", presetId).
 		ToSql()
-
 	if err != nil {
 		logger.Log.Errorf(
 			"repository.question_repository_v1.repository.GetByPreset() - r.sb.Select(): %v. presetId: %d",
@@ -45,7 +44,6 @@ func (r *repository) GetByPreset(presetId int) ([]*entity.Question, error) {
 		sql,
 		args...,
 	)
-
 	if err != nil {
 		logger.Log.Errorf(
 			"repository.question_repository_v1.repository.GetByPreset() - r.db.Query(): %v. presetId: %d",
@@ -82,7 +80,6 @@ func (r *repository) Create(in entity.Question) (*entity.Question, error) {
 		Values(in.PresetId, in.Title).
 		Suffix("RETURNING id, preset_id, title").
 		ToSql()
-
 	if err != nil {
 		logger.Log.Errorf(
 			"repository.question_repository_v1.repository.Create() - r.sb.Insert(): %v. question: %#+v",
@@ -110,7 +107,6 @@ func (r *repository) Create(in entity.Question) (*entity.Question, error) {
 	}
 
 	return &question, nil
-
 }
 
 func (r *repository) Update(in entity.Question) (*entity.Question, error) {
@@ -122,7 +118,6 @@ func (r *repository) Update(in entity.Question) (*entity.Question, error) {
 		Set("title", in.Title).
 		Where("id = ?", in.ID).
 		ToSql()
-
 	if err != nil {
 		logger.Log.Errorf(
 			"repository.question_repository_v1.repository.Update() - r.sb.Update(): %v. question: %#+v",
@@ -156,14 +151,12 @@ func (r *repository) Update(in entity.Question) (*entity.Question, error) {
 	}
 
 	return &in, nil
-
 }
 
 func (r *repository) Delete(id int) error {
 	sql, args, err := r.sb.Delete("questions").
 		Where("id = ?", id).
 		ToSql()
-
 	if err != nil {
 		logger.Log.Errorf(
 			"repository.question_repository_v1.repository.Delete() - r.sb.Delete(): %v. id: %d",
@@ -178,7 +171,6 @@ func (r *repository) Delete(id int) error {
 		sql,
 		args...,
 	)
-
 	if err != nil {
 		logger.Log.Errorf(
 			"repository.question_repository_v1.repository.Delete() - r.db.Exec(): %v. id: %d",

@@ -18,7 +18,6 @@ func NewUseCase(userRepo repository.UserRepository) UseCase {
 
 func (uc *usecase) GetByInterval(interval int) ([]int64, error) {
 	users, err := uc.userRepo.GetByInterval(interval)
-
 	if err != nil {
 		logger.Log.Errorf(
 			"app.usecase.crud_user.implement.GetByInterval() - uc.userRepo.GetByInterval(interval): %v. interval: %d",
@@ -34,7 +33,6 @@ func (uc *usecase) GetByInterval(interval int) ([]int64, error) {
 
 func (uc *usecase) GetByChatId(chatId int) (*entity.User, error) {
 	user, err := uc.userRepo.GetByChatId(chatId)
-
 	if err != nil {
 		logger.Log.Errorf(
 			"app.usecase.crud_user.implement.GetByChatId() - uc.userRepo.GetByChatId(chatId): %v. chatId: %d",
@@ -50,7 +48,6 @@ func (uc *usecase) GetByChatId(chatId int) (*entity.User, error) {
 
 func (uc *usecase) Create(in entity.User) (*entity.User, error) {
 	user, err := uc.userRepo.Create(in)
-
 	if err != nil {
 		logger.Log.Errorf(
 			"app.usecase.crud_user.implement.Create() - uc.userRepo.Create(in): %v. in: %#+v",
@@ -66,7 +63,6 @@ func (uc *usecase) Create(in entity.User) (*entity.User, error) {
 
 func (uc *usecase) Update(in entity.User) (*entity.User, error) {
 	user, err := uc.userRepo.Update(in)
-
 	if err != nil {
 		logger.Log.Errorf(
 			"app.usecase.crud_user.implement.Update() - uc.userRepo.Update(in): %v. in: %#+v",

@@ -76,7 +76,6 @@ func (h *handler) Create(c *fiber.Ctx) error {
 
 func (h *handler) Update(c *fiber.Ctx) error {
 	id, err := strconv.Atoi(c.Params("id"))
-
 	if err != nil {
 		return err
 	}

@@ -32,7 +32,6 @@ func (r *repository) GetByInterval(interval int) ([]int64, error) {
 		Where("interval = ?", interval).
 		Where("interval_enabled = ?", true).
 		ToSql()
-
 	if err != nil {
 		logger.Log.Errorf(
 			"repository.user_repository_v1.repository.GetByInterval() - r.sb.Select(): %v",
@@ -46,7 +45,6 @@ func (r *repository) GetByInterval(interval int) ([]int64, error) {
 		sql,
 		args...,
 	)
-
 	if err != nil {
 		logger.Log.Errorf(
 			"repository.user_repository_v1.repository.GetByInterval() - r.db.Query(): %v",
@@ -79,7 +77,6 @@ func (r *repository) GetByChatId(chatId int) (*entity.User, error) {
 		From("users").
 		Where("chat_id = ?", chatId).
 		ToSql()
-
 	if err != nil {
 		logger.Log.Errorf(
 			"repository.user_repository_v1.repository.GetByChatId() - r.sb.Select(): %v. ChatId: %d",
@@ -138,7 +135,6 @@ func (r *repository) Create(in entity.User) (*entity.User, error) {
 		Suffix("RETURNING id").
 		SetMap(toInsert).
 		ToSql()
-
 	if err != nil {
 		logger.Log.Errorf(
 			"repository.user_repository_v1.repository.Create() - r.sb.Insert(): %v. User: %#+v",
@@ -184,7 +180,6 @@ func (r *repository) Update(in entity.User) (*entity.User, error) {
 	}
 
 	sql, args, err := query.ToSql()
-
 	if err != nil {
 		logger.Log.Errorf(
 			"repository.user_repository_v1.repository.Update() - query.ToSql(): %v. User: %#+v",
@@ -199,7 +194,6 @@ func (r *repository) Update(in entity.User) (*entity.User, error) {
 		sql,
 		args...,
 	)
-
 	if err != nil {
 		logger.Log.Errorf(
 			"repository.user_repository_v1.repository.Update() - r.db.Exec(): %v. User: %#+v",

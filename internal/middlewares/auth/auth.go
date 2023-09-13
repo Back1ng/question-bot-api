@@ -2,9 +2,10 @@ package auth
 
 import (
 	"errors"
+	"strings"
+
 	"github.com/gofiber/fiber/v2"
 	"gitlab.com/back1ng1/question-bot-api/pkg/logger"
-	"strings"
 )
 
 var (

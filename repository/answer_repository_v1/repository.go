@@ -30,7 +30,6 @@ func (r *repository) Get(questionId int) ([]*entity.Answer, error) {
 		From("answers").
 		Where("question_id = ?", questionId).
 		ToSql()
-
 	if err != nil {
 		logger.Log.Errorf(
 			"repository.answer_repository_v1.repository.Get() - r.sb.Select(\"*\"): %v",
@@ -45,7 +44,6 @@ func (r *repository) Get(questionId int) ([]*entity.Answer, error) {
 		sql,
 		args...,
 	)
-
 	if err != nil {
 		logger.Log.Errorf(
 			"repository.answer_repository_v1.repository.Get() - r.db.Query(): %v. sql: %#+v. args: %#+v",
@@ -82,7 +80,6 @@ func (r *repository) Create(in entity.Answer) (*entity.Answer, error) {
 		Values(in.QuestionId, in.Title, in.IsCorrect).
 		Suffix("RETURNING id, is_correct").
 		ToSql()
-
 	if err != nil {
 		logger.Log.Errorf(
 			"repository.answer_repository_v1.repository.Create() - r.sb.Insert(\"answers\"): %v",
@@ -110,7 +107,6 @@ func (r *repository) Create(in entity.Answer) (*entity.Answer, error) {
 	}
 
 	return &in, nil
-
 }
 
 func (r *repository) Update(in entity.Answer) (*entity.Answer, error) {
@@ -129,7 +125,6 @@ func (r *repository) Update(in entity.Answer) (*entity.Answer, error) {
 		Set("is_correct", in.IsCorrect).
 		Where("id = ?", in.ID).
 		ToSql()
-
 	if err != nil {
 		logger.Log.Errorf(
 			"repository.answer_repository_v1.repository.Update() - r.sb.Update(\"answers\"): %v",
@@ -144,7 +139,6 @@ func (r *repository) Update(in entity.Answer) (*entity.Answer, error) {
 		sql,
 		args...,
 	)
-
 	if err != nil {
 		logger.Log.Errorf(
 			"repository.answer_repository_v1.repository.Update() - r.db.Exec(): %v. sql: %#+v. args: %#+v",
@@ -182,7 +176,6 @@ func (r *repository) Delete(id int) error {
 
 	sql, args, err := r.sb.Delete("answers").
 		Where("id = ?", id).ToSql()
-
 	if err != nil {
 		logger.Log.Errorf(
 			"repository.answer_repository_v1.repository.Delete() - r.sb.Delete(\"answers\"): %v",
@@ -197,7 +190,6 @@ func (r *repository) Delete(id int) error {
 		sql,
 		args...,
 	)
-
 	if err != nil {
 		logger.Log.Errorf(
 			"repository.answer_repository_v1.repository.Delete() - r.db.Exec(): %v. sql: %#+v, args %#+v",
