@@ -11,6 +11,8 @@ services:
     image: postgres:14.2-alpine
     restart: always
     command: ["postgres", "-p", "${DB_PORT}"]
+    ports: 
+        - 127.0.0.1:${DB_PORT}:${DB_PORT}
     networks:
         - bot
     environment:
