@@ -16,7 +16,7 @@ services:
       - POSTGRESQL_URL=postgresql://${DB_USERNAME}:${DB_PASSWORD}@db:${DB_PORT}/${DB_DATABASE}?sslmode=disable
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
     volumes:
       - ./:/usr/src/app
     networks:

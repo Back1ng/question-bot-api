@@ -3,13 +3,14 @@ package app
 import (
 	"context"
 	"fmt"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"gitlab.com/back1ng1/question-bot-api/internal/middlewares/auth"
 	"os"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	fiber_logger "github.com/gofiber/fiber/v2/middleware/logger"
-	"github.com/jackc/pgx/v5"
 	"github.com/joho/godotenv"
 	"gitlab.com/back1ng1/question-bot-api/app/usecase/auth_usecase"
 	crud_answers "gitlab.com/back1ng1/question-bot-api/app/usecase/crud_answer"
@@ -21,7 +22,6 @@ import (
 	"gitlab.com/back1ng1/question-bot-api/handler/preset_handler"
 	"gitlab.com/back1ng1/question-bot-api/handler/question_handler"
 	"gitlab.com/back1ng1/question-bot-api/handler/user_handler"
-	"gitlab.com/back1ng1/question-bot-api/internal/middlewares/auth"
 	"gitlab.com/back1ng1/question-bot-api/pkg/logger"
 	"gitlab.com/back1ng1/question-bot-api/repository/answer_repository_v1"
 	"gitlab.com/back1ng1/question-bot-api/repository/preset_repository_v1"
@@ -39,12 +39,14 @@ func Run() {
 
 	fmt.Println("Initializing postgres connection...")
 	sb := squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
-	conn, err := pgx.Connect(context.Background(), os.Getenv("PGBOUNCER_URL"))
+
+	conn, err := pgxpool.New(context.Background(), os.Getenv("PGBOUNCER_URL"))
+
 	if err != nil {
 		logger.Log.Errorf("app.Run - pgx.Connect: %v", err)
 		os.Exit(1)
 	}
-	defer conn.Close(context.Background())
+	defer conn.Close()
 
 	fmt.Println("Initializing api...")
 

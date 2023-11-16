@@ -3,20 +3,20 @@ package question_repository_v1
 import (
 	"context"
 	"errors"
+	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/jackc/pgx/v5"
 	irepository "gitlab.com/back1ng1/question-bot-api/app/repository"
 	"gitlab.com/back1ng1/question-bot-api/entity"
 	"gitlab.com/back1ng1/question-bot-api/pkg/logger"
 )
 
 type repository struct {
-	db *pgx.Conn
+	db *pgxpool.Pool
 	sb squirrel.StatementBuilderType
 }
 
-func NewRepository(db *pgx.Conn, sb squirrel.StatementBuilderType) irepository.QuestionRepository {
+func NewRepository(db *pgxpool.Pool, sb squirrel.StatementBuilderType) irepository.QuestionRepository {
 	return &repository{
 		db: db,
 		sb: sb,
