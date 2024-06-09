@@ -3,8 +3,9 @@ package user_repository_v1
 import (
 	"context"
 	"errors"
-	"github.com/jackc/pgx/v5/pgxpool"
 	"reflect"
+
+	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/Masterminds/squirrel"
 	irepository "gitlab.com/back1ng1/question-bot-api/app/repository"
@@ -168,7 +169,7 @@ func (r *repository) Update(in entity.User) (*entity.User, error) {
 
 	i := reflect.ValueOf(in.IntervalEnabled)
 	if !i.IsZero() {
-		query.Set("interval_enabled", in.IntervalEnabled)
+		query = query.Set("interval_enabled", in.IntervalEnabled)
 	}
 
 	if in.Interval > 0 && in.Interval < 25 {
